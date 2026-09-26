@@ -1,0 +1,16 @@
+# Local Unity/build artifacts. Already tracked files remain tracked.
+/Library/
+/Temp/
+/Obj/
+/Logs/
+/UserSettings/
+/Builds/
+/.vs/
+/*.csproj
+/*.sln
+
+# Local configuration and credentials.
+/.env
+/.secrets/
+*.ulf
+*.alf
