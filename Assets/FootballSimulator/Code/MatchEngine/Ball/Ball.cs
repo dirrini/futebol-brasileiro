@@ -41,7 +41,13 @@ namespace FStudio.MatchEngine.Balls {
         public Transform ballAssetPoint;
 
         [SerializeField] private Transform ballShadow;
-        [SerializeField] private Material shadowMaterial;
+        // Preserve the legacy prefab reference; author the material on the shadow renderer.
+        [SerializeField, HideInInspector] private Material shadowMaterial;
+        [SerializeField, Min(0f), Tooltip("Shadow power is Max(0, this value - ball height).")]
+        private float shadowFadeHeight = 0.6f;
+
+        private Renderer ballShadowRenderer;
+        private MaterialPropertyBlock ballShadowProperties;
 
         private float nextCollision;
 
@@ -160,12 +166,28 @@ namespace FStudio.MatchEngine.Balls {
 
             rigidbody.velocity = ballVel;
 
-            ballShadow.position = ballPos;
-            // ball shadow power.
-            float height = ballPos.y;
-            ballPos.y = 0;
-            float heightPow = Mathf.Max (0, 0.6f - height);
-            shadowMaterial.SetFloat(BALL_SHADOW_POWER, heightPow);
+            if (ballShadow != null) {
+                ballShadow.position = ballPos;
+                UpdateShadowPower(ballPos.y);
+            }
+        }
+
+        private void UpdateShadowPower(float height) {
+            if (ballShadowRenderer == null || ballShadowRenderer.transform != ballShadow) {
+                ballShadowRenderer = ballShadow.GetComponent<Renderer>();
+            }
+            if (ballShadowRenderer == null) {
+                return;
+            }
+            if (ballShadowProperties == null) {
+                ballShadowProperties = new MaterialPropertyBlock();
+            }
+
+            // Preserve other renderer overrides without changing the material asset,
+            // including while this component previews the shadow in Edit Mode.
+            ballShadowRenderer.GetPropertyBlock(ballShadowProperties);
+            ballShadowProperties.SetFloat(BALL_SHADOW_POWER, Mathf.Max(0, shadowFadeHeight - height));
+            ballShadowRenderer.SetPropertyBlock(ballShadowProperties);
         }
 
         /// <summary>
