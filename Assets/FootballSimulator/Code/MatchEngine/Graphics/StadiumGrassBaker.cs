@@ -1,6 +1,7 @@
 ﻿
 
 using System.Threading.Tasks;
+using FStudio.Utilities;
 using UnityEngine;
 
 namespace FStudio.MatchEngine.Graphics {
@@ -13,11 +14,11 @@ namespace FStudio.MatchEngine.Graphics {
         [SerializeField] private int textureQuality = 2;
 
         private async void Start () {
-            await Task.Delay(100); // wait a bit
+            await UnityAsync.Delay(100); // wait a bit
 
             ScreenCapture.CaptureScreenshot($"{savePath}screen.png", textureQuality);
 
-            await Task.Delay(100); // wait a bit
+            await UnityAsync.Delay(100); // wait a bit
         }
     }
 }

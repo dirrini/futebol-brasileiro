@@ -66,6 +66,13 @@ namespace FStudio.MatchEngine {
 
         private void OnDisable() {
             EventManager.UnSubscribe<PlayerControlBallEvent>(OnBallHold);
+            ClearAllInputListeners();
+        }
+
+        private void LateUpdate() {
+            foreach (var listener in inputListeners) {
+                listener?.UpdateShotCharge();
+            }
         }
 
         private void OnBallHold(PlayerControlBallEvent _) {

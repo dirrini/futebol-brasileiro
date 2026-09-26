@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using System.Threading.Tasks;
+using FStudio.Loaders;
 using UnityEngine.AddressableAssets;
 
 namespace FStudio.MatchEngine.Graphics {
@@ -10,7 +11,7 @@ namespace FStudio.MatchEngine.Graphics {
         public async Task<Material> GetRefereeMaterial () {
             var loadSkin = Addressables.LoadAssetAsync<Material>(RefereeMaterial);
 
-            await loadSkin.Task;
+            await loadSkin.AwaitResult();
 
             return loadSkin.Result;
         }

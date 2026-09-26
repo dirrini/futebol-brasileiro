@@ -1,6 +1,8 @@
 ﻿using FStudio.Data;
 using FStudio.UI.Graphics;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace FStudio.Database {

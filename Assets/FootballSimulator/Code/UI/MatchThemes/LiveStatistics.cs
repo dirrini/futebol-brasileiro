@@ -129,7 +129,7 @@ namespace FStudio.UI.MatchThemes {
         protected override async void OnAppeared() {
             base.OnAppeared();
 
-            await Task.Delay (Mathf.RoundToInt (statisticsLifeTime * 1000));
+            await UnityAsync.Delay (Mathf.RoundToInt (statisticsLifeTime * 1000));
 
             Disappear();
         }

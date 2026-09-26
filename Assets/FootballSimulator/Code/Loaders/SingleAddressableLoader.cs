@@ -32,7 +32,7 @@ namespace FStudio.Loaders {
             }
 
             operation = prefab.InstantiateAsync();
-            this.currentInstantiatedTheme = await operation.Task;
+            this.currentInstantiatedTheme = await operation.AwaitResult();
         }
     }
 }

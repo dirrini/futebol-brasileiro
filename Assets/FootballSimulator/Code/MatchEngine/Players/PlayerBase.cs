@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using FStudio.MatchEngine.Players.Behaviours;
 using System.Threading.Tasks;
 using FStudio.MatchEngine.Utilities;
+using FStudio.Utilities;
 using FStudio.Events;
 using FStudio.MatchEngine.Events;
 
@@ -1136,7 +1137,7 @@ namespace FStudio.MatchEngine.Players {
 
             PlayerController.IsPhysicsEnabled = false;
 
-            await Task.Delay(mili);
+            await UnityAsync.Delay(mili);
 
             try {
                 PlayerController.IsPhysicsEnabled = true;

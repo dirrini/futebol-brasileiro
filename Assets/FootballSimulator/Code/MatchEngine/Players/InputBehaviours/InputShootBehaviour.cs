@@ -8,9 +8,16 @@ namespace FStudio.MatchEngine.Players.Behaviours {
         private (Transform point, float angleFree) shootingTarget;
 
         private Vector3 shootingDir;
+        private float shotPower = 1f;
 
         public bool IsTriggered { private get; set; }
         public Vector3 InputDirection { set; private get; }
+
+        public void SetCharge(float normalizedCharge) {
+            // A tap still kicks the ball; a full charge preserves the original maximum.
+            shotPower = Mathf.Lerp(0.35f, 1f, Mathf.Clamp01(normalizedCharge));
+            shootingTarget = default;
+        }
 
         public override bool Behave(bool isAlreadyActive) {
             if (!IsTriggered && !isAlreadyActive) {
@@ -19,21 +26,25 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
             if (!Player.isInputControlled) {
                 IsTriggered = false;
+                shootingTarget = default;
                 return false;
             }
 
             if (Player.IsThrowHolder) {
                 IsTriggered = false;
+                shootingTarget = default;
                 return false;
             }
 
             if (Player.IsCornerHolder) {
                 IsTriggered = false;
+                shootingTarget = default;
                 return false;
             }
 
             if (ball.HolderPlayer != Player) {
                 IsTriggered = false;
+                shootingTarget = default;
                 return false;
             }
 
@@ -63,7 +74,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
                     var target = targetGoalNet.
                         GetShootingVectorFromPoint(Player, shootingTarget.point) * shootPowerByAngleFree;
 
-                    Player.Shoot(target);
+                    Player.Shoot(target * shotPower);
 
                     shootingTarget = default;
                 }

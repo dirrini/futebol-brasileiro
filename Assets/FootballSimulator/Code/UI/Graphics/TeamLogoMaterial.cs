@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 using FStudio.Scriptables;
 using FStudio.Database;
+using FStudio.Loaders;
 
 namespace FStudio.UI.Graphics {
     public class TeamLogoMaterial : SerializedSingletonScriptable<TeamLogoMaterial> {
@@ -32,7 +33,7 @@ namespace FStudio.UI.Graphics {
         public async Task<Material> GetScoreboardMaterial(Color color1, Color color2) {
             var board = Addressables.LoadAssetAsync<Material>(ScoreboardMaterial);
 
-            await board.Task;
+            await board.AwaitResult();
 
             var colored = new Material(board.Result);
             colored.SetColor(MASK_COLOR_1, color1);

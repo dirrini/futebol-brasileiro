@@ -133,7 +133,7 @@ namespace FStudio.MatchEngine.Balls {
 
         private async void OnGoal (GoalEvent goal) {
             isOnGoal = true;
-            await Task.Delay((int) (250 / Time.timeScale));
+            await UnityAsync.Delay((int) (250 / Time.timeScale));
             isOnGoal = false;
         }
 

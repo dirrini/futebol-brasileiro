@@ -6,6 +6,7 @@ using FStudio.Events;
 using FStudio.MatchEngine.Events;
 using System.Threading.Tasks;
 using FStudio.MatchEngine.UI;
+using FStudio.Utilities;
 
 namespace FStudio.UI {
     public class FinalWhistlePanel : MonoBehaviour {
@@ -26,7 +27,7 @@ namespace FStudio.UI {
 
             // show statistics.
 
-            await Task.Delay(showStatisticsAfterSeconds);
+            await UnityAsync.Delay(showStatisticsAfterSeconds);
 
             // Show statistics.
             EventManager.Trigger(new MatchStatisticsEvent());

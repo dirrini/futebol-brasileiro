@@ -10,6 +10,7 @@ using FStudio.UI.Graphics;
 using UnityEngine.UI;
 using FStudio.UI.MatchThemes.MatchEvents;
 using FStudio.Database;
+using FStudio.Utilities;
 
 namespace FStudio.UI.MatchThemes {
     public class BigScorePanel : ScoreboardPanel {
@@ -30,7 +31,7 @@ namespace FStudio.UI.MatchThemes {
             var scorerPool = new StaticPool<ScoreboardScorerMember, PlayerEntry>(scorerElementAsset, scorerHolder);
 
             for (int i = 0; i < MAX_GOAL_PER_TEAM; i++) {
-                var asset = scorerElementAsset.InstantiateAsync(scorerHolder).Task;
+                var asset = scorerElementAsset.InstantiateAsync(scorerHolder).AwaitResult();
                 await asset;
 
                 asset.Result.SetActive(false); // hide.
@@ -129,7 +130,7 @@ namespace FStudio.UI.MatchThemes {
         private async void Kickoff (KickOffEvent eventObject) {
             Appear();
 
-            await Task.Delay(3000);
+            await UnityAsync.Delay(3000);
 
             Disappear();
         }
@@ -142,7 +143,7 @@ namespace FStudio.UI.MatchThemes {
                 async void enabler(StaticPool<ScoreboardScorerMember, PlayerEntry> pool) {
                     foreach (var e in pool.Members) {
                         if (e.IsActive) {
-                            await Task.Delay(200);
+                            await UnityAsync.Delay(200);
                             e.MarkAsActive();
                         }
                     }

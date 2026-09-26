@@ -108,7 +108,7 @@ namespace FStudio.Loaders {
                 var target = Get(willActivate);
 
                 if (target == null) {
-                    var asset = await assetReference.InstantiateAsync(parent).Task;
+                    var asset = await assetReference.InstantiateAsync(parent).AwaitResult();
                     target = asset.GetComponent<T>();
                     list.Add(target);
                 }

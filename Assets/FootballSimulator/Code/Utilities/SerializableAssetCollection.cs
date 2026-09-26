@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FStudio.Loaders;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -66,7 +67,7 @@ namespace FStudio.Utilities {
 
             for (int i=0, length = Entries.Length; i<length; i++) {
                 if (Entries[i].Id.Equals ( key )) {
-                    var item = await Addressables.LoadAssetAsync<Value>(Entries[i].Val).Task;
+                    var item = await Addressables.LoadAssetAsync<Value>(Entries[i].Val).AwaitResult();
                     return item;
                 }
             }
@@ -84,7 +85,7 @@ namespace FStudio.Utilities {
 
             for (int i = 0, length = Entries.Length; i < length; i++) {
                 if (Entries[i].Id.Equals(key)) {
-                    var item = await Entries[i].Val.InstantiateAsync (holder).Task;
+                    var item = await Entries[i].Val.InstantiateAsync (holder).AwaitResult();
                     return item;
                 }
             }

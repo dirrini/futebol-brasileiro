@@ -33,14 +33,16 @@ namespace AudioManager.Public {
 
             isLoading = true;
 
-            foreach (var audio in audioCollection.Buckets) {
-                await audio.Load();
+            try {
+                foreach (var audio in audioCollection.Buckets) {
+                    await audio.Load();
+                }
+
+                currentCollection = audioCollection;
+                isLoaded = true;
+            } finally {
+                isLoading = false;
             }
-
-            currentCollection = audioCollection;
-
-            isLoading = false;
-            isLoaded = true;
         }
 
         public void UnloadCollection () {

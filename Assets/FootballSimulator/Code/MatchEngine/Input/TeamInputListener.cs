@@ -15,6 +15,7 @@ using FStudio.MatchEngine.Events;
 using FStudio.MatchEngine.Tactics;
 using FStudio.MatchEngine.Cameras;
 using FStudio.MatchEngine.Players.PlayerController;
+using FStudio.MatchEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
 namespace FStudio.MatchEngine.Input {
@@ -28,9 +29,19 @@ namespace FStudio.MatchEngine.Input {
         }
 
         private const float MOVE_DEADZONE = 0.3f;
+        private const float SHOT_CHARGE_SECONDS = 0.5f;
+        private static readonly Vector3 shotBarWorldOffset = Vector3.up * 2.8f;
+
+        private readonly ShotPowerBar shotPowerBar;
+        private readonly InputAction shootAction;
+        private PlayerBase chargingPlayer;
+        private float shotChargeStartedAt;
 
         private PlayerBase m_ActivePlayer;
         public PlayerBase ActivePlayer { get => m_ActivePlayer; private set {
+                if (m_ActivePlayer != value) {
+                    CancelShotCharge();
+                }
                 Debug.Log("Assigned active player: " + value);
                 m_ActivePlayer = value;
             } }
@@ -56,6 +67,13 @@ namespace FStudio.MatchEngine.Input {
 
             inputPointer = Object.Instantiate(Resources.Load<Transform>("UI/InputPointer"));
             inputPointerFollower = inputPointer.GetChild(0);
+            shotPowerBar = new ShotPowerBar(inputPointer);
+            shootAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("Shoot");
+            if (shootAction != null) {
+                shootAction.canceled += OnShootCanceled;
+            }
+            EventManager.Subscribe<MatchPauseEvent>(OnMatchPause);
+            Application.focusChanged += OnFocusChanged;
 
             // create direction listener.
             RegisterAction("Move", MoveInput);
@@ -72,8 +90,17 @@ namespace FStudio.MatchEngine.Input {
             Debug.Log("Team Input Listener Created.");
         }
 
-        ~TeamInputListener () {
-            Clear();
+        public override void Clear() {
+            CancelShotCharge();
+            EventManager.UnSubscribe<MatchPauseEvent>(OnMatchPause);
+            Application.focusChanged -= OnFocusChanged;
+            if (shootAction != null) {
+                shootAction.canceled -= OnShootCanceled;
+            }
+            if (inputPointer != null) {
+                Object.Destroy(inputPointer.gameObject);
+            }
+            base.Clear();
         }
 
         private bool ChangeTacticHighInput(InputAction.CallbackContext ctx) {
@@ -171,22 +198,80 @@ namespace FStudio.MatchEngine.Input {
         }
 
         private bool ShootInput (InputAction.CallbackContext ctx) {
-            if (MatchPause.IsPaused) {
+            if (MatchPause.IsPaused || !Application.isFocused) {
+                CancelShotCharge();
                 return false;
             }
 
-            var value = ctx.ReadValue<float>();
-
-            if (ActivePlayer == null || 
-                !ActivePlayer.PlayerController.IsPhysicsEnabled) {
+            // Shoot is a PassThrough action: performed is sent for both press and release.
+            if (ctx.ReadValue<float>() > 0.5f) {
+                if (chargingPlayer == null && CanChargeShot(ActivePlayer)) {
+                    chargingPlayer = ActivePlayer;
+                    shotChargeStartedAt = Time.unscaledTime;
+                    shotPowerBar.Show(chargingPlayer.Position + shotBarWorldOffset, 0);
+                }
                 return true;
             }
 
-            if (value == 1) {
-                ActivatePlayerBehaviour<InputShootBehaviour>();
+            if (chargingPlayer == null) {
+                return true;
+            }
+
+            var player = chargingPlayer;
+            var charge = ShotCharge;
+            CancelShotCharge();
+            if (player == ActivePlayer && CanChargeShot(player)) {
+                var behaviour = player.Behaviours.OfType<InputShootBehaviour>().FirstOrDefault();
+                if (behaviour != null) {
+                    behaviour.SetCharge(charge);
+                    ActivatePlayerBehaviour<InputShootBehaviour>();
+                }
             }
 
             return true;
+        }
+
+        private float ShotCharge => Mathf.Clamp01((Time.unscaledTime - shotChargeStartedAt) / SHOT_CHARGE_SECONDS);
+
+        private bool CanChargeShot(PlayerBase player) {
+            if (player == null || player != ActivePlayer || MatchPause.IsPaused ||
+                shootAction == null || !shootAction.enabled || MatchManager.Current == null) {
+                return false;
+            }
+
+            var status = MatchManager.Current.MatchFlags;
+            return (status == MatchStatus.Playing || status == MatchStatus.WaitingForKickOff) &&
+                player.PlayerController.IsPhysicsEnabled &&
+                Ball.Current != null && Ball.Current.HolderPlayer == player &&
+                !player.IsThrowHolder && !player.IsCornerHolder &&
+                player.ActiveBehaviour is not IInputBehaviour;
+        }
+
+        // Called every rendered frame, including pauses and match cutscenes.
+        public void UpdateShotCharge() {
+            if (chargingPlayer == null) {
+                return;
+            }
+            if (!CanChargeShot(chargingPlayer)) {
+                CancelShotCharge();
+                return;
+            }
+            shotPowerBar.Show(chargingPlayer.Position + shotBarWorldOffset, ShotCharge);
+        }
+
+        private void CancelShotCharge() {
+            chargingPlayer = null;
+            shotPowerBar?.Hide();
+        }
+
+        private void OnShootCanceled(InputAction.CallbackContext _) => CancelShotCharge();
+
+        private void OnMatchPause(MatchPauseEvent _) => CancelShotCharge();
+
+        private void OnFocusChanged(bool hasFocus) {
+            if (!hasFocus) {
+                CancelShotCharge();
+            }
         }
 
         private bool ThroughtPass (InputAction.CallbackContext ctx) {

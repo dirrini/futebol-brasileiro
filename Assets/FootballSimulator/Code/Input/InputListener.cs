@@ -78,7 +78,7 @@ namespace FStudio.Input {
         /// <summary>
         /// UnRegister all of the actions.
         /// </summary>
-        public void Clear () {
+        public virtual void Clear () {
             if (PlayerInput == null) {
                 return;
             }

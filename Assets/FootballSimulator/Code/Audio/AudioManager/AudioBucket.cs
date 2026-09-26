@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using FStudio.Loaders;
 
 namespace AudioManager.Public {
     [CreateAssetMenu(fileName = "NewAudioBucket", menuName = "AudioManager/Create new audio bucket", order = 1)]
@@ -65,13 +66,27 @@ namespace AudioManager.Public {
             isLoading = true;
 
             LoadedClips = new AudioClip[clipsLength];
+            int loadedCount = 0;
 
-            for (int i=0; i<clipsLength; i++) {
-                LoadedClips[i] = await clips[i].LoadAssetAsync<AudioClip>().Task;
+            try {
+                for (int i=0; i<clipsLength; i++) {
+                    LoadedClips[i] = await clips[i].LoadAssetAsync<AudioClip>().AwaitResult();
+                    loadedCount++;
+                }
+
+                IsLoaded = true;
+            } catch {
+                // AwaitResult already releases the failed operation.
+                for (int i=0; i<loadedCount; i++) {
+                    if (clips[i].OperationHandle.IsValid()) {
+                        clips[i].ReleaseAsset();
+                    }
+                }
+                LoadedClips = null;
+                throw;
+            } finally {
+                isLoading = false;
             }
-
-            isLoading = false;
-            IsLoaded = true;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FStudio.Input;
 using FStudio.UI.GamepadInput;
+using FStudio.Utilities;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,7 +52,7 @@ namespace FStudio.UI.Utilities {
         }
 
         private async void OnInputUnSelect (string _) {
-            await Task.Delay(100);
+            await UnityAsync.Delay(100);
             Current = null;
         }
 

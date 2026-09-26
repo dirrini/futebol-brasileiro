@@ -20,7 +20,7 @@ namespace FStudio.Loaders {
         public static async Task<SceneInstance> LoadScene (AssetReference sceneAsset) {
             Debug.Log($"[SceneLoader] Load scene {sceneAsset}");
 
-            var loader = await Addressables.LoadSceneAsync(sceneAsset, UnityEngine.SceneManagement.LoadSceneMode.Single).Task;
+            var loader = await Addressables.LoadSceneAsync(sceneAsset, UnityEngine.SceneManagement.LoadSceneMode.Single).AwaitResult();
             var activator = loader.ActivateAsync();
 
             while (!activator.isDone) {

@@ -353,12 +353,12 @@ namespace FStudio.MatchEngine {
         }
 
         private async void StartKickoffCounter() {
-            await Task.Delay(refereeWhistleForKickOffDelay);
+            await UnityAsync.Delay(refereeWhistleForKickOffDelay);
 
             EventManager.Trigger(new RefereeShortWhistleEvent());
             EventManager.Trigger(new ShowScoreboardEvent());
 
-            await Task.Delay(kickOffAfterMilliSecs);
+            await UnityAsync.Delay(kickOffAfterMilliSecs);
 
             if (minutes == 0) {
                 EventManager.Trigger(new FirstWhistleEvent());

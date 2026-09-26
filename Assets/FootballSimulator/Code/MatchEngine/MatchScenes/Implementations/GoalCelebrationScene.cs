@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using MM = FStudio.MatchEngine.MatchManager;
 using FStudio.MatchEngine.Cameras;
+using FStudio.Utilities;
 
 namespace MatchEngine.MatchScenes.Implementations {
     public class GoalCelebrationScene : IMatchScene {
@@ -127,7 +128,7 @@ namespace MatchEngine.MatchScenes.Implementations {
                 CameraSystem.Current.ZoomMultiplier = CELEBRATION_ZOOM_MULTIPLIER;
                 cameraSwitch = true;
 
-                await Task.Delay(1000);
+                await UnityAsync.Delay(1000);
             });
 
             Debug.Log($"[MatchManager] OnGoal {callback.HomeOrAway}");
@@ -178,7 +179,7 @@ namespace MatchEngine.MatchScenes.Implementations {
 
                         EventManager.Trigger(new InfoboardEvent());
 
-                        await Task.Delay(4000);
+                        await UnityAsync.Delay(4000);
 
                         EventManager.Trigger<InfoboardEvent>(null);
                     });

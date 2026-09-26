@@ -359,7 +359,7 @@ namespace FStudio.UI.GamepadInput {
                     break;
                 } else {
                     // wait.
-                    await Task.Delay(2); // wait a little bit.
+                    await UnityAsync.Delay(2); // wait a little bit.
                 }
             }
 
