@@ -28,6 +28,8 @@ namespace FStudio.FootballWorld.Bootstrap
             "Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json";
         public const string SourceSchemaAssetPath =
             "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json";
+        public const string SourceSchemaV2AssetPath =
+            "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json";
         public const string StreamingDatabasePath = "FootballWorld/database.json";
         public const string StreamingSchemaPath = "FootballWorld/database.schema.json";
 

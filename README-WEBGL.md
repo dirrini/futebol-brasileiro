@@ -3,6 +3,8 @@
 O Unity **2022.3.62f2 instalado no Windows** compila o jogo e os Addressables.
 O Docker Compose empacota o resultado em Nginx e o disponibiliza em
 [http://localhost:8080](http://localhost:8080). O jogo roda no navegador.
+O mesmo endereço oferece o [editor da base](http://localhost:8080/editor/), servido
+por uma aplicação Node separada através do Nginx.
 
 Este é o fluxo escolhido para o projeto: utiliza a ativação existente do
 Unity Hub e não precisa de Unity, licença ou senha dentro de um container.
@@ -60,6 +62,11 @@ arquivos incompletos nem substitui a imagem que já estava servindo o jogo.
 # Conferir o serviço e seus logs.
 docker compose ps
 docker compose logs --tail=50 soccer-web
+docker compose logs --tail=50 database-editor
+
+# Publicar somente alterações no editor externo e seus serviços.
+# Reutiliza o WebGL existente; não compila mudanças no jogo ou em seu contrato.
+docker compose up --build -d --wait soccer-web
 
 # Parar o serviço.
 docker compose down
@@ -72,16 +79,24 @@ em `Builds/WebGL`. A edição do JSON externo tem o fluxo sem build descrito aba
 
 ## Editar a base e atualizar o navegador
 
-Com `soccer-web` iniciado pelo Compose, edite e salve
+Abra [o editor](http://localhost:8080/editor/), edite clubes/jogadores e escolha
+**Salvar alterações**. O servidor valida a base e incrementa `databaseRevision`;
+depois, atualize a página do jogo. O rascunho é local à aba e não tem autosave.
+**Exportar JSON** permite guardar o rascunho sem publicar. Conflitos ou falhas de
+validação mantêm as alterações abertas para correção.
+
+Também é possível editar diretamente
 `Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json`.
-Mantenha os IDs existentes e incremente `databaseRevision` para uma nova revisão.
+Nesse caso, mantenha os IDs existentes e incremente `databaseRevision` manualmente.
 Recarregue [o jogo](http://localhost:8080): o catálogo será lido novamente.
 Não é necessário executar o script, reconstruir a imagem ou reiniciar o container
 quando a única alteração for nesse JSON compatível. A recarga reinicia o jogo;
 não atualiza uma partida em andamento nem preserva seu progresso.
 
 O Compose monta o diretório de autoria em `/opt/football-database`, somente para
-leitura. Isso também acompanha editores que salvam substituindo o arquivo.
+leitura no `soccer-web`. O serviço `database-editor` recebe o mesmo diretório em
+`/data`, com escrita para publicar revisões. Isso também acompanha editores que
+salvam substituindo o arquivo.
 É um bind da pasta já existente no computador, não um volume persistente Docker.
 `create_host_path: false` impede criar uma pasta vazia se a origem estiver errada.
 O Nginx publica somente o JSON no endereço que o player já utiliza:
@@ -90,7 +105,8 @@ O Nginx publica somente o JSON no endereço que o player já utiliza:
 
 Essa resposta usa `Cache-Control: no-store`, sem ETag ou respostas condicionais
 por data, para que a atualização não recupere uma revisão antiga do navegador.
-O schema e os outros arquivos StreamingAssets continuam vindo do build. A pasta
+O schema publicado descreve v1 e v2; ele e os outros arquivos StreamingAssets
+continuam vindo do build. A pasta
 de autoria completa, incluindo arquivos `.meta`, não é exposta por essa rota.
 O JSON empacotado pelo Unity continua existindo no export, mas o servidor local
 usa a origem montada. Um arquivo ausente retorna erro; não há fallback silencioso
@@ -102,7 +118,7 @@ Antes de atualizar o navegador, a validação estrutural opcional em PowerShell 
 ```powershell
 Test-Json `
   -LiteralPath 'Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json' `
-  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json'
+  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json'
 ```
 
 O importador do jogo também valida referências, posições, IDs e limites; consulte
@@ -114,6 +130,35 @@ Escudos, uniformes, modelos 3D e bindings ainda são recursos compilados Unity.
 Alterá-los exige `.\scripts\webgl.ps1`; colocar uma imagem ou um campo novo no
 JSON não cria suporte de importação. Novos tipos de dados ou versões de contrato
 também exigem adaptar, testar e publicar o player compatível.
+
+## Serviço do editor
+
+`database-editor` usa Node 22 e Ajv 8 com os schemas versionados do projeto. O
+frontend está em `database-editor/client`; validação, HTTP e gravação ficam em
+`database-editor/server`. O container executa como usuário `node`, com filesystem
+somente leitura exceto o bind da base. Não usa volumes Docker persistentes nem
+publica porta própria no host. O Nginx encaminha `/editor/` para o serviço na rede
+do Compose; a única porta externa permanece `127.0.0.1:8080`.
+
+O editor lê a base com um ETag e envia `If-Match` ao salvar. O servidor rejeita
+versões desatualizadas, valida estrutura e referências, prepara um arquivo
+temporário e substitui a fonte por rename. Salva uma cópia anterior em
+`Examples/.editor-backups/previous.database.json`, fora das rotas públicas e
+ignorada pelo Git. A revisão é incrementada uma vez por salvamento bem-sucedido.
+Esses arquivos são conteúdo no diretório do projeto, não dados no filesystem
+descartável do container.
+
+O `soccer-web` depende do healthcheck do editor ao iniciar. Para publicar mudanças
+apenas no frontend/backend, mantendo o contrato do Unity, execute
+`docker compose up --build -d --wait soccer-web` e verifique os dois serviços com
+`docker compose ps`. Se apenas o editor falhar, consulte
+`docker compose logs --tail=50 database-editor`; erros de escrita devem ser
+verificados no bind de `/data`. O player carrega o JSON diretamente pelo Nginx e
+não chama a API do editor durante a partida.
+
+O editor local não é uma galeria pública nem recebe modelos/imagens nesta etapa.
+As escolhas de aparência selecionam recursos já compilados. Consulte
+[README-DATABASE.md](README-DATABASE.md) para uso, limites e testes do editor.
 
 ## Como o build é configurado
 
@@ -176,7 +221,8 @@ Conferidos HTTP 200 para arquivos do player e configuração dos Addressables,
 `application/wasm` com `Content-Encoding: gzip`, e HTTP 404 para arquivo ausente.
 A verificação inicial não cobre todas as ações de gameplay e dispositivos.
 
-Somente o build e a configuração Nginx entram na imagem. Fontes, `.git`, caches
+Somente o build e a configuração Nginx entram na imagem `soccer-web`. A imagem
+separada `database-editor` recebe seu cliente, servidor e schemas. `.git`, caches
 e credenciais são excluídos pelo `.dockerignore`. No ambiente local, o Compose
-acrescenta o bind somente para leitura da base, conforme descrito acima.
+acrescenta os binds de leitura e escrita delimitados acima.
 A porta está vinculada a `127.0.0.1`: o serviço fica acessível neste computador.

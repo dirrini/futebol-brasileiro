@@ -1,0 +1,9 @@
+{
+  "name": "futebol-brasileiro-database-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server/index.mjs", "test": "node --test test/*.test.mjs client/*.test.mjs" },
+  "dependencies": { "ajv": "8.20.0" }
+}

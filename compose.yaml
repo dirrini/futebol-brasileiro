@@ -1,6 +1,36 @@
 name: futebol-brasileiro
 
 services:
+  database-editor:
+    image: futebol-brasileiro-database-editor:local
+    build:
+      context: .
+      dockerfile: database-editor/Dockerfile
+    environment:
+      PORT: "3000"
+      DATABASE_PATH: /data/four-clubs.database.json
+      SCHEMA_DIRECTORY: /app/schemas
+      ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+    # Only this service can save the authored database. No Docker volume is created.
+    volumes:
+      - type: bind
+        source: ./Assets/FootballSimulator/Data/FootballWorld/Examples
+        target: /data
+        bind:
+          create_host_path: false
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
   soccer-web:
     image: futebol-brasileiro-web:local
     build:
@@ -8,6 +38,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "127.0.0.1:8080:80"
+    depends_on:
+      database-editor:
+        condition: service_healthy
     # Serve saved database edits directly; this is a host bind, not a Docker volume.
     # Mount the directory so editors that replace files atomically remain visible.
     volumes:

@@ -1,0 +1,436 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:futebol-brasileiro:database:v2",
+  "title": "Futebol Brasileiro - club and player database v2",
+  "description": "Bare JSON catalog, compatible with v1 sporting data. Adds optional complete built-in appearance presets. Strict UTF-8 JSON, at most 1 MiB and depth 32. Integer tokens are required. Runtime also validates identities and cross references. Community model and media packages remain outside this version.",
+  "definitions": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}(?![\\s\\S])"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "[^\\u0009-\\u000D\\u0020\\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "club": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strength",
+        "acceleration",
+        "topSpeed",
+        "dribbleSpeed",
+        "jump",
+        "tackling",
+        "ballKeeping",
+        "passing",
+        "longBall",
+        "agility",
+        "shooting",
+        "shootPower",
+        "positioning",
+        "reaction",
+        "ballControl"
+      ],
+      "properties": {
+        "strength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "acceleration": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "topSpeed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "dribbleSpeed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "jump": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "tackling": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ballKeeping": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "passing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "longBall": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "agility": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "shooting": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "shootPower": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "positioning": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "reaction": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ballControl": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "naturalPositions",
+        "heightCm",
+        "weightKg",
+        "attributes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "naturalPositions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "GK",
+              "RB",
+              "LB",
+              "CB",
+              "DM",
+              "CM",
+              "RM",
+              "LM",
+              "AM",
+              "LW",
+              "RW",
+              "ST"
+            ]
+          },
+          "uniqueItems": true,
+          "maxItems": 12
+        },
+        "heightCm": {
+          "type": "integer",
+          "minimum": 150,
+          "maximum": 210
+        },
+        "weightKg": {
+          "type": "integer",
+          "minimum": 45,
+          "maximum": 100
+        },
+        "attributes": {
+          "$ref": "#/definitions/attributes"
+        }
+      }
+    },
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clubId",
+        "playerId"
+      ],
+      "properties": {
+        "clubId": {
+          "$ref": "#/definitions/id"
+        },
+        "playerId": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "skin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skinId",
+        "revision",
+        "compatibilityProfile"
+      ],
+      "properties": {
+        "skinId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "compatibilityProfile": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "visualProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "playerId",
+        "skin"
+      ],
+      "properties": {
+        "playerId": {
+          "$ref": "#/definitions/id"
+        },
+        "skin": {
+          "$ref": "#/definitions/skin"
+        },
+        "appearance": {
+          "$ref": "#/definitions/appearance"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "appearance"
+            ]
+          },
+          "then": {
+            "properties": {
+              "skin": {
+                "type": "object",
+                "properties": {
+                  "skinId": {
+                    "const": "builtin-player"
+                  },
+                  "revision": {
+                    "const": 1
+                  },
+                  "compatibilityProfile": {
+                    "const": "football-player-v1"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "appearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skinTone",
+        "hairStyle",
+        "hairColor",
+        "beardStyle",
+        "beardColor",
+        "bootsColor",
+        "sockAccessoryColor"
+      ],
+      "properties": {
+        "skinTone": {
+          "type": "string",
+          "enum": [
+            "tone-1",
+            "tone-2",
+            "tone-3",
+            "tone-4",
+            "tone-5",
+            "tone-6"
+          ]
+        },
+        "hairStyle": {
+          "type": "string",
+          "enum": [
+            "none",
+            "short",
+            "styled",
+            "styled-alt",
+            "mohawk",
+            "locs",
+            "short-parted"
+          ]
+        },
+        "hairColor": {
+          "type": "string",
+          "enum": [
+            "brown",
+            "dark-brown",
+            "black",
+            "light-yellow",
+            "yellow",
+            "gray",
+            "white",
+            "green",
+            "dark-green",
+            "blue",
+            "dark-blue",
+            "light-red",
+            "red",
+            "light-orange",
+            "orange"
+          ]
+        },
+        "beardStyle": {
+          "type": "string",
+          "enum": [
+            "none",
+            "mustache",
+            "goatee",
+            "full"
+          ]
+        },
+        "beardColor": {
+          "type": "string",
+          "enum": [
+            "brown",
+            "dark-brown",
+            "black",
+            "light-yellow",
+            "yellow",
+            "gray",
+            "white",
+            "green",
+            "dark-green",
+            "blue",
+            "dark-blue",
+            "light-red",
+            "red",
+            "light-orange",
+            "orange"
+          ]
+        },
+        "bootsColor": {
+          "type": "string",
+          "enum": [
+            "black",
+            "red",
+            "orange",
+            "purple",
+            "cyan",
+            "gray",
+            "white"
+          ]
+        },
+        "sockAccessoryColor": {
+          "type": "string",
+          "enum": [
+            "none",
+            "black",
+            "gray",
+            "white"
+          ]
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "databaseId",
+    "databaseRevision",
+    "clubs",
+    "players",
+    "memberships",
+    "visualProfiles"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "databaseId": {
+      "$ref": "#/definitions/id"
+    },
+    "databaseRevision": {
+      "$ref": "#/definitions/revision"
+    },
+    "clubs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/club"
+      }
+    },
+    "players": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/player"
+      }
+    },
+    "memberships": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/membership"
+      }
+    },
+    "visualProfiles": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/visualProfile"
+      }
+    }
+  }
+}

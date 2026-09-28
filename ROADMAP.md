@@ -1,8 +1,9 @@
 # Entregas incrementais
 
-Revisão: 28/09/2026. O catálogo de clubes/jogadores já alimenta o amistoso 3D.
-As etapas podem ser revisadas com evidência da implementação. O editor externo,
-o campeonato e a importação de skins ainda não estão implementados. Consulte
+Revisão: 28/09/2026. O catálogo de clubes/jogadores e os presets de aparência já
+alimentam o amistoso 3D. Um editor local intermediário está disponível em `/editor/`.
+As etapas podem ser revisadas com evidência da implementação. O campeonato,
+o editor completo e a importação de skins ainda não estão implementados. Consulte
 [ARCHITECTURE.md](ARCHITECTURE.md), [DATA-FORMAT.md](DATA-FORMAT.md) e
 [README-DATABASE.md](README-DATABASE.md).
 
@@ -11,12 +12,13 @@ o campeonato e a importação de skins ainda não estão implementados. Consulte
 | Etapa | Entrega | Aceite |
 | --- | --- | --- |
 | A1 | Arquitetura, contratos propostos, roteiro e regras no AGENTS.md | Dependências, propriedade de dados, integração e requisito de skins explícitos; revisão documental e build vigente |
-| A2 | Contrato v1 executável: schemas, exemplos e validação | Exemplo mínimo válido; erros claros para IDs/referências/versões inválidos; fonte visual separada do core |
+| A2 | Contratos executáveis: schemas, exemplos e validação | Exemplo mínimo válido; erros claros para IDs/referências/versões inválidos; fonte visual separada do core |
 | A3 | Domain/Application em C# puro e adaptadores de importação | Quatro clubes e seus jogadores carregados de base externa; nenhuma dependência de Unity/JSON no core |
 | A4 | Catálogo na seleção e no amistoso | Seleção por ClubId; escalação de onze sem truncar elenco; dados importados na partida; cancelamento e retorno com liberação dos clones |
 
 A1 está concluída. A2 está implementada no recorte JSON v1 de clubes, jogadores,
-vínculos e referências visuais; schemas de competições, pacotes e skins ficam nas
+vínculos e referências visuais, com extensão v2 de sete presets de aparência;
+schemas de competições, pacotes e skins ficam nas
 respectivas etapas futuras. A3 está implementada com Domain/Application isolados,
 importador e bootstrap que carrega quatro clubes no player. A amostra atual tem
 72 jogadores, incluindo 39 do São Paulo FC; o JSON é editável por refresh no
@@ -25,6 +27,12 @@ Nenhum resultado ou temporada foi acrescentado ao catálogo. A4 está implementa
 com LineupPlanner, bindings visuais locais e uma sessão que fixa a revisão de cada
 amistoso. Não inclui captura de resultados ou FixtureId/ExecutionId de B4.
 Não criar assemblies vazias ou serviços fictícios somente para marcar uma etapa.
+
+O editor atual permite cadastrar/editar clubes e jogadores, transferir vínculos,
+ajustar posições, altura/peso, atributos e presets, validar, salvar e exportar JSON.
+O salvamento incrementa a revisão e o jogo lê a nova base após refresh. Sua prévia
+é ilustrativa e suas opções usam o personagem compilado; não incluem upload de
+imagens/modelos. Esse recorte adianta parte de D1 sem concluir o marco do editor.
 
 ## B. Primeiro marco: competição jogável
 
@@ -59,8 +67,9 @@ Reprodutibilidade de C2 não implica determinismo da física/animação da parti
 
 ## D. Editor externo e skins da comunidade
 
-Esta frente usa o contrato de A2. O editor é uma aplicação separada; a tecnologia
-da interface será escolhida na sua implementação. D1 pode começar após A3. A prova
+Esta frente usa o contrato de A2. O editor local usa ES modules no navegador e
+backend Node 22/Ajv 8, separado do Unity e do core, com schemas portáteis. D1 começou
+pelo cadastro de clubes/jogadores; competições e regras ainda faltam. A prova
 de skins D2 deve preceder a interface completa de upload, para confirmar o contrato
 visual com o motor real.
 
@@ -72,6 +81,14 @@ visual com o motor real.
 | D4 | Upload, prévia processada e associação pelo editor | Autor envia fonte compatível, acompanha processamento, revisa animações e associa SkinId/revisão a PlayerId sem configurar a skin manualmente no Unity |
 | D5 | Exportação e importação dos recursos gráficos | Base e skin transferidas para uma instalação limpa compatível; testar dependência ausente, revisão antiga e fallback |
 | D6 | Teste da comunidade no WebGL | Exemplo de skin personalizada, como uma representação de Messi, utilizável em partida; atributos e física permanecem os do cadastro; medir 22 skins distintas e confirmar limites do perfil |
+
+Próximo passo recomendado nessa frente: adicionar uma prévia 3D real ao fluxo de
+edição e executar D2 com uma única skin de referência compatível. Isso deve
+confirmar rig, materiais, troca de uniforme e animações antes de construir o
+processamento e a interface de upload. Não substituir D2 por mais opções de
+presets. Em paralelo, B1 pode iniciar a temporada em memória, sem acoplar o core
+ao editor ou às imagens. D1 continua parcial até o cadastro das competições e
+regras suportadas.
 
 **O primeiro editor utilizável precisa concluir D1 a D6.** Um seletor de presets,
 um retrato PNG ou uma textura sobre o modelo padrão não substituem o suporte a
@@ -95,6 +112,8 @@ local deve permitir importar, preparar e compartilhar pacotes como arquivos.
 3. Para código ou recursos compilados, gerar WebGL novo com `./scripts/webgl.ps1`
    e confirmar `soccer-web` saudável. Edições apenas no JSON externo compatível
    seguem a exceção de refresh do AGENTS.md, com validação e teste no navegador.
+   Mudanças somente no editor, mantendo o contrato Unity, exigem `npm test`,
+   publicação das imagens Compose e verificação do editor e dos serviços saudáveis.
 4. Testar no navegador o comportamento afetado e descrever a cobertura real.
 5. Informar arquivos alterados e comandos Git restritos à entrega; não executar
    comandos Git sem pedido explícito do usuário.

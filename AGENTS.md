@@ -19,12 +19,16 @@
 - Do not promise arbitrary FBX/GLB compatibility or automatic rig repair. Report validation failures in the database editor and provide a reference authoring template.
 - Keep package import transactional, preserve the last valid content, and pin content revisions for active seasons. Reject unsupported rule types or versions. Fallback is allowed only for visual resources when declared by the contract, with a visible diagnostic.
 - Introduce assemblies for new pure C# modules incrementally; do not reorganize the legacy engine as an incidental change. Follow the staged acceptance criteria in `ROADMAP.md`.
+- Keep the local editor in `database-editor`: browser ES modules in `client`, Node services in `server`, and shared portable schemas under `Assets/FootballSimulator/Data/FootballWorld/Schemas`. Do not add Unity or competition-core dependencies to the editor.
+- Treat the current editor as an intermediate clubs/players/preset tool. Competitions, real 3D previews, community model import and skin processing are still separate roadmap work; do not mark the complete external editor delivered from preset controls alone.
+- Preserve explicit draft/save behavior, stable IDs, optimistic `If-Match` checks, server-side validation, atomic file replacement and the previous valid database backup. A failed save or conflict must keep the browser draft available.
 
 # Docker
 
 - The project must use Docker Compose to serve the generated WebGL build.
 - Keep the Compose project name explicitly defined as `futebol-brasileiro` in `compose.yaml`. The web service is `soccer-web` and is available at `http://localhost:8080`.
-- The current server does not require persistent Docker volumes. The read-only host bind of `Assets/FootballSimulator/Data/FootballWorld/Examples` supplies the live database; preserve `create_host_path: false` and keep it outside the public web root. Do not add mounts or volumes without a concrete need.
+- The current services do not require persistent Docker volumes. `soccer-web` reads `Assets/FootballSimulator/Data/FootballWorld/Examples` through a read-only host bind; only `database-editor` receives the same directory with write access to save the database. Preserve `create_host_path: false` and keep the directory outside both public web roots. Do not add mounts or volumes without a concrete need.
+- Publish the editor only through `soccer-web` at `http://localhost:8080/editor/`. Keep the host port bound to `127.0.0.1`; `database-editor` has no public host port and runs as the Node user with a read-only container filesystem except its authored-data bind.
 - Persistent volumes must have explicit Docker `name` values that include `futebol-brasileiro`.
 - Do not create anonymous Docker volumes.
 - Before creating new volumes, check whether a project volume already exists and reuse it when appropriate.
@@ -47,6 +51,7 @@
 
 - After updates to runtime code, compiled assets, scenes, bindings, shaders, packages, or the data contract, generate a fresh WebGL build and serve it so the user can test without exporting manually.
 - Exception requested by the user: changes limited to the compatible external database JSON served by the existing Compose bind must be testable by saving the source and refreshing `http://localhost:8080`, without a Unity build or a container restart. Validate the edited data and verify its HTTP content and affected browser behavior. Preserve stable IDs and increment `databaseRevision`. This exception does not make images, models, uniforms, or other compiled Unity assets reloadable.
+- Changes limited to the external editor's UI/backend, with no Unity runtime or portable-contract changes, require editor tests, `docker compose up --build -d --wait soccer-web`, healthy services and browser verification; they do not require recompiling the unchanged Unity player. The save operation increments `databaseRevision` automatically; manual JSON edits must still increment it explicitly.
 - From the project root in PowerShell, run `./scripts/webgl.ps1`. Follow `README-WEBGL.md` for prerequisites and troubleshooting.
 - The activated local Unity Editor compiles the game and Addressables. Docker Compose packages and serves the generated files through Nginx. Do not require Unity credentials or a license file inside a container for this workflow.
 - The script builds from a synchronized copy of saved `Assets`, `Packages`, and `ProjectSettings` in `Builds/UnityWebGLProject`. Do not edit that generated copy or force-close the user's original Unity Editor. Unsaved Editor changes are not part of the build.
@@ -64,5 +69,6 @@
 - Keep unrelated staged changes out of the proposed commit as well; use an explicit commit path list (for example, `git commit --only ... -- <files>`) when providing commands.
 - Use an English Conventional Commit message that accurately describes the update. Group overlapping changes so each proposed commit remains coherent and compilable.
 - Do not stage generated WebGL output, `Library`, `Temp`, `Obj`, `Logs`, `UserSettings`, IDE-generated files, build caches, or local credentials. `Builds` is ignored in this project; the container receives the export from the working directory.
+- Do not stage `database-editor/node_modules`, `.editor-backups`, or `.editor-*.tmp`. The hidden `Examples/.editor-backups/previous.database.json` is a local recovery copy, not authored content for a commit.
 - Some generated files may already be tracked in the inherited repository. Preserve unrelated changes and do not perform repository-wide cache removal or line-ending normalization as part of another task.
 - Do not execute Git commands unless the user explicitly asks you to execute them. A request to provide commands is not authorization to run them.

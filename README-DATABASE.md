@@ -4,13 +4,44 @@ O jogo carrega um catálogo de clubes/jogadores independente do motor Unity.
 A base de exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores e
 72 vínculos. O São Paulo tem 39 atletas, conforme o elenco oficial consultado em
 28/09/2026; ver [fontes e limitações da amostra](SAO-PAULO-DATA.md).
-A seleção e o amistoso usam esse catálogo para os dados esportivos.
-Escudos, uniformes, formações e aparência continuam editáveis em recursos Unity.
+A seleção e o amistoso usam esse catálogo para os dados esportivos e os presets
+de aparência. O [editor local](http://localhost:8080/editor/) permite editar a base
+no navegador. Escudos, uniformes, formações, modelos e as próprias paletas/meshes
+dos presets continuam sendo recursos Unity compilados.
+
+## Editar no navegador
+
+Com os serviços do Compose iniciados, abra [localhost:8080/editor/](http://localhost:8080/editor/).
+Escolha um jogador e use as abas **Ficha**, **Atributos** e **Aparência**. É possível
+criar, editar e excluir clubes/jogadores, transferir o vínculo do jogador ou deixá-lo
+sem clube, selecionar posições naturais e editar altura, peso e quinze atributos.
+Um clube com jogadores precisa ter esses vínculos removidos antes da exclusão.
+
+As alterações formam um rascunho único nesta aba; não há salvamento automático.
+**Salvar alterações** valida e publica a base inteira, incrementando a revisão
+automaticamente. Depois, atualize [a página do jogo](http://localhost:8080) para
+iniciar uma partida com os novos dados. **Descartar alterações** restaura o último
+conteúdo carregado; **Exportar JSON** baixa o conteúdo atual, incluindo mudanças
+ainda não salvas, sem publicar no jogo. Recarregar/fechar a aba pode perder o
+rascunho; exporte-o se precisar guardá-lo fora dessa sessão.
+
+Se outra aba ou um editor de arquivos alterar a fonte, o salvamento detecta o
+conflito e mantém o rascunho aberto. Exporte-o antes de recarregar a base e reaplicar
+as alterações necessárias. Uma falha de validação também preserva o rascunho.
+Cada salvamento mantém uma cópia da revisão anterior em
+`Assets/FootballSimulator/Data/FootballWorld/Examples/.editor-backups/previous.database.json`.
+Esse backup local é substituído a cada gravação e não entra no Git; não é um
+histórico de revisões nem um save de temporada.
+
+Esta é uma ferramenta intermediária de cadastro e presets. A prévia é ilustrativa,
+não o personagem 3D real. Ainda não há cadastro de campeonatos/regras, upload de
+imagens, importação de modelos ou processamento de skins da comunidade.
 
 ## Arquivos de autoria
 
 - [Base de exemplo](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 - [JSON Schema v1](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
+- [JSON Schema v2](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json), com aparência portátil.
 - [Bindings visuais](Assets/FootballSimulator/Resources/FootballWorld/LegacyMatchBindings.asset).
 - [Contrato e limites](DATA-FORMAT.md).
 - [Arquitetura](ARCHITECTURE.md) e [próximas entregas](ROADMAP.md).
@@ -28,10 +59,19 @@ largura e profundidade. Esses valores também participam do dimensionamento do
 collider legado. Salvar uma revisão compatível e atualizar o navegador aplica
 os valores na próxima partida, sem recompilar no fluxo local descrito abaixo.
 
-Pele, cabelo, barba, chuteiras e meias continuam nos templates de aparência
-associados por `PlayerId` em `LegacyMatchBindings`, editáveis no Unity. O JSON v1
-ainda não oferece esses campos nem um editor de rosto/corpo. Modelos e skins
-personalizados dependem das etapas de mídia previstas no ROADMAP.
+No JSON v2, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
+estilo e cor do cabelo, estilo e cor da barba, cor das chuteiras e cor da faixa da
+meia. A meia principal continua no uniforme do clube. Esses campos usam IDs de
+presets compilados; não são cores RGB livres ou modelos novos. Veja as opções
+completas em [DATA-FORMAT.md](DATA-FORMAT.md).
+
+A aparência completa no JSON tem prioridade sobre os bindings e dispensa um
+`PlayerEntry` de referência. Quando omitida, v1/v2 preservam a aparência associada
+por `PlayerId` em `LegacyMatchBindings`, ou seu default declarado. O editor oferece
+**Definir aparência na base** nesses casos; uma skin externa vinculada não é
+sobrescrita por presets. A revisão 3 da amostra usa v2 e copia para o JSON exatamente
+os visuais genéricos já usados pelos 72 jogadores, sem inferir feições dos atletas.
+Altura/peso e atributos esportivos permanecem separados dessas escolhas visuais.
 
 ## Carregamento no Editor e WebGL
 
@@ -56,17 +96,21 @@ no navegador, pois compilar e disponibilizar o JSON não prova sua ativação.
 Depois de abrir [o jogo](http://localhost:8080), o console registra:
 
 ```text
-[FootballWorld] Loaded database <id> revision 2: 4 clubs, 72 players, 72 memberships.
+[FootballWorld] Loaded database <id> revision <revision>: 4 clubs, 72 players, 72 memberships.
 ```
 
 O JSON e seu schema podem ser inspecionados no servidor local:
 
 - [database.json](http://localhost:8080/StreamingAssets/FootballWorld/database.json)
 - [database.schema.json](http://localhost:8080/StreamingAssets/FootballWorld/database.schema.json)
+- [Schema do editor](http://localhost:8080/editor/api/schema)
 
-O Compose monta o diretório de autoria somente para leitura, e o Nginx entrega
+Os endpoints de schema descrevem as duas versões suportadas. Os schemas de
+autoria v1/v2 continuam separados nos arquivos indicados acima.
+
+O Compose monta o diretório de autoria somente para leitura no `soccer-web`, e o Nginx entrega
 o JSON original nesse endereço com `Cache-Control: no-store`. Para testar nomes,
-elenco, posições, medidas ou atributos:
+elenco, posições, medidas, atributos ou presets de aparência diretamente no arquivo:
 
 1. Edite e salve `Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json`.
 2. Preserve os IDs existentes e incremente `databaseRevision` a cada revisão.
@@ -108,12 +152,14 @@ cadastros com menos de onze ou sem goleiro/linha suficientes aparecem bloqueados
 
 No Inspector de LegacyMatchBindings, as listas Clubs e Players associam IDs a
 templates visuais existentes. Clube sem binding usa os defaults declarados de
-escudo, kits e formação, com aviso. Jogador sem binding usa DefaultPlayerAppearance,
-também com aviso. Para preservar a identidade ao renomear clubes/jogadores,
+escudo, kits e formação, com aviso. Jogador sem aparência no JSON e sem binding usa
+DefaultPlayerAppearance, também com aviso. Uma aparência portátil completa não
+precisa desse fallback. Para preservar a identidade ao renomear clubes/jogadores,
 edite o nome no JSON mantendo o ID; não altere os vínculos visuais.
 
-Somente nome, medidas e quinze atributos do JSON entram nos objetos esportivos
-temporários. Templates fornecem recursos visuais, nunca atributos. Cada partida
+Nome, medidas e quinze atributos do JSON entram nos objetos esportivos
+temporários. Os sete presets são aplicados separadamente pelo adaptador visual;
+templates fornecem recursos visuais, nunca atributos. Cada partida
 possui clones próprios e a revisão do catálogo usada na preparação; o mapeamento
 0–21 -> ClubId/PlayerId fica em FriendlyMatchSession.ActiveMatch.Players. Os clones
 são liberados depois da UI e do motor ao cancelar, sair ou recuperar uma falha.
@@ -121,14 +167,14 @@ são liberados depois da UI e do motor ao cancelar, sair ou recuperar uma falha.
 Sem perfil visual, ou com builtin-player@1 / football-player-v1, o jogo usa a
 aparência embutida. Uma skin diferente em um titular impede a partida desse clube
 com mensagem visível; não é substituída silenciosamente. Skins dos reservas são
-verificadas quando escalados. Não há upload, modelos externos, save, campeonato
+verificadas quando escalados. Não há upload, modelos externos, save de temporada, campeonato
 ou persistência da seleção após recarregar o navegador nesta entrega.
 
 O console registra também a origem da seleção e da partida:
 
 ```text
-[FootballWorld] Friendly selection uses database <id> revision 2: 4 clubs.
-[FootballWorld] 3D friendly started with 22 imported players from database revision 2.
+[FootballWorld] Friendly selection uses database <id> revision <revision>: 4 clubs.
+[FootballWorld] 3D friendly started with 22 imported players from database revision <revision>.
 ```
 
 ## Validação e testes
@@ -140,7 +186,9 @@ Newtonsoft ou DTOs. A biblioteca DataContracts também é independente do Unity.
 No Test Runner do Unity, executar os testes de FootballWorld em EditMode e PlayMode.
 EditMode cobre contrato, referências, invariantes, escalação, mapeamento dos quinze
 atributos, bindings por IDs e vida independente dos clones. PlayMode verifica
-leitura externa e o ciclo de vida do bootstrap. As fixtures do adaptador ficam em
+leitura externa, preservação dos perfis v2 após erro e o ciclo de vida do bootstrap.
+Testes do prefab verificam os presets existentes e a remoção de cabelo/barba ao
+selecionar `none`. As fixtures do adaptador ficam em
 Code/FootballWorld/Editor/Tests, na assembly Editor padrão, pois usam o legado.
 Os testes determinísticos usam uma cópia fixa da antiga base Royal/44 atletas e
 dos bindings em diretórios `Tests/Fixtures`, separados da base editável. A
@@ -153,7 +201,7 @@ Validação estrutural opcional, usando PowerShell 7 com `Test-Json` disponível
 ```powershell
 Test-Json `
   -LiteralPath 'Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json' `
-  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json'
+  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json'
 ```
 
 Isso não substitui o importador: IDs duplicados, referências cruzadas e as
@@ -165,3 +213,18 @@ campo e mensagem; não corrigem valores ou descartam registros silenciosamente.
 Para testes automatizados nesta máquina, usar a cópia isolada sincronizada pelo
 último build, sem fechar o Editor do projeto original. Não executar dois Unity
 na mesma cópia simultaneamente. Resultados e logs devem ficar em `Logs/WebGL`.
+
+O editor fica separado em `database-editor/client` (ES modules do navegador) e
+`database-editor/server` (Node 22 e Ajv 8). Para testar o backend localmente, com
+Node 22 instalado, execute a partir da raiz:
+
+```powershell
+Push-Location .\database-editor
+npm ci
+npm test
+Pop-Location
+```
+
+Mudanças apenas nessa aplicação, mantendo o contrato do jogo, são publicadas com
+`docker compose up --build -d --wait soccer-web`; confira editor e jogo no navegador.
+Mudanças no contrato, adaptador ou recursos Unity exigem também WebGL novo.

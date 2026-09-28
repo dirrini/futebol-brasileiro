@@ -242,6 +242,84 @@ namespace FStudio.FootballWorld.Editor.Tests
         }
 
         [Test]
+        public void CompletePortableAppearanceNeedsNoLegacyPlayerBindingAndChangesOnlyCosmetics()
+        {
+            var appearance = new BuiltinAppearanceData("tone-6", "mohawk", "blue", "full", "white", "cyan", "gray");
+            var profiles = imported.VisualProfiles.Select(profile =>
+                new VisualProfileData(profile.PlayerId, profile.Skin, appearance)).ToArray();
+            var withoutPlayers = ScriptableObject.CreateInstance<LegacyMatchBindings>();
+            ownedObjects.Add(withoutPlayers);
+            withoutPlayers.Clubs = bindings.Clubs;
+            withoutPlayers.DefaultVisualTemplate = bindings.DefaultVisualTemplate;
+            withoutPlayers.DefaultFormation = bindings.DefaultFormation;
+            withoutPlayers.DefaultPlayerAppearance = null;
+            withoutPlayers.Players = Array.Empty<PlayerAppearanceBinding>();
+            var adapter = CreateAdapter(visualProfiles: profiles, localBindings: withoutPlayers);
+            foreach (var option in adapter.Teams)
+            {
+                Assert.IsTrue(option.CanPlay, option.Error);
+                Assert.IsNull(option.Warning, "A complete appearance must not use a legacy cosmetic fallback.");
+                foreach (var player in option.Preview.Players)
+                {
+                    Assert.AreEqual(SkinColor.SuperDark, player.SkinColor);
+                    Assert.AreEqual(HairStyles.Mohawk, player.HairStyles);
+                    Assert.AreEqual(HairColors.Blue, player.HairColor);
+                    Assert.AreEqual(FacialHairStyles.LongBeard, player.FacialHairStyles);
+                    Assert.AreEqual(HairColors.White, player.FacialHairColor);
+                    Assert.AreEqual(BootColor.Cyan, player.BootColor);
+                    Assert.AreEqual(SockAccessoryColor.Gray, player.SockAccessoryColor);
+                }
+            }
+            var lease = CreateLease(adapter, adapter.Teams[0].ClubId, adapter.Teams[1].ClubId);
+            var second = CreateLease(adapter, lease.HomeClubId, lease.AwayClubId);
+            foreach (var identity in lease.Players)
+            {
+                var team = identity.LocalId < 11 ? lease.Request.homeTeam : lease.Request.awayTeam;
+                var player = team.Players[identity.LocalId % 11];
+                AssertSportingData(imported.Catalog.GetPlayer(identity.PlayerId), player);
+                Assert.AreEqual(HairStyles.Mohawk, player.HairStyles);
+                Assert.AreEqual(BootColor.Cyan, player.BootColor);
+            }
+            lease.Request.homeTeam.Players[0].HairStyles = HairStyles.None;
+            lease.Request.homeTeam.Players[0].BootColor = BootColor.Black;
+            Assert.AreEqual(HairStyles.Mohawk, second.Request.homeTeam.Players[0].HairStyles);
+            Assert.AreEqual(BootColor.Cyan, second.Request.homeTeam.Players[0].BootColor);
+            Assert.AreEqual(HairStyles.Mohawk, adapter.Teams[0].Preview.Players[0].HairStyles);
+        }
+
+        [Test]
+        public void PortableAppearanceOverridesLocalBindingWhileOmittedAppearanceKeepsIt()
+        {
+            var firstProfile = imported.VisualProfiles[0];
+            var edited = new BuiltinAppearanceData("tone-1", "none", "white", "none", "white", "white", "none");
+            var profiles = imported.VisualProfiles.Select(profile => profile.PlayerId == firstProfile.PlayerId
+                ? new VisualProfileData(profile.PlayerId, profile.Skin, edited) : profile).ToArray();
+            var adapter = CreateAdapter(visualProfiles: profiles);
+            var lease = CreateLease(adapter, adapter.Teams[0].ClubId, adapter.Teams[1].ClubId);
+            foreach (var identity in lease.Players)
+            {
+                var team = identity.LocalId < 11 ? lease.Request.homeTeam : lease.Request.awayTeam;
+                var player = team.Players[identity.LocalId % 11];
+                AssertSportingData(imported.Catalog.GetPlayer(identity.PlayerId), player);
+                if (identity.PlayerId == firstProfile.PlayerId)
+                {
+                    Assert.AreEqual(SkinColor.SuperBright, player.SkinColor);
+                    Assert.AreEqual(HairStyles.None, player.HairStyles);
+                    Assert.AreEqual(FacialHairStyles.None, player.FacialHairStyles);
+                    Assert.AreEqual(HairColors.White, player.HairColor);
+                    Assert.AreEqual(HairColors.White, player.FacialHairColor);
+                    Assert.AreEqual(BootColor.White, player.BootColor);
+                    Assert.AreEqual(SockAccessoryColor.None, player.SockAccessoryColor);
+                }
+                else
+                {
+                    AssertAppearance(bindings.Players.Single(binding => binding.PlayerId == identity.PlayerId).Appearance, player);
+                }
+            }
+            Assert.That(lease.Players.Any(identity => identity.PlayerId == firstProfile.PlayerId), Is.True);
+        }
+
+        [Test]
         public void FullRosterAndUnsupportedReserveRemainInCatalogWithoutEnteringEleven()
         {
             var catalog = imported.Catalog;

@@ -124,3 +124,31 @@ visual. O escudo no peito faz parte dos atlas e dos previews dos kits.
 Jogadores usam aparências genéricas existentes. A amostra demonstra dados e
 identidade do clube; não representa rostos ou skins personalizadas dos atletas.
 Verificar os dois kits na preparação e o primeiro em partida no navegador.
+
+## Editor web da base
+
+O editor é uma aplicação de autoria em pt-BR, disponível em `/editor/`, separada
+da interface de gameplay. A apresentação usa azul petróleo (`#183d47`), papel
+frio (`#edf2f1`), texto escuro (`#173b46`) e verde (`#23735a`) para a ação principal.
+Tokens e estados compartilhados pertencem a `database-editor/client/styles.css`.
+Tipografia local: Segoe UI para leitura, Bahnschrift para títulos e Consolas para
+identificadores e revisão; não há fontes ou recursos carregados de terceiros.
+
+A navegação lateral oferece Jogadores e Clubes. Lista com busca, filtro e paginação
+acompanha a ficha selecionada. A ficha tem seções Ficha, Atributos e Aparência;
+as duas entidades compartilham campos, diálogos, estado de rascunho e salvamento.
+O formulário conserva rolagem natural, e a lista limita sua própria rolagem. Em
+telas estreitas, os painéis se empilham sem esconder ações essenciais.
+
+O rascunho pertence à base inteira: navegar entre fichas preserva as alterações;
+“Salvar alterações” publica uma revisão validada. Erros e conflitos permanecem
+visíveis e não descartam o rascunho. Exclusão e descarte usam diálogo com nome e
+consequência, foco inicial em Cancelar e fechamento por Escape. O contrato completo
+de interação fica em `database-editor/client/UX-CONTRACT.md`.
+
+A prévia de aparência é uma ilustração SVG, claramente identificada como tal.
+Ela aproxima cores e estilos do modelo padrão; o uniforme é neutro. “Faixa da meia”
+edita apenas o acessório disponível no motor. A cor do meião pertence ao kit.
+Prévia 3D real e upload de modelos são etapas futuras, sem controles simulados.
+Verificar criação/edição/remoção, validação, conflito, descarte, teclado, largura
+reduzida e aplicação dos dados no jogo; auditoria estática não substitui esse teste.

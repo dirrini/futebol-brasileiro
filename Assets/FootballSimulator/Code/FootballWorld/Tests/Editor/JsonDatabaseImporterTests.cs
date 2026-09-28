@@ -99,13 +99,133 @@ namespace FStudio.FootballWorld.Tests
         [TestCase("visualProfiles", "null", "invalid_type")]
         [TestCase("visualProfiles[0].skin.revision", "0", "out_of_range")]
         [TestCase("visualProfiles[0].skin.compatibilityProfile", "\"bad/profile\"", "invalid_id")]
-        [TestCase("schemaVersion", "2", "unsupported_schema_version")]
+        [TestCase("schemaVersion", "3", "unsupported_schema_version")]
         public void RejectsWrongTypesRangesAndUnsupportedVersions(string path, string replacement, string code)
         {
             // Replace textual numbers directly so exponent spelling is preserved.
             var document = ValidDocument();
             document.SelectToken(path).Replace(new JRaw(replacement));
             AssertFailure(Import(document), code, "$." + path);
+        }
+
+        [Test]
+        public void VersionOneRejectsAppearanceAndVersionTwoCanOmitIt()
+        {
+            var document = ValidDocument();
+            Assert.That(Import(document).VisualProfiles.Single().Appearance, Is.Null);
+            document["visualProfiles"][0]["appearance"] = ValidAppearance();
+            AssertFailure(Import(document), "unknown_property", "$.visualProfiles[0].appearance");
+            document["schemaVersion"] = 2;
+            ((JProperty)document["visualProfiles"][0]["appearance"].Parent).Remove();
+            var withoutAppearance = Import(document);
+            AssertSuccess(withoutAppearance);
+            Assert.That(withoutAppearance.VisualProfiles.Single().Appearance, Is.Null);
+        }
+
+        [Test]
+        public void VersionTwoImportsImmutableAppearanceWithoutChangingSportingData()
+        {
+            var document = ValidAppearanceDocument();
+            var result = Import(document);
+            AssertSuccess(result);
+            var appearance = result.VisualProfiles.Single().Appearance;
+            Assert.That(new[] {appearance.SkinTone, appearance.HairStyle, appearance.HairColor,
+                    appearance.BeardStyle, appearance.BeardColor, appearance.BootsColor, appearance.SockAccessoryColor},
+                Is.EqualTo(new[] {"tone-3", "short", "black", "goatee", "brown", "cyan", "white"}));
+            var player = result.Catalog.GetPlayer("player-1");
+            Assert.That(player.Name, Is.EqualTo("Player One"));
+            Assert.That(player.NaturalPositions, Is.EqualTo(new[] {PlayerPosition.ST, PlayerPosition.RW}));
+            Assert.That(player.HeightCm, Is.EqualTo(180));
+            Assert.That(player.WeightKg, Is.EqualTo(80));
+            var a = player.Attributes;
+            Assert.That(new[] {a.Strength, a.Acceleration, a.TopSpeed, a.DribbleSpeed, a.Jump,
+                a.Tackling, a.BallKeeping, a.Passing, a.LongBall, a.Agility, a.Shooting,
+                a.ShootPower, a.Positioning, a.Reaction, a.BallControl}, Is.EqualTo(Enumerable.Range(1, 15)));
+            document["visualProfiles"][0]["appearance"]["hairStyle"] = "none";
+            document["visualProfiles"] = new JArray();
+            Assert.That(appearance.HairStyle, Is.EqualTo("short"));
+            Assert.That(result.VisualProfiles, Has.Count.EqualTo(1));
+            Assert.That(typeof(BuiltinAppearanceData).GetProperties().All(property => property.SetMethod == null), Is.True);
+            Assert.Throws<NotSupportedException>(() => ((IList<string>)BuiltinAppearancePresets.SkinTones)[0] = "other");
+        }
+
+        [TestCaseSource(nameof(AppearancePresetCases))]
+        public void VersionTwoAcceptsEveryDocumentedPreset(string field, string value)
+        {
+            var document = ValidAppearanceDocument();
+            document["visualProfiles"][0]["appearance"][field] = value;
+            AssertSuccess(Import(document));
+        }
+
+        [TestCase("skinTone")]
+        [TestCase("hairStyle")]
+        [TestCase("hairColor")]
+        [TestCase("beardStyle")]
+        [TestCase("beardColor")]
+        [TestCase("bootsColor")]
+        [TestCase("sockAccessoryColor")]
+        public void AppearanceRequiresEveryFieldAndRejectsUnknownNullOrNumericPresets(string field)
+        {
+            var document = ValidAppearanceDocument();
+            var appearance = (JObject)document["visualProfiles"][0]["appearance"];
+            var path = "$.visualProfiles[0].appearance." + field;
+            appearance.Remove(field);
+            AssertFailure(Import(document), "required", path);
+            appearance[field] = "not-a-preset";
+            AssertFailure(Import(document), "unknown_appearance_preset", path);
+            appearance[field] = JValue.CreateNull();
+            AssertFailure(Import(document), "invalid_type", path);
+            appearance[field] = 0;
+            AssertFailure(Import(document), "invalid_type", path);
+        }
+
+        [TestCase("null")]
+        [TestCase("[]")]
+        [TestCase("\"preset\"")]
+        public void AppearanceRejectsNonObjectValues(string replacement)
+        {
+            var document = ValidAppearanceDocument();
+            document["visualProfiles"][0]["appearance"] = JToken.Parse(replacement);
+            AssertFailure(Import(document), "invalid_type", "$.visualProfiles[0].appearance");
+        }
+
+        [Test]
+        public void AppearanceRejectsUnknownPropertiesAndCaseChanges()
+        {
+            var document = ValidAppearanceDocument();
+            document["visualProfiles"][0]["appearance"]["eyeColor"] = "blue";
+            AssertFailure(Import(document), "unknown_property", "$.visualProfiles[0].appearance.eyeColor");
+            ((JProperty)document["visualProfiles"][0]["appearance"]["eyeColor"].Parent).Remove();
+            document["visualProfiles"][0]["appearance"]["hairStyle"] = "Short";
+            AssertFailure(Import(document), "unknown_appearance_preset", "$.visualProfiles[0].appearance.hairStyle");
+        }
+
+        [TestCase("skinId", "\"community-skin\"")]
+        [TestCase("revision", "2")]
+        [TestCase("compatibilityProfile", "\"football-player-v2\"")]
+        public void BuiltinAppearanceCannotOverrideAnExternalOrUnsupportedSkin(string field, string replacement)
+        {
+            var document = ValidAppearanceDocument();
+            document["visualProfiles"][0]["skin"][field] = JToken.Parse(replacement);
+            AssertFailure(Import(document), "unsupported_appearance_skin", "$.visualProfiles[0].appearance");
+        }
+
+        [Test]
+        public void PublishedVersionTwoSchemaListsTheSameAppearancePresetsAsTheImporter()
+        {
+            var path = Path.Combine(UnityEngine.Application.dataPath,
+                "FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json");
+            var schema = JObject.Parse(File.ReadAllText(path));
+            var appearance = schema["definitions"]["appearance"];
+            Assert.That((int)schema["properties"]["schemaVersion"]["const"], Is.EqualTo(2));
+            Assert.That((bool)appearance["additionalProperties"], Is.False);
+            var options = AppearanceOptions();
+            Assert.That(appearance["required"].Values<string>(), Is.EquivalentTo(options.Keys));
+            foreach (var option in options)
+                Assert.That(appearance["properties"][option.Key]["enum"].Values<string>(),
+                    Is.EqualTo(option.Value), option.Key);
+            Assert.That(schema["definitions"]["visualProfile"]["required"].Values<string>(),
+                Does.Not.Contain("appearance"));
         }
 
         [TestCase("visualProfiles")]
@@ -353,6 +473,42 @@ namespace FStudio.FootballWorld.Tests
         }
 
         private static PlayerAttributes Attributes() => new PlayerAttributes(50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50);
+
+        private static Dictionary<string, IReadOnlyList<string>> AppearanceOptions() =>
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                {"skinTone", BuiltinAppearancePresets.SkinTones},
+                {"hairStyle", BuiltinAppearancePresets.HairStyles},
+                {"hairColor", BuiltinAppearancePresets.HairColors},
+                {"beardStyle", BuiltinAppearancePresets.BeardStyles},
+                {"beardColor", BuiltinAppearancePresets.HairColors},
+                {"bootsColor", BuiltinAppearancePresets.BootsColors},
+                {"sockAccessoryColor", BuiltinAppearancePresets.SockAccessoryColors}
+            };
+
+        private static IEnumerable<TestCaseData> AppearancePresetCases()
+        {
+            foreach (var option in AppearanceOptions())
+                foreach (var value in option.Value)
+                    yield return new TestCaseData(option.Key, value);
+        }
+
+        private static JObject ValidAppearance() => JObject.Parse(@"{
+            'skinTone':'tone-3','hairStyle':'short','hairColor':'black','beardStyle':'goatee',
+            'beardColor':'brown','bootsColor':'cyan','sockAccessoryColor':'white'
+        }");
+
+        private static JObject ValidAppearanceDocument()
+        {
+            var document = ValidDocument();
+            document["schemaVersion"] = 2;
+            document["visualProfiles"][0]["skin"] = new JObject
+            {
+                ["skinId"] = "builtin-player", ["revision"] = 1, ["compatibilityProfile"] = "football-player-v1"
+            };
+            document["visualProfiles"][0]["appearance"] = ValidAppearance();
+            return document;
+        }
 
         private static JObject ValidDocument()
         {

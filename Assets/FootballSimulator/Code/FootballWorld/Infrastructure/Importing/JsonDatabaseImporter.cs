@@ -86,8 +86,9 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 "clubs", "players", "memberships", "visualProfiles");
             if (root == null) return null;
             var schemaVersion = Integer(root["schemaVersion"], "$.schemaVersion", int.MinValue, int.MaxValue, errors);
-            if (root["schemaVersion"] != null && root["schemaVersion"].Type == JTokenType.Integer && schemaVersion != 1)
-                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1 is supported.");
+            if (root["schemaVersion"] != null && root["schemaVersion"].Type == JTokenType.Integer &&
+                schemaVersion != 1 && schemaVersion != 2)
+                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1 and 2 are supported.");
             var databaseId = Id(root["databaseId"], "$.databaseId", errors);
             var revision = Integer(root["databaseRevision"], "$.databaseRevision", 1, int.MaxValue, errors);
             var clubs = new List<ClubData>();
@@ -135,14 +136,26 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
             });
             ReadItems(root["visualProfiles"], "$.visualProfiles", 0, errors, (item, path) =>
             {
-                var obj = Object(item, path, errors, "playerId", "skin");
+                var required = new[] {"playerId", "skin"};
+                var obj = ObjectWithOptionalFields(item, path, errors, required,
+                    schemaVersion == 2 ? new[] {"appearance"} : Array.Empty<string>());
                 if (obj == null) return;
                 var playerId = Id(obj["playerId"], path + ".playerId", errors);
                 var skin = Object(obj["skin"], path + ".skin", errors, "skinId", "revision", "compatibilityProfile");
-                if (skin != null) visuals.Add(new VisualProfileData(playerId, new SkinReferenceData(
+                var appearance = schemaVersion == 2 && obj.Property("appearance", StringComparison.Ordinal) != null
+                    ? ReadAppearance(obj["appearance"], path + ".appearance", errors)
+                    : null;
+                if (skin == null) return;
+                var skinReference = new SkinReferenceData(
                     Id(skin["skinId"], path + ".skin.skinId", errors),
                     Integer(skin["revision"], path + ".skin.revision", 1, int.MaxValue, errors),
-                    Id(skin["compatibilityProfile"], path + ".skin.compatibilityProfile", errors))));
+                    Id(skin["compatibilityProfile"], path + ".skin.compatibilityProfile", errors));
+                if (appearance != null &&
+                    (skinReference.SkinId != "builtin-player" || skinReference.Revision != 1 ||
+                     skinReference.CompatibilityProfile != "football-player-v1"))
+                    Error(errors, "unsupported_appearance_skin", path + ".appearance",
+                        "Built-in appearance requires builtin-player revision 1 with compatibilityProfile football-player-v1.");
+                visuals.Add(new VisualProfileData(playerId, skinReference, appearance));
             });
             return new DatabaseDocument(schemaVersion, databaseId, revision, clubs, players, memberships, visuals);
         }
@@ -195,6 +208,10 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
         }
 
         private static JObject Object(JToken token, string path, List<DatabaseImportError> errors, params string[] fields)
+            => ObjectWithOptionalFields(token, path, errors, fields, Array.Empty<string>());
+
+        private static JObject ObjectWithOptionalFields(JToken token, string path, List<DatabaseImportError> errors,
+            string[] required, string[] optional)
         {
             if (token == null) return null; // Missing fields are reported by their parent object.
             if (!(token is JObject result))
@@ -202,12 +219,41 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 Error(errors, "invalid_type", path, "Expected an object.");
                 return null;
             }
-            var allowed = new HashSet<string>(fields, StringComparer.Ordinal);
+            var allowed = new HashSet<string>(required, StringComparer.Ordinal);
+            allowed.UnionWith(optional);
             foreach (var property in result.Properties())
-                if (!allowed.Contains(property.Name)) Error(errors, "unknown_property", path + "." + property.Name, "Property is not supported by schemaVersion 1.");
-            foreach (var field in fields)
+                if (!allowed.Contains(property.Name)) Error(errors, "unknown_property", path + "." + property.Name,
+                    "Property is not supported by this schema version.");
+            foreach (var field in required)
                 if (result.Property(field, StringComparison.Ordinal) == null) Error(errors, "required", path + "." + field, "Required property is missing.");
             return result;
+        }
+
+        private static BuiltinAppearanceData ReadAppearance(JToken token, string path, List<DatabaseImportError> errors)
+        {
+            var obj = Object(token, path, errors, "skinTone", "hairStyle", "hairColor", "beardStyle",
+                "beardColor", "bootsColor", "sockAccessoryColor");
+            if (obj == null) return null;
+            return new BuiltinAppearanceData(
+                Preset(obj["skinTone"], path + ".skinTone", BuiltinAppearancePresets.SkinTones, errors),
+                Preset(obj["hairStyle"], path + ".hairStyle", BuiltinAppearancePresets.HairStyles, errors),
+                Preset(obj["hairColor"], path + ".hairColor", BuiltinAppearancePresets.HairColors, errors),
+                Preset(obj["beardStyle"], path + ".beardStyle", BuiltinAppearancePresets.BeardStyles, errors),
+                Preset(obj["beardColor"], path + ".beardColor", BuiltinAppearancePresets.HairColors, errors),
+                Preset(obj["bootsColor"], path + ".bootsColor", BuiltinAppearancePresets.BootsColors, errors),
+                Preset(obj["sockAccessoryColor"], path + ".sockAccessoryColor", BuiltinAppearancePresets.SockAccessoryColors, errors));
+        }
+
+        private static string Preset(JToken token, string path, IReadOnlyList<string> allowed,
+            List<DatabaseImportError> errors)
+        {
+            var value = String(token, path, errors);
+            if (value == null) return null;
+            for (var i = 0; i < allowed.Count; i++)
+                if (string.Equals(allowed[i], value, StringComparison.Ordinal)) return value;
+            Error(errors, "unknown_appearance_preset", path,
+                "Unknown appearance preset. Supported IDs: " + string.Join(", ", allowed) + ".");
+            return value;
         }
 
         private static void ReadItems(JToken token, string path, int minimum, List<DatabaseImportError> errors, Action<JToken, string> read)

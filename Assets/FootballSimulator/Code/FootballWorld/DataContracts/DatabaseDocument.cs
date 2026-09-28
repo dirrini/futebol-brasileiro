@@ -97,7 +97,14 @@ namespace FStudio.FootballWorld.DataContracts
     {
         public string PlayerId { get; }
         public SkinReferenceData Skin { get; }
-        public VisualProfileData(string playerId, SkinReferenceData skin) { PlayerId = playerId; Skin = skin; }
+        public BuiltinAppearanceData Appearance { get; }
+
+        public VisualProfileData(string playerId, SkinReferenceData skin, BuiltinAppearanceData appearance = null)
+        {
+            PlayerId = playerId;
+            Skin = skin;
+            Appearance = appearance;
+        }
     }
 
     public sealed class SkinReferenceData

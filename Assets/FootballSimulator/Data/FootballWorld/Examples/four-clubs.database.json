@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "databaseId": "db-2bc0ad3f537e4fadbd99aa1addb41feb",
-  "databaseRevision": 2,
+  "databaseRevision": 5,
   "clubs": [
     {
       "id": "club-8515fca92adc4d77a428fb272bb7d160",
@@ -2209,6 +2209,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2217,6 +2226,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2225,6 +2243,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2233,6 +2260,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "none",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2241,6 +2277,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2249,6 +2294,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "mohawk",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2257,6 +2311,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "none",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2265,6 +2328,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled-alt",
+        "hairColor": "light-yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2273,6 +2345,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2281,6 +2362,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2289,6 +2379,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2297,6 +2396,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2305,6 +2413,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2313,6 +2430,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2321,6 +2447,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "none",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2329,6 +2464,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2337,6 +2481,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "mohawk",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2345,6 +2498,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "none",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2353,6 +2515,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled-alt",
+        "hairColor": "light-yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2361,6 +2532,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2369,6 +2549,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2377,6 +2566,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2385,6 +2583,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2393,6 +2600,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2401,6 +2617,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2409,6 +2634,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "none",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2417,6 +2651,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2425,6 +2668,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "mohawk",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2433,6 +2685,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "none",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2441,6 +2702,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled-alt",
+        "hairColor": "light-yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2449,6 +2719,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2457,6 +2736,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2465,6 +2753,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2473,6 +2770,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2481,6 +2787,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2489,6 +2804,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2497,6 +2821,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "none",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2505,6 +2838,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2513,6 +2855,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "mohawk",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2521,6 +2872,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "styled-alt",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2529,6 +2889,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled-alt",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2537,6 +2906,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2545,6 +2923,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2553,6 +2940,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2561,6 +2957,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "short-parted",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "dark-brown",
+        "bootsColor": "cyan",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2569,6 +2974,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-3",
+        "hairStyle": "styled-alt",
+        "hairColor": "brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2577,6 +2991,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "short-parted",
+        "hairColor": "black",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "gray",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2585,6 +3008,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2593,6 +3025,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "none",
+        "hairColor": "brown",
+        "beardStyle": "full",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2601,6 +3042,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "styled-alt",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "gray",
+        "sockAccessoryColor": "gray"
       }
     },
     {
@@ -2609,6 +3059,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "light-yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2617,6 +3076,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled-alt",
+        "hairColor": "yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2625,6 +3093,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2633,6 +3110,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "goatee",
+        "beardColor": "black",
+        "bootsColor": "gray",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2641,6 +3127,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "orange",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2649,6 +3144,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "locs",
+        "hairColor": "black",
+        "beardStyle": "goatee",
+        "beardColor": "black",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2657,6 +3161,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "styled-alt",
+        "hairColor": "black",
+        "beardStyle": "goatee",
+        "beardColor": "black",
+        "bootsColor": "purple",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2665,6 +3178,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "mustache",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2673,6 +3195,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-1",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2681,6 +3212,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-1",
+        "hairStyle": "styled",
+        "hairColor": "light-yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2689,6 +3229,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "goatee",
+        "beardColor": "black",
+        "bootsColor": "white",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2697,6 +3246,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2705,6 +3263,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "short-parted",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2713,6 +3280,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled-alt",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2721,6 +3297,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "styled-alt",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2729,6 +3314,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "styled-alt",
+        "hairColor": "light-yellow",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "gray"
       }
     },
     {
@@ -2737,6 +3331,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short-parted",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2745,6 +3348,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-5",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2753,6 +3365,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-4",
+        "hairStyle": "short",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     },
     {
@@ -2761,6 +3382,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled-alt",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "white",
+        "sockAccessoryColor": "white"
       }
     },
     {
@@ -2769,6 +3399,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-6",
+        "hairStyle": "styled",
+        "hairColor": "black",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "orange",
+        "sockAccessoryColor": "black"
       }
     },
     {
@@ -2777,6 +3416,15 @@
         "skinId": "builtin-player",
         "revision": 1,
         "compatibilityProfile": "football-player-v1"
+      },
+      "appearance": {
+        "skinTone": "tone-2",
+        "hairStyle": "styled",
+        "hairColor": "dark-brown",
+        "beardStyle": "none",
+        "beardColor": "brown",
+        "bootsColor": "black",
+        "sockAccessoryColor": "none"
       }
     }
   ]

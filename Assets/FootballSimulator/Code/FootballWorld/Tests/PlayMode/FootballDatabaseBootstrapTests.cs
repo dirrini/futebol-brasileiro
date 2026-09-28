@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FStudio.FootballWorld.Bootstrap;
+using FStudio.FootballWorld.DataContracts;
 using FStudio.FootballWorld.Domain;
 using FStudio.FootballWorld.Infrastructure.Importing;
 using NUnit.Framework;
@@ -104,6 +105,79 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             Assert.That(bootstrap.Session.ActiveCatalog, Is.Not.SameAs(previousCatalog));
             Assert.That(bootstrap.VisualProfiles, Is.Not.SameAs(previousProfiles));
             Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(invalidUri));
+            Assert.That(bootstrap.Errors, Is.Empty);
+        }
+
+        [UnityTest]
+        public IEnumerator V2AppearanceSurvivesRejectedReloadAndNewRevisionDoesNotMutateTheOldSnapshot()
+        {
+            // A separate minimal fixture guarantees v2 coverage even while the
+            // authored live database still uses v1 during a staged deployment.
+            const string json = @"{
+                ""schemaVersion"":2,""databaseId"":""appearance-fixture"",""databaseRevision"":19,
+                ""clubs"":[{""id"":""fixture-club"",""name"":""Fixture club""}],
+                ""players"":[{
+                    ""id"":""fixture-player"",""name"":""Fixture player"",""naturalPositions"":[""GK""],
+                    ""heightCm"":182,""weightKg"":79,
+                    ""attributes"":{
+                        ""strength"":50,""acceleration"":50,""topSpeed"":50,""dribbleSpeed"":50,
+                        ""jump"":50,""tackling"":50,""ballKeeping"":50,""passing"":50,""longBall"":50,
+                        ""agility"":50,""shooting"":50,""shootPower"":50,""positioning"":50,
+                        ""reaction"":50,""ballControl"":50
+                    }
+                }],
+                ""memberships"":[{""clubId"":""fixture-club"",""playerId"":""fixture-player""}],
+                ""visualProfiles"":[{
+                    ""playerId"":""fixture-player"",
+                    ""skin"":{""skinId"":""builtin-player"",""revision"":1,""compatibilityProfile"":""football-player-v1""},
+                    ""appearance"":{
+                        ""skinTone"":""tone-4"",""hairStyle"":""locs"",""hairColor"":""black"",
+                        ""beardStyle"":""full"",""beardColor"":""dark-brown"",""bootsColor"":""cyan"",
+                        ""sockAccessoryColor"":""white""
+                    }
+                }]
+            }";
+            var path = CreateTemporaryDatabase(json);
+            var uri = new Uri(path).AbsoluteUri;
+            bootstrap.Load(uri);
+            yield return WaitForLoad(FootballDatabaseLoadState.Ready);
+
+            Assert.That(bootstrap.VisualProfiles, Has.Count.EqualTo(1));
+            var previousCatalog = bootstrap.Session.ActiveCatalog;
+            var previousProfiles = bootstrap.VisualProfiles;
+            var previousAppearance = previousProfiles[0].Appearance;
+            var expectedAppearance = new[] { "tone-4", "locs", "black", "full", "dark-brown", "cyan", "white" };
+            Assert.That(AppearanceValues(previousAppearance), Is.EqualTo(expectedAppearance));
+            Assert.That(previousCatalog.DatabaseRevision, Is.EqualTo(19));
+            Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(uri));
+
+            File.WriteAllText(path, json.Replace("\"bootsColor\":\"cyan\"", "\"bootsColor\":\"ultraviolet\""));
+            LogAssert.Expect(LogType.Error,
+                "[FootballWorld] Database load failed. The previous catalog remains active.");
+            LogAssert.Expect(LogType.Error,
+                new Regex(@"^\[FootballWorld\] unknown_appearance_preset at \$\.visualProfiles\[0\]\.appearance\.bootsColor: "));
+            bootstrap.Reload();
+            yield return WaitForLoad(FootballDatabaseLoadState.Failed);
+
+            Assert.That(bootstrap.Session.ActiveCatalog, Is.SameAs(previousCatalog));
+            Assert.That(bootstrap.VisualProfiles, Is.SameAs(previousProfiles));
+            Assert.That(bootstrap.VisualProfiles[0].Appearance, Is.SameAs(previousAppearance));
+            Assert.That(AppearanceValues(previousAppearance), Is.EqualTo(expectedAppearance));
+            Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(uri));
+            Assert.That(bootstrap.Errors, Has.Count.EqualTo(1));
+            Assert.That(bootstrap.Errors[0].Code, Is.EqualTo("unknown_appearance_preset"));
+
+            var nextJson = json.Replace("\"databaseRevision\":19", "\"databaseRevision\":20")
+                .Replace("\"bootsColor\":\"cyan\"", "\"bootsColor\":\"white\"");
+            File.WriteAllText(path, nextJson);
+            bootstrap.Reload();
+            yield return WaitForLoad(FootballDatabaseLoadState.Ready);
+            Assert.That(bootstrap.Session.ActiveCatalog.DatabaseRevision, Is.EqualTo(20));
+            Assert.That(bootstrap.VisualProfiles, Is.Not.SameAs(previousProfiles));
+            Assert.That(bootstrap.VisualProfiles[0].Appearance, Is.Not.SameAs(previousAppearance));
+            Assert.That(bootstrap.VisualProfiles[0].Appearance.BootsColor, Is.EqualTo("white"));
+            Assert.That(AppearanceValues(previousAppearance), Is.EqualTo(expectedAppearance));
+            Assert.That(previousCatalog.DatabaseRevision, Is.EqualTo(19));
             Assert.That(bootstrap.Errors, Is.Empty);
         }
 
@@ -239,7 +313,16 @@ namespace FStudio.FootballWorld.Tests.PlayMode
                     profile.PlayerId, profile.Skin.SkinId, profile.Skin.Revision, profile.Skin.CompatibilityProfile }),
                 Is.EqualTo(expectedImport.VisualProfiles.Select(profile => new {
                     profile.PlayerId, profile.Skin.SkinId, profile.Skin.Revision, profile.Skin.CompatibilityProfile })));
+            for (var i = 0; i < bootstrap.VisualProfiles.Count; i++)
+                Assert.That(AppearanceValues(bootstrap.VisualProfiles[i].Appearance),
+                    Is.EqualTo(AppearanceValues(expectedImport.VisualProfiles[i].Appearance)),
+                    "All seven appearance choices, or their absence, must survive runtime loading.");
         }
+
+        private static string[] AppearanceValues(BuiltinAppearanceData appearance) => appearance == null ? null : new[] {
+            appearance.SkinTone, appearance.HairStyle, appearance.HairColor, appearance.BeardStyle,
+            appearance.BeardColor, appearance.BootsColor, appearance.SockAccessoryColor
+        };
 
         private static int[] AttributeValues(PlayerAttributes attributes) => new[] {
             attributes.Strength, attributes.Acceleration, attributes.TopSpeed, attributes.DribbleSpeed,

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#183d47">
+    <title>Editor de base · Futebol Brasileiro</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Ir para a edição</a>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegação do editor">
+        <a class="brand" href="./">
+          <svg viewBox="0 0 40 48" width="36" height="44" aria-hidden="true"><path d="M3 3h34v27L20 45 3 30Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 14h16M12 23h16M20 14v18" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <span>Futebol<br><strong>Brasileiro</strong></span>
+        </a>
+        <div class="sidebar-caption">EDITOR DE BASE</div>
+        <nav id="navigation" aria-label="Cadastros"></nav>
+        <div class="sidebar-bottom"><span class="local-dot" aria-hidden="true"></span> Ambiente local<p>Seu elenco, do cadastro<br>para o campo.</p></div>
+      </aside>
+      <main class="main">
+        <header class="page-header">
+          <div><p class="eyebrow">FUTEBOL BRASILEIRO / BASE DE DADOS</p><h1 id="page-title">Jogadores</h1></div>
+          <div class="header-actions"><a class="button button-outline" href="/" target="_blank" rel="noopener">Jogar <span aria-hidden="true">↗</span></a><button id="export" class="button button-outline" disabled>Exportar JSON</button><button id="save" class="button button-primary" disabled>Salvar alterações</button></div>
+        </header>
+        <div id="save-status" class="save-status" aria-live="polite"></div>
+        <div id="feedback" aria-live="polite"></div>
+        <section id="workspace" class="workspace" aria-label="Editor de cadastros" tabindex="-1"><div class="state-panel"><span class="spinner" aria-hidden="true"></span><h2>Carregando a base</h2><p>Buscando clubes, jogadores e opções de aparência.</p></div></section>
+        <footer class="page-footer">As alterações salvas aparecem no jogo após atualizar a página. Partidas em andamento mantêm os dados com que começaram.</footer>
+      </main>
+    </div>
+    <dialog id="app-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description"></dialog>
+    <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+  </body>
+</html>

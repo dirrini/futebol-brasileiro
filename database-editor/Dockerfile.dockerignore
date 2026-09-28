@@ -1,0 +1,10 @@
+**
+!database-editor/
+!database-editor/**
+database-editor/node_modules/
+!Assets/
+!Assets/FootballSimulator/
+!Assets/FootballSimulator/Data/
+!Assets/FootballSimulator/Data/FootballWorld/
+!Assets/FootballSimulator/Data/FootballWorld/Schemas/
+!Assets/FootballSimulator/Data/FootballWorld/Schemas/*.json

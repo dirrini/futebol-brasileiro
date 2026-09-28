@@ -169,6 +169,10 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             var usesDefaultAppearance = false;
             for (var i = 0; i < plan.Players.Count; i++)
             {
+                // A complete portable appearance owns all seven cosmetic fields.
+                // It does not need a local PlayerEntry or a declared legacy fallback.
+                if (profiles.TryGetValue(plan.Players[i].Id, out var profile) && profile.Appearance != null)
+                    continue;
                 if (!appearances.TryGetValue(plan.Players[i].Id, out selectedAppearances[i]))
                 {
                     selectedAppearances[i] = bindings.DefaultPlayerAppearance;
@@ -202,7 +206,10 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                     player.hideFlags = HideFlags.DontSave;
                     player.team = team;
                     ApplyCatalogPlayer(player, plan.Players[i]);
-                    ApplyAppearance(player, selectedAppearances[i]);
+                    if (profiles.TryGetValue(plan.Players[i].Id, out var profile) && profile.Appearance != null)
+                        BuiltinAppearanceMapper.Apply(player, profile.Appearance);
+                    else
+                        ApplyAppearance(player, selectedAppearances[i]);
                     playerIds.Add(plan.Players[i].Id);
                 }
                 team.IsValid = true;

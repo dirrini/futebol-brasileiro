@@ -1,8 +1,9 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: catálogo integrado ao amistoso, 28/09/2026. Domain, Application, DTOs,
-importador JSON, bootstrap e ponte com a partida 3D estão implementados. Campeonato,
-editor externo e processamento de skins continuam planejados
+Estado: catálogo e presets integrados ao amistoso, 28/09/2026. Domain, Application,
+DTOs v1/v2, importador JSON, bootstrap e ponte com a partida 3D estão implementados.
+Há um editor local intermediário de clubes/jogadores e aparência padrão.
+Campeonato, editor completo e processamento de skins continuam planejados
 conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
 [DATA-FORMAT.md](DATA-FORMAT.md); uso e testes em [README-DATABASE.md](README-DATABASE.md).
 
@@ -12,22 +13,31 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
   RosterMembership e DatabaseCatalog imutáveis, com invariantes próprias.
 - `Application`: CatalogSession ativa um catálogo completo; LineupPlanner escolhe
   onze jogadores para uma formação. Não representa uma temporada em andamento.
-- `DataContracts`: DTOs de intercâmbio, incluindo referências visuais separadas.
+- `DataContracts`: DTOs de intercâmbio, incluindo referências visuais separadas e
+  os sete IDs de preset em BuiltinAppearanceData, sem enums do motor Unity.
 - `Infrastructure/Importing`: JsonDatabaseImporter valida JSON e suas referências,
   cria DTOs e mapeia explicitamente para o domínio; não lê arquivos ou muda sessões.
 - `Bootstrap`: FootballDatabaseBootstrap lê a base externa com UnityWebRequest e
   só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
-- `Editor`: FootballDatabaseBuildProcessor valida a base e a registra como arquivo
-  StreamingAssets adicional, sem criar fontes fora de FootballSimulator.
+- `Editor`: FootballDatabaseBuildProcessor valida a base e a registra com um schema
+  que aceita v1/v2 como StreamingAssets adicionais, sem criar fontes fora de
+  FootballSimulator.
 - `Infrastructure/LegacyMatch`: CatalogMatchAdapter converte os onze escalados em
   objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
   preparação e descarregamento; CatalogMatchLease mantém a revisão e os IDs.
+  BuiltinAppearanceMapper resolve os IDs portáteis nos presets visuais existentes.
+- `database-editor/client`: aplicação externa em ES modules, com rascunho único de
+  edição, formulários, prévia ilustrativa e publicação explícita da base.
+- `database-editor/server`: Node 22 com rotas HTTP, validação Ajv 8 dos schemas,
+  verificação semântica e gravação do arquivo separadas em módulos.
 
 O exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores. A seleção
 aguarda o catálogo e apresenta seus clubes; o amistoso recebe nomes, medidas e
 atributos importados. TeamEntry/PlayerEntry persistentes fornecem apenas recursos
-visuais e formação via LegacyMatchBindings. Não há fallback para DatabaseService.
-Apenas a aparência embutida é suportada; skins externas continuam planejadas.
+visuais e formação via LegacyMatchBindings. Aparência completa em v2 tem prioridade
+e dispensa binding de jogador; se omitida, preserva o caminho legado e seu default
+declarado. Não há fallback para DatabaseService. Apenas a aparência embutida é
+suportada; skins externas continuam planejadas.
 
 ## Objetivos
 
@@ -129,8 +139,9 @@ autoritativo do cadastro externo nem do progresso da temporada.
   PlayerId ordinal. Vagas restantes recebem jogadores de linha e geram aviso.
   Reservas e jogadores sem clube continuam no catálogo, sem truncamento.
 - LegacyMatchBindings é um ScriptableObject editável que associa IDs a escudos,
-  kits, formações e aparência local. Defaults declarados atendem novos IDs com
-  aviso. Nenhum atributo esportivo é lido desses templates.
+  kits, formações e aparência local. Defaults declarados atendem recursos sem
+  binding com aviso; um perfil de aparência completo no JSON dispensa o template
+  de jogador. Nenhum atributo esportivo é lido desses templates.
 - Cada CatalogMatchLease possui clones exclusivos dos times/jogadores, snapshot
   do catálogo e mapeamento dos IDs locais 0–21 para PlayerId/ClubId. Atualizar a
   base durante a preparação/partida não altera a execução ativa.
@@ -178,7 +189,38 @@ Limitações observadas do legado que orientam a implementação:
 - `GoalCelebrationScene` atualiza o placar. Preservar esse comportamento durante
   a primeira integração; qualquer separação posterior exige testes de gols.
 
-## Base externa e importação
+## Editor local e base externa
+
+O editor é uma aplicação separada, em `database-editor`, exposta em `/editor/` pelo
+Nginx do jogo. O frontend não referencia assemblies Unity ou o core C#; compartilha
+o contrato portátil e as opções de presets com o backend. A partida continua
+recebendo conteúdo pelo importador C#, com validação própria, antes de ativar a
+revisão. Não é necessário que o editor participe da execução da partida.
+
+O recorte implementado permite CRUD de clubes/jogadores, vínculos de elenco,
+posições naturais, medidas, quinze atributos e sete presets visuais. Formulários
+compartilham um rascunho em memória; salvar é uma ação explícita da base inteira,
+e exportar JSON pode preservar mudanças ainda não publicadas. A prévia é uma
+ilustração dos presets, não uma renderização do personagem do Unity.
+
+O backend separa parsing JSON estrito, schemas/referências, transporte HTTP e
+`DatabaseStore`. A leitura devolve um ETag derivado dos bytes. O salvamento exige
+`If-Match`, confere identidade/revisão, valida a base e incrementa a revisão. Escritas
+são serializadas no processo; uma segunda comparação de hash detecta alterações
+externas antes de substituir a fonte pelo arquivo temporário. Erros ou conflitos
+não publicam o rascunho nem o apagam da aba. Uma cópia local da revisão anterior
+fica em `Examples/.editor-backups/previous.database.json`; não representa progresso
+de temporada, nem histórico completo.
+
+No Compose, `database-editor` recebe escrita somente no bind do diretório de
+autoria; executa como usuário Node com filesystem do container somente leitura.
+`soccer-web` monta esse mesmo diretório apenas para leitura e publica um único JSON.
+O editor não expõe porta no host: o proxy atende em `127.0.0.1:8080/editor/`.
+Nenhum volume Docker persistente é necessário. O Compose aguarda o editor saudável
+ao iniciar o servidor web, mas o carregamento do catálogo pelo jogo é direto no
+Nginx e independe da API durante a partida.
+
+## Importação no jogo
 
 Fluxo: leitura do pacote -> validação estrutural -> validação de referências e
 capacidades -> mapeamento -> ativação de uma nova revisão do catálogo.
@@ -193,9 +235,10 @@ regras suportados. O domínio mantém suas próprias invariantes. Um pacote inv�
 não substitui a base ativa. Não executar scripts ou nomes de tipos recebidos em
 JSON. Regulamentos parametrizam comportamentos implementados no jogo.
 
-O editor oferece criar, editar, validar e exportar. O jogo continua utilizável sem
-o editor em execução. A primeira integração usa um arquivo local; hospedagem de
-catálogos públicos pode ser acrescentada como outra origem de conteúdo.
+O editor atual oferece criar, editar, validar e exportar clubes/jogadores. A rota
+local ainda não importa pacotes gráficos, competições ou regulamentos. Hospedagem
+de catálogos públicos pode ser acrescentada como outra origem de conteúdo; a
+aplicação local não define autenticação ou publicação pública de uma galeria.
 
 ## Skins da comunidade
 
@@ -219,7 +262,7 @@ Separar dois artefatos:
    Addressables/AssetBundles gerados para a versão do jogo e a plataforma alvo.
    O primeiro alvo é WebGL. O jogo carrega esse conteúdo preparado.
 
-O editor permite selecionar o pacote fonte, acompanhar validação e compilação,
+Na etapa futura de skins, o editor permitirá selecionar o pacote fonte, acompanhar validação e compilação,
 visualizar o resultado processado, corrigir problemas e associar a skin pronta.
 A preparação é uma operação separada, iniciada pelo editor e executada por um
 worker Unity; não é uma operação do core ou do navegador. Inicialmente o worker
@@ -261,7 +304,9 @@ Cada etapa segue o [AGENTS.md](AGENTS.md): preservar mudanças alheias, gerar bu
 WebGL novo para código e recursos compilados, servir com Compose e validar o
 comportamento afetado. Edições compatíveis exclusivamente no JSON externo são
 servidas diretamente pelo bind local e verificadas com refresh, sem novo build.
-Testes de regras
+Mudanças somente no editor, preservando o contrato, exigem testes Node, nova imagem
+Compose e verificação no navegador, reutilizando o player existente. Mudanças no
+contrato ou no adaptador Unity exigem novo WebGL. Testes de regras
 puros cobrem calendário, pontuação e duplicidade; testes de integração cobrem
 transições do motor e importação; testes visuais cobrem material e animação de
 skins. Aprovar compilação não comprova que uma skin funciona durante uma partida.

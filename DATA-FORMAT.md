@@ -1,34 +1,83 @@
 # Contratos de base e mídia
 
-Estado: contrato JSON v1 de clubes e jogadores implementado em 28/09/2026.
+Estado: contratos JSON v1 e v2 de clubes/jogadores implementados em 28/09/2026.
+V2 acrescenta presets de aparência; o editor local cria e salva esse conteúdo.
 Pacotes ZIP, campeonatos, mídia carregável e skins completas nas seções seguintes
 continuam sendo extensões planejadas. Consulte [README-DATABASE.md](README-DATABASE.md),
 [ROADMAP.md](ROADMAP.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Contrato executável atual: JSON v1
+## Contratos executáveis atuais: JSON v1 e v2
 
 Schema: [database-v1.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
+Extensão de aparência: [database-v2.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json).
 Exemplo: [four-clubs.database.json](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 
 O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
 
 | Campo obrigatório | Conteúdo |
 | --- | --- |
-| schemaVersion | Inteiro 1 |
+| schemaVersion | Inteiro 1 ou 2 |
 | databaseId | ID permanente da base |
 | databaseRevision | Inteiro de 1 a 2147483647 |
 | clubs | Um ou mais objetos com id e name |
 | players | Um ou mais jogadores com id, name, naturalPositions, heightCm, weightKg e attributes |
 | memberships | Zero ou mais vínculos clubId/playerId; um clube inicial por jogador |
-| visualProfiles | Zero ou mais perfis com playerId e skin; no máximo um por jogador |
+| visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional apenas em v2; no máximo um por jogador |
 
 `skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
 O importador valida a forma da referência e a existência de PlayerId. A ponte do
-amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`, usando a
-aparência local associada ao PlayerId. Perfil ausente também usa essa aparência.
+amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`. Em v2,
+uma `appearance` completa define os sete presets; se omitida, usa a aparência
+local associada ao PlayerId ou o default declarado com diagnóstico. Perfil
+ausente também mantém o comportamento legado. V1 continua válido e rejeita o
+novo campo; a migração é explícita por `schemaVersion: 2`.
 Outras skins/revisões/perfis bloqueiam um clube quando estão entre os onze
 escalados. O catálogo pode registrá-los, mas ainda não há download ou processamento
 de modelos externos; não existe substituição silenciosa de uma skin solicitada.
+
+### Aparência portátil v2
+
+`appearance` é opcional, mas, quando presente, precisa conter exatamente os sete
+campos abaixo, sem nulls nem valores desconhecidos. Os IDs são sensíveis a
+maiúsculas. A aparência só é aceita com `builtin-player@1` e
+`football-player-v1`; não modifica nem substitui uma skin personalizada.
+
+| Campo | IDs disponíveis |
+| --- | --- |
+| skinTone | tone-1, tone-2, tone-3, tone-4, tone-5, tone-6 (do mais claro ao mais escuro na paleta atual) |
+| hairStyle | none, short, styled, styled-alt, mohawk, locs, short-parted |
+| hairColor | brown, dark-brown, black, light-yellow, yellow, gray, white, green, dark-green, blue, dark-blue, light-red, red, light-orange, orange |
+| beardStyle | none, mustache, goatee, full |
+| beardColor | Os mesmos IDs de hairColor |
+| bootsColor | black, red, orange, purple, cyan, gray, white |
+| sockAccessoryColor | none, black, gray, white |
+
+Exemplo de campo em um perfil v2:
+
+```json
+"appearance": {
+  "skinTone": "tone-3",
+  "hairStyle": "short",
+  "hairColor": "black",
+  "beardStyle": "goatee",
+  "beardColor": "dark-brown",
+  "bootsColor": "cyan",
+  "sockAccessoryColor": "white"
+}
+```
+
+`none` remove cabelo/barba/faixa conforme o campo. `full` resolve para a barba
+longa existente; `sockAccessoryColor` colore somente a faixa/acessório, enquanto
+o meião completo pertence ao uniforme. Os nomes identificam a paleta legada:
+`bootsColor: red`, por exemplo, corresponde atualmente a um rosa avermelhado.
+As cores e meshes podem ser ajustadas nos recursos Unity; isso exige novo build.
+
+O adaptador `BuiltinAppearanceMapper` converte os IDs para os enums do legado.
+DTOs armazenam strings portáteis; Domain/Application não dependem desses enums
+ou carregam materiais. Uma aparência completa dispensa binding de PlayerEntry.
+Ela não altera altura, peso, atributos, colisores ou regras de gameplay.
+
+### Dados esportivos e validação
 
 Cada jogador declara suas posições dentre GK, RB, LB, CB, DM, CM, RM, LM, AM, LW,
 RW e ST, sem repetição. Altura é um inteiro entre 150 e 210 cm; peso entre 45 e
@@ -43,9 +92,9 @@ sensíveis a maiúsculas. Jogador sem vínculo representa um jogador sem clube;
 elencos vazios ou maiores que onze são válidos no catálogo. LineupPlanner verifica
 se o clube pode fornecer um goleiro natural e dez jogadores de linha ao amistoso.
 
-Objetos não aceitam propriedades desconhecidas. Null, campos ausentes e conversões
+Objetos não aceitam propriedades desconhecidas. Null, campos obrigatórios ausentes e conversões
 implícitas de strings para números são rejeitados. Regras, competições, caminhos
-de arquivo e recursos binários não podem ser acrescentados ao v1 sem uma evolução
+de arquivo e recursos binários não podem ser acrescentados aos contratos atuais sem uma evolução
 explícita de versão e importador; não são campos silenciosamente ignorados.
 
 O runtime impõe até 1 MiB UTF-8 e profundidade 32. JSON deve usar aspas duplas,
@@ -66,13 +115,22 @@ migração inicial. A revisão 2 substitui Royal por São Paulo FC e seus 39 atl
 com novas identidades. Nomes e alturas têm fontes oficiais; pesos, atributos e
 adaptações táticas são demonstrativos, conforme [SAO-PAULO-DATA.md](SAO-PAULO-DATA.md).
 Escudo e dois uniformes são recursos Unity associados ao ClubId, sem acrescentar
-campos de mídia ao JSON v1. A edição local compatível do JSON é lida por refresh
+campos de mídia ao JSON. A revisão 3 usa v2 e registra as sete escolhas visuais
+copiadas dos bindings genéricos dos 72 jogadores; não são feições pesquisadas dos
+atletas. A edição local compatível do JSON é lida por refresh
 no Compose; novos recursos compilados ainda requerem build.
+
+O editor local salva JSON validado com controle de concorrência por ETag/If-Match,
+incremento de `databaseRevision` no servidor e substituição atômica do arquivo.
+Exportar um rascunho não muda a revisão publicada. A aplicação pode ler v1 e
+promove o rascunho para v2 ao definir uma aparência. Os schemas de autoria são
+separados; `StreamingAssets/FootballWorld/database.schema.json` e
+`/editor/api/schema` publicam as duas versões suportadas.
 
 ## Extensões planejadas
 
 As seções abaixo orientam as próximas versões. Elas não descrevem campos extras
-aceitos pelo importador v1 nem funcionalidades já disponíveis.
+aceitos pelos importadores v1/v2 nem funcionalidades já disponíveis.
 
 ## Versões e identidades
 
@@ -206,7 +264,7 @@ Exemplo parcial de associação em um perfil visual:
 ```
 
 Os valores e campos desse exemplo são ilustrativos da extensão futura; não formam
-um objeto válido do contrato v1 atual. O perfil visual não altera velocidade,
+um objeto válido dos contratos v1/v2 atuais. O perfil visual não altera velocidade,
 força, IA, colisão ou regras.
 Referências abreviadas como `portraitAssetId` e `fallbackSkinId` são resolvidas
 pelo manifesto imutável da base para revisões e digests exatos. Isso também vale

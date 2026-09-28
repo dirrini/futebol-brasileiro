@@ -14,3 +14,8 @@
 /.secrets/
 *.ulf
 *.alf
+
+# Local editor dependencies and the previous successfully saved database.
+/database-editor/node_modules/
+/Assets/FootballSimulator/Data/FootballWorld/Examples/.editor-backups/
+/Assets/FootballSimulator/Data/FootballWorld/Examples/.editor-*.tmp

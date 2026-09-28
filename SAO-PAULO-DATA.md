@@ -10,8 +10,10 @@ O São Paulo substitui Royal e seus onze jogadores, com os **39 atletas** listad
 na [página oficial do elenco profissional](https://www.saopaulofc.net/esporte/futebol-masculino-profissional/).
 Os outros três clubes, seus 33 jogadores, vínculos e perfis visuais foram mantidos.
 
-A base preserva `databaseId` e passa a `databaseRevision: 2`. São Paulo FC recebe
-o novo `ClubId` `club-8515fca92adc4d77a428fb272bb7d160`; cada atleta recebe um novo
+A inclusão do clube na revisão 2 preservou `databaseId`. A revisão 3 promove a base
+a `schemaVersion: 2` e grava as sete escolhas de aparência dos 72 jogadores,
+copiadas exatamente dos bindings já usados, sem mudar elenco ou atributos.
+São Paulo FC recebeu o novo `ClubId` `club-8515fca92adc4d77a428fb272bb7d160`; cada atleta recebeu um novo
 `PlayerId` opaco, gerado uma única vez e gravado no JSON. O novo clube não herda a
 identidade esportiva de Royal. Futuras edições dos mesmos registros devem
 preservar esses IDs, mesmo quando nomes, atributos ou vínculos mudarem.
@@ -37,13 +39,16 @@ preservar esses IDs, mesmo quando nomes, atributos ou vínculos mudarem.
   oficiais, desempenho atual ou comparação entre jogadores reais.
 - **Disponibilidade:** todos os 39 estão disponíveis no teste. Lesões, suspensões,
   condição física, contratos e inscrição em competições não são simulados pelo
-  contrato JSON v1.
+  contratos JSON v1/v2.
 - **Escalação:** o amistoso seleciona onze por compatibilidade de posição e
   desempate por ID. Não escolhe os melhores atributos nem reproduz o time titular
   do São Paulo. Os demais atletas permanecem no catálogo, sem serem truncados.
 - **Aparência:** todos referenciam `builtin-player`, revisão 1, perfil
   `football-player-v1`. São personagens genéricos do jogo, sem rostos ou modelos
-  3D dos atletas. A configuração de uniforme e escudo pertence ao adaptador visual
+  3D dos atletas. Tom de pele, cabelo/barba e cores de chuteiras/faixa da meia
+  conservam os presets demonstrativos anteriores, agora editáveis no JSON v2 e
+  no editor local. Não são características físicas verificadas dos jogadores reais.
+  A configuração de uniforme e escudo pertence ao adaptador visual
   Unity, separado deste JSON; esta amostra não implementa skins da comunidade.
 
 ## Elenco e fontes individuais
@@ -111,10 +116,12 @@ confirma a utilização recente de atletas da relação, incluindo Pedro Lima e
 Sabino. A base representa a lista do site consultada em 28/09/2026; não é
 sincronizada automaticamente com transferências ou alterações futuras.
 
-Para alterar ou experimentar nomes, medidas, posições e atributos, edite o JSON
-preservando seus IDs. Consulte [README-DATABASE.md](README-DATABASE.md) para o
+Para alterar ou experimentar nomes, medidas, posições, atributos e aparência,
+use [o editor local](http://localhost:8080/editor/) ou edite o JSON preservando seus
+IDs. O editor incrementa a revisão ao salvar; uma edição manual deve fazê-lo
+explicitamente. Consulte [README-DATABASE.md](README-DATABASE.md) para o
 fluxo de publicação local e [DATA-FORMAT.md](DATA-FORMAT.md) para os limites do
-contrato. As fontes ficam neste documento porque o JSON v1 rejeita propriedades
+contrato. As fontes ficam neste documento porque o JSON v1/v2 rejeita propriedades
 adicionais de procedência e comentários.
 
 ## Escudo e uniformes do protótipo
@@ -131,5 +138,5 @@ Não reproduzem patrocinadores, estrelas, detalhes de fabricação nem a coleç�
 completa. O kit do goleiro é um recurso de contraste do protótipo. As aparências
 genéricas são associadas em sequência aos 39 IDs e não representam características
 físicas individuais. Os recursos ficam em `Assets/FootballSimulator/Arts/Teams/SaoPaulo`.
-Alterações nesse material compilado exigem build; o JSON de nomes e atributos
+Alterações nesse material compilado exigem build; o JSON de nomes, atributos e presets
 pode mudar apenas com refresh após a instalação desta versão.
