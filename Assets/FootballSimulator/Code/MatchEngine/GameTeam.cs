@@ -259,7 +259,7 @@ namespace FStudio.MatchEngine {
         public void Clear() {
             if (GamePlayers != null) {
                 foreach (PlayerBase player in GamePlayers) {
-                    player.Dispose();
+                    player?.Dispose();
                 }
             }
 

@@ -1,14 +1,15 @@
-# Base externa: fundação de dados
+# Base externa e amistoso
 
-Esta etapa carrega um catálogo de clubes/jogadores independente do motor Unity.
+O jogo carrega um catálogo de clubes/jogadores independente do motor Unity.
 A base de exemplo contém Royal, Milano, London e Catalagna, com 44 jogadores e
-44 vínculos. O jogo importa o catálogo ao iniciar; o amistoso e a seleção de times
-existentes continuam usando o cadastro legado até a próxima etapa de integração.
+44 vínculos. A seleção e o amistoso usam esse catálogo para os dados esportivos.
+Escudos, uniformes, formações e aparência continuam editáveis em recursos Unity.
 
 ## Arquivos de autoria
 
 - [Base de exemplo](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 - [JSON Schema v1](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
+- [Bindings visuais](Assets/FootballSimulator/Resources/FootballWorld/LegacyMatchBindings.asset).
 - [Contrato e limites](DATA-FORMAT.md).
 - [Arquitetura](ARCHITECTURE.md) e [próximas entregas](ROADMAP.md).
 
@@ -58,9 +59,45 @@ O bootstrap persiste entre cenas. Expõe `Current.Session.ActiveCatalog`, `State
 solicitado pode ativar dados. Uma falha indica `Failed` e mantém o catálogo anterior;
 os consumidores devem distinguir o estado da última tentativa do catálogo ativo.
 
-Não há tela de upload, persistência da seleção de base, resolução de skins ou
-adaptação dos clubes importados para uma partida nesta entrega. A evidência do
-carregamento está no log e nas consultas da sessão; o menu atual permanece igual.
+## Seleção e partida
+
+O menu mostra os clubes do catálogo. Escolha dois clubes distintos e pressione
+Play. Na preparação, confira nomes, escalações e kits; Back to teams cancela e
+preserva as escolhas. Ao sair da partida, a seleção volta com os mesmos ClubIds.
+Enquanto a base carrega, os seletores e Play ficam indisponíveis. Uma falha de
+leitura mostra diagnóstico e Retry, sem recorrer ao cadastro antigo.
+
+LineupPlanner escolhe onze jogadores de forma determinística por posições e IDs:
+um goleiro natural, preferindo um jogador exclusivo de GK, e dez jogadores de
+linha. Maximiza as correspondências naturais da formação e preenche eventuais
+vagas restantes com jogadores de linha, avisando sobre improvisações. Não escolhe
+por overall nem promete a melhor escalação tática. Reservas permanecem na base;
+cadastros com menos de onze ou sem goleiro/linha suficientes aparecem bloqueados.
+
+No Inspector de LegacyMatchBindings, as listas Clubs e Players associam IDs a
+templates visuais existentes. Clube sem binding usa os defaults declarados de
+escudo, kits e formação, com aviso. Jogador sem binding usa DefaultPlayerAppearance,
+também com aviso. Para preservar a identidade ao renomear clubes/jogadores,
+edite o nome no JSON mantendo o ID; não altere os vínculos visuais.
+
+Somente nome, medidas e quinze atributos do JSON entram nos objetos esportivos
+temporários. Templates fornecem recursos visuais, nunca atributos. Cada partida
+possui clones próprios e a revisão do catálogo usada na preparação; o mapeamento
+0–21 -> ClubId/PlayerId fica em FriendlyMatchSession.ActiveMatch.Players. Os clones
+são liberados depois da UI e do motor ao cancelar, sair ou recuperar uma falha.
+
+Sem perfil visual, ou com builtin-player@1 / football-player-v1, o jogo usa a
+aparência embutida. Uma skin diferente em um titular impede a partida desse clube
+com mensagem visível; não é substituída silenciosamente. Skins dos reservas são
+verificadas quando escalados. Não há upload, modelos externos, save, campeonato
+ou persistência da seleção após recarregar o navegador nesta entrega.
+
+O console registra também a origem da seleção e da partida:
+
+```text
+[FootballWorld] Friendly selection uses database <id> revision 1: 4 clubs.
+[FootballWorld] 3D friendly started with 22 imported players from database revision 1.
+```
 
 ## Validação e testes
 
@@ -69,8 +106,12 @@ para DTOs/modelos, compatível com IL2CPP. Domain/Application não referenciam U
 Newtonsoft ou DTOs. A biblioteca DataContracts também é independente do Unity.
 
 No Test Runner do Unity, executar os testes de FootballWorld em EditMode e PlayMode.
-EditMode cobre contrato, referências, invariantes e snapshots. PlayMode verifica
-leitura externa e o ciclo de vida do bootstrap. Testes ficam fora do player final.
+EditMode cobre contrato, referências, invariantes, escalação, mapeamento dos quinze
+atributos, bindings por IDs e vida independente dos clones. PlayMode verifica
+leitura externa e o ciclo de vida do bootstrap. As fixtures do adaptador ficam em
+Code/FootballWorld/Editor/Tests, na assembly Editor padrão, pois usam o legado.
+Testes ficam fora do player final. Validar também navegação e partida no navegador;
+testes do adaptador não comprovam o comportamento da física ou IA.
 
 Validação estrutural opcional, usando PowerShell 7 com `Test-Json` disponível:
 

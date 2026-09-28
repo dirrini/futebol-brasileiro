@@ -23,10 +23,12 @@ O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
 | visualProfiles | Zero ou mais perfis com playerId e skin; no máximo um por jogador |
 
 `skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
-O importador valida a forma da referência e a existência de PlayerId. Disponibilidade
-do modelo, rig, compatibilidade gráfica e download ainda não são verificados:
-esta etapa não carrega skins. `builtin-player`, usado no exemplo, é uma referência
-descritiva reservada para a futura ponte visual, não um registro já resolvido.
+O importador valida a forma da referência e a existência de PlayerId. A ponte do
+amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`, usando a
+aparência local associada ao PlayerId. Perfil ausente também usa essa aparência.
+Outras skins/revisões/perfis bloqueiam um clube quando estão entre os onze
+escalados. O catálogo pode registrá-los, mas ainda não há download ou processamento
+de modelos externos; não existe substituição silenciosa de uma skin solicitada.
 
 Cada jogador declara suas posições dentre GK, RB, LB, CB, DM, CM, RM, LM, AM, LW,
 RW e ST, sem repetição. Altura é um inteiro entre 150 e 210 cm; peso entre 45 e
@@ -38,8 +40,8 @@ Nomes têm até 100 pontos de código Unicode e não podem conter apenas espaço
 Não são normalizados silenciosamente. IDs têm 1 a 64 caracteres ASCII dentre
 letras, números, ponto, sublinhado e hífen, começando por letra ou número. São
 sensíveis a maiúsculas. Jogador sem vínculo representa um jogador sem clube;
-elencos vazios ou maiores que onze são válidos no catálogo. Verificar a capacidade
-de escalar uma partida será responsabilidade da futura aplicação de partidas.
+elencos vazios ou maiores que onze são válidos no catálogo. LineupPlanner verifica
+se o clube pode fornecer um goleiro natural e dez jogadores de linha ao amistoso.
 
 Objetos não aceitam propriedades desconhecidas. Null, campos ausentes e conversões
 implícitas de strings para números são rejeitados. Regras, competições, caminhos
@@ -198,8 +200,9 @@ Exemplo parcial de associação em um perfil visual:
 }
 ```
 
-Os valores são ilustrativos; nenhum desses IDs/perfis está registrado no jogo
-atual. O perfil visual não altera velocidade, força, IA, colisão ou regras.
+Os valores e campos desse exemplo são ilustrativos da extensão futura; não formam
+um objeto válido do contrato v1 atual. O perfil visual não altera velocidade,
+força, IA, colisão ou regras.
 Referências abreviadas como `portraitAssetId` e `fallbackSkinId` são resolvidas
 pelo manifesto imutável da base para revisões e digests exatos. Isso também vale
 para o catálogo de recursos embutidos; restaurar um save não consulta um alias

@@ -404,6 +404,7 @@ namespace FStudio.UI.MatchThemes {
 
         private void SetPlayer (PlayerFace face, GameTeam team, MatchPlayer player) {
             face.overallText.text = player.Player.Overall.ToString();
+            face.playerName.richText = false;
             face.playerName.text = $"{player.Number} {player.Player.Name}";
 
             foreach (var holder in face.playerHolders)

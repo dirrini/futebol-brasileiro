@@ -6,6 +6,8 @@ using FStudio.MatchEngine;
 using FStudio.MatchEngine.Enums;
 using TMPro;
 using FStudio.UI.Panels;
+using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using System;
 
 namespace FStudio.UI.MatchThemes {
     public class UpcomingMatchPanel : EventPanel<UpcomingMatchEvent> {
@@ -13,6 +15,8 @@ namespace FStudio.UI.MatchThemes {
         [SerializeField] private TextMeshProUGUI difficultyText;
 
         private UpcomingMatchEvent eventObject;
+        private bool isTransitioning;
+        private int preparationGeneration;
 
         /// <summary>
         /// home kit or away kit.
@@ -20,12 +24,15 @@ namespace FStudio.UI.MatchThemes {
         private bool[] kits = new bool[2];
 
         protected override async void OnEventCalled(UpcomingMatchEvent eventObject) {
+            var generation = ++preparationGeneration;
             this.eventObject = eventObject;
 
             if (eventObject == null) {
                 Disappear();
                 return;
             }
+            isTransitioning = false;
+            try {
 
             Debug.Log("Upcoming match");
 
@@ -35,11 +42,13 @@ namespace FStudio.UI.MatchThemes {
                 eventObject.details.homeTeam,
                 eventObject.details.homeTeam.Formation,
                 eventObject.details.homeTeam.Players);
+            if (!IsCurrentPreparation(generation, eventObject)) return;
 
             await teams [1].SetTeam(
                 eventObject.details.awayTeam,
                 eventObject.details.awayTeam.Formation,
                 eventObject.details.awayTeam.Players);
+            if (!IsCurrentPreparation(generation, eventObject)) return;
 
             kits[0] = false; // set home teams kit to main kit.
             kits[1] = true; // set away teams kit to side kit.
@@ -49,6 +58,20 @@ namespace FStudio.UI.MatchThemes {
             Appear();
 
             EventManager.Trigger<LoadingEvent>(null);
+            } catch (Exception exception) {
+                if (IsCurrentPreparation(generation, eventObject))
+                    await FriendlyMatchSession.Current.ReportMatchFailure(exception);
+            }
+        }
+
+        private bool IsCurrentPreparation(int generation, UpcomingMatchEvent expectedEvent) {
+            return this != null && generation == preparationGeneration && eventObject == expectedEvent;
+        }
+
+        protected override void OnDisable() {
+            ++preparationGeneration;
+            eventObject = null;
+            base.OnDisable();
         }
 
         private void UpdateKits () {
@@ -65,23 +88,54 @@ namespace FStudio.UI.MatchThemes {
         }
 
         public async void StartMatch () {
-            Disappear();
-
+            if (isTransitioning || eventObject == null || !IsActive) return;
+            isTransitioning = true;
+            var matchEvent = eventObject;
+            var session = FriendlyMatchSession.Current;
+            var lease = session.ActiveMatch;
+            try {
             // update the details.
-            var details = eventObject.details;
+            var details = matchEvent.details;
             details.aiLevel = MatchSettingsPanel.AILEVEL;
             details.dayTime = MatchSettingsPanel.DAYTIMES;
             details.userTeam = MatchSettingsPanel.SIDE;
-            eventObject.details = details;
+            matchEvent.details = details;
             //
 
+            // Disappear may disable this component and invalidate its UI event.
+            Disappear();
             await MatchEngineLoader.Current.StartMatchEngine(
-                eventObject,
+                matchEvent,
                 kits[0],
                 kits[1]);
+            } catch (Exception exception) {
+                if (session != null && ReferenceEquals(session.ActiveMatch, lease) &&
+                    (lease == null || !lease.IsDisposed))
+                    await session.ReportMatchFailure(exception);
+            }
+        }
+
+        public async void BackToTeams() {
+            if (isTransitioning || eventObject == null || !IsActive) return;
+            isTransitioning = true;
+            ++preparationGeneration;
+            eventObject = null;
+            var session = FriendlyMatchSession.Current;
+            var lease = session.ActiveMatch;
+            try {
+                await MatchEngineLoader.Current.UnloadMatch();
+                if (session != null && session.ActiveMatch == null) {
+                    EventManager.Trigger(new CloseAllPanelsEvent());
+                    EventManager.Trigger(new MainMenuEvent());
+                }
+            } catch (Exception exception) {
+                if (session != null && (session.ActiveMatch == null || ReferenceEquals(session.ActiveMatch, lease)))
+                    await session.ReportMatchFailure(exception);
+            }
         }
 
         public void SwitchKit (int index) {
+            if (isTransitioning || eventObject == null || index < 0 || index >= kits.Length) return;
             kits[index] = !kits[index];
 
             UpdateKits();

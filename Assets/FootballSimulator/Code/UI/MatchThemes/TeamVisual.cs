@@ -20,8 +20,10 @@ namespace FStudio.UI.MatchThemes {
         [SerializeField] private TextMeshProUGUI overallText;
 
         [SerializeField] private TeamSquadPresentation squadPresentation;
+        private Material logoMaterial;
 
         public async Task SetTeam (TeamEntry teamEntry, Formations formation, PlayerEntry[] players) {
+            nameText.richText = false;
             nameText.text = teamEntry.TeamName;
 
             var overall = teamEntry.Overall;
@@ -36,11 +38,17 @@ namespace FStudio.UI.MatchThemes {
             overallText.text = overall.ToString();
 
             logoImage.gameObject.SetActive(false);
-            logoImage.material = TeamLogoMaterial.Current.GetColoredMaterial(teamEntry.TeamLogo);
+            if (logoMaterial != null) Destroy(logoMaterial);
+            logoMaterial = TeamLogoMaterial.Current.GetColoredMaterial(teamEntry.TeamLogo);
+            logoImage.material = logoMaterial;
             logoImage.gameObject.SetActive(true);
 
             var squadPlayers = TeamSquadPresentation.PlayersToSquadMembers(players, formation, teamEntry);
             await squadPresentation.SetSquadMembers(squadPlayers);
+        }
+
+        private void OnDestroy() {
+            if (logoMaterial != null) Destroy(logoMaterial);
         }
     }
 }

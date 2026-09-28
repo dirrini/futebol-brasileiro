@@ -79,6 +79,7 @@ namespace FStudio.MatchEngine {
 
         private int refereeWhistleForKickOffDelay = 1000;
         private int kickOffAfterMilliSecs = 1000;
+        private int kickoffGeneration;
 
         [SerializeField] private float matchSpeed = 0.5f;
 
@@ -148,6 +149,7 @@ namespace FStudio.MatchEngine {
         }
 
         private void OnDisable() {
+            kickoffGeneration++;
             EventManager.UnSubscribe<KickOffEvent>(KickOff);
             EventManager.UnSubscribe<ThrowInEvent>(OnThrowIn);
             EventManager.UnSubscribe<OutEvent>(OnCorner);
@@ -155,6 +157,8 @@ namespace FStudio.MatchEngine {
 
         [Preserve]
         private void OnDestroy() {
+            CurrentMatchDetails = null;
+            AllPlayers = null;
             if (matchSceneManager != null) {
                 matchSceneManager.Dispose();
                 matchSceneManager = null;
@@ -242,7 +246,8 @@ namespace FStudio.MatchEngine {
         public static void ClearMatchAssets() {
             if (Current.Referees != null) {
                 foreach (var referee in Current.Referees) {
-                    Destroy(referee.PlayerController.UnityObject);
+                    if (referee?.PlayerController != null)
+                        Destroy(referee.PlayerController.UnityObject);
                 }
 
                 Current.Referees = null;
@@ -353,12 +358,15 @@ namespace FStudio.MatchEngine {
         }
 
         private async void StartKickoffCounter() {
+            var generation = ++kickoffGeneration;
             await UnityAsync.Delay(refereeWhistleForKickOffDelay);
+            if (this == null || !isActiveAndEnabled || generation != kickoffGeneration) return;
 
             EventManager.Trigger(new RefereeShortWhistleEvent());
             EventManager.Trigger(new ShowScoreboardEvent());
 
             await UnityAsync.Delay(kickOffAfterMilliSecs);
+            if (this == null || !isActiveAndEnabled || generation != kickoffGeneration) return;
 
             if (minutes == 0) {
                 EventManager.Trigger(new FirstWhistleEvent());
@@ -451,21 +459,25 @@ namespace FStudio.MatchEngine {
         public void ClearMatch () {
             MatchFlags &= ~MatchFlags;
 
-            Current.generalInput.Clear();
+            generalInput?.Clear();
+            generalInput = null;
 
             ClearMatchAssets();
 
             ResetMatchState();
+            CurrentMatchDetails = null;
+            AllPlayers = null;
         }
 
         public void ResetMatchState () {
+            kickoffGeneration++;
             Debug.Log("[MatchManager] ResetMatchState ()");
-            GameTeam1.Clear();
-            GameTeam2.Clear();
+            GameTeam1?.Clear();
+            GameTeam2?.Clear();
 
             var midPoint = new Vector3(fieldEndX / 2f, 0, fieldEndY / 2f);
 
-            ball.ResetBall(midPoint);
+            ball?.ResetBall(midPoint);
 
             MatchFlags = MatchStatus.NotPlaying;
         }

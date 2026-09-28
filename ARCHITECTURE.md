@@ -1,8 +1,8 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: fundação de dados implementada, 28/09/2026. Domain, Application, DTOs,
-importador JSON e bootstrap de catálogo estão implementados. Campeonato, ponte
-com a partida 3D, editor externo e processamento de skins continuam planejados
+Estado: catálogo integrado ao amistoso, 28/09/2026. Domain, Application, DTOs,
+importador JSON, bootstrap e ponte com a partida 3D estão implementados. Campeonato,
+editor externo e processamento de skins continuam planejados
 conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
 [DATA-FORMAT.md](DATA-FORMAT.md); uso e testes em [README-DATABASE.md](README-DATABASE.md).
 
@@ -10,8 +10,8 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 
 - `Domain`: ClubDefinition, PlayerDefinition, PlayerAttributes, PlayerPosition,
   RosterMembership e DatabaseCatalog imutáveis, com invariantes próprias.
-- `Application`: CatalogSession ativa um catálogo completo e permite consultar
-  seu elenco. Não representa ainda uma temporada em andamento.
+- `Application`: CatalogSession ativa um catálogo completo; LineupPlanner escolhe
+  onze jogadores para uma formação. Não representa uma temporada em andamento.
 - `DataContracts`: DTOs de intercâmbio, incluindo referências visuais separadas.
 - `Infrastructure/Importing`: JsonDatabaseImporter valida JSON e suas referências,
   cria DTOs e mapeia explicitamente para o domínio; não lê arquivos ou muda sessões.
@@ -19,12 +19,15 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
   só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
 - `Editor`: FootballDatabaseBuildProcessor valida a base e a registra como arquivo
   StreamingAssets adicional, sem criar fontes fora de FootballSimulator.
+- `Infrastructure/LegacyMatch`: CatalogMatchAdapter converte os onze escalados em
+  objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
+  preparação e descarregamento; CatalogMatchLease mantém a revisão e os IDs.
 
-O exemplo contém Royal, Milano, London e Catalagna, com 44 jogadores. O bootstrap
-o carrega em paralelo ao menu. O amistoso atual continua usando DatabaseService e
-TeamEntry; consumir o catálogo novo na partida é a próxima integração, não um
-efeito desta entrega. Referências de skins são dados versionados, sem resolução
-ou download gráfico implementado nesta etapa.
+O exemplo contém Royal, Milano, London e Catalagna, com 44 jogadores. A seleção
+aguarda o catálogo e apresenta seus clubes; o amistoso recebe nomes, medidas e
+atributos importados. TeamEntry/PlayerEntry persistentes fornecem apenas recursos
+visuais e formação via LegacyMatchBindings. Não há fallback para DatabaseService.
+Apenas a aparência embutida é suportada; skins externas continuam planejadas.
 
 ## Objetivos
 
@@ -74,10 +77,16 @@ Domain e Application possuem assemblies separados, sem referências ao Unity;
 Application referencia somente Domain. DataContracts e Importing também têm
 assemblies próprios: apenas Importing referencia Newtonsoft.Json. Bootstrap é
 uma assembly Unity que conecta os módulos, sem depender do motor legado.
-Adaptadores futuros que usam o legado podem permanecer inicialmente na assembly padrão:
+O adaptador LegacyMatch e a UI existente permanecem na assembly padrão:
 uma assembly criada por `.asmdef` não pode depender de classes em
 `Assembly-CSharp`. Extrair o legado será uma mudança futura delimitada, se houver
 necessidade. [Referência Unity](https://docs.unity3d.com/2022.3/Documentation/Manual/ScriptCompilationAssemblyDefinitionFiles.html).
+
+Nesta integração incremental, MainMenuPanel/TeamSelectionTeam dependem da fachada
+Unity FriendlyMatchSession. Ela é uma fronteira de composição concreta, fora de
+Domain/Application. O restante da UI e do motor legado não foi repartido em novas
+assemblies. Os contratos de competição abaixo serão extraídos quando tiverem
+consumidores reais; não são APIs já implementadas pelo amistoso.
 
 Não introduzir um servidor para coordenar a competição local, repositórios
 genéricos, um barramento global novo ou um framework de injeção apenas para
@@ -110,6 +119,31 @@ recursos Unity, prefabs e parâmetros de apresentação. Não são o armazenamen
 autoritativo do cadastro externo nem do progresso da temporada.
 
 ## Integração da competição com a partida
+
+### Ponte do amistoso implementada
+
+- A seleção guarda ClubId e reaplica esse ID após reconstrução da UI; renomear ou
+  reordenar clubes não muda a identidade. Só clubes distintos podem jogar.
+- LineupPlanner exige onze vagas, um goleiro natural e dez jogadores capazes de
+  atuar na linha. Faz correspondência máxima de posições naturais; empates usam
+  PlayerId ordinal. Vagas restantes recebem jogadores de linha e geram aviso.
+  Reservas e jogadores sem clube continuam no catálogo, sem truncamento.
+- LegacyMatchBindings é um ScriptableObject editável que associa IDs a escudos,
+  kits, formações e aparência local. Defaults declarados atendem novos IDs com
+  aviso. Nenhum atributo esportivo é lido desses templates.
+- Cada CatalogMatchLease possui clones exclusivos dos times/jogadores, snapshot
+  do catálogo e mapeamento dos IDs locais 0–21 para PlayerId/ClubId. Atualizar a
+  base durante a preparação/partida não altera a execução ativa.
+- Cancelar a preparação, sair da partida ou recuperar uma falha descarrega os
+  consumidores antes dos clones. A sessão persiste quando a UI geral é destruída.
+- Uma importação inválida bloqueia novas partidas e oferece Retry. O catálogo
+  válido anterior permanece no bootstrap, mas não é usado silenciosamente para
+  contornar a falha da última leitura.
+- Perfil ausente usa aparência embutida. A referência builtin-player, revisão 1,
+  perfil football-player-v1 é suportada. Outra skin em um titular bloqueia o
+  clube com diagnóstico; reservas são verificadas quando escaladas.
+
+### Contratos da competição futura
 
 Contratos iniciais, ainda a implementar:
 

@@ -216,6 +216,9 @@ MonoBehaviour:
   overallText: {fileID: 1844176855295117973}
   teamLogoImage: {fileID: 3209804152244108923}
   overallFiller: {fileID: 1870202211279820684}
+  previousButton: {fileID: 800000000000000001}
+  nextButton: {fileID: 800000000000000002}
+  disabledNavigationAlpha: 0.4
 --- !u!1 &2926370440954561031
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,9 +660,9 @@ MonoBehaviour:
   m_fontSize: 57.8
   m_fontSizeBase: 57.8
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 28
+  m_fontSizeMax: 57.8
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -672,13 +675,13 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -1419,3 +1422,25 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8032487761400472986, guid: a6673d169c085cf44b2f22d47804cdc1, type: 3}
   m_PrefabInstance: {fileID: 6857662400213578093}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &800000000000000001 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8032487761400472987, guid: a6673d169c085cf44b2f22d47804cdc1, type: 3}
+  m_PrefabInstance: {fileID: 4077177379323891308}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 763aa18842dc4234fb6f380352edc576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &800000000000000002 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8032487761400472987, guid: a6673d169c085cf44b2f22d47804cdc1, type: 3}
+  m_PrefabInstance: {fileID: 6857662400213578093}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 763aa18842dc4234fb6f380352edc576, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

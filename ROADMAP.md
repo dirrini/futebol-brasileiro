@@ -1,6 +1,6 @@
 # Entregas incrementais
 
-Revisão: 28/09/2026. A fundação de importação de clubes/jogadores está implementada.
+Revisão: 28/09/2026. O catálogo de clubes/jogadores já alimenta o amistoso 3D.
 As etapas podem ser revisadas com evidência da implementação. O editor externo,
 o campeonato e a importação de skins ainda não estão implementados. Consulte
 [ARCHITECTURE.md](ARCHITECTURE.md), [DATA-FORMAT.md](DATA-FORMAT.md) e
@@ -13,13 +13,15 @@ o campeonato e a importação de skins ainda não estão implementados. Consulte
 | A1 | Arquitetura, contratos propostos, roteiro e regras no AGENTS.md | Dependências, propriedade de dados, integração e requisito de skins explícitos; revisão documental e build vigente |
 | A2 | Contrato v1 executável: schemas, exemplos e validação | Exemplo mínimo válido; erros claros para IDs/referências/versões inválidos; fonte visual separada do core |
 | A3 | Domain/Application em C# puro e adaptadores de importação | Quatro clubes e seus jogadores carregados de base externa; nenhuma dependência de Unity/JSON no core |
+| A4 | Catálogo na seleção e no amistoso | Seleção por ClubId; escalação de onze sem truncar elenco; dados importados na partida; cancelamento e retorno com liberação dos clones |
 
 A1 está concluída. A2 está implementada no recorte JSON v1 de clubes, jogadores,
 vínculos e referências visuais; schemas de competições, pacotes e skins ficam nas
 respectivas etapas futuras. A3 está implementada com Domain/Application isolados,
 importador e bootstrap que carrega quatro clubes e 44 jogadores no player.
-Nenhum resultado ou temporada foi acrescentado ao catálogo. A ponte para usar
-esses dados no amistoso existente é a próxima entrega de integração.
+Nenhum resultado ou temporada foi acrescentado ao catálogo. A4 está implementada
+com LineupPlanner, bindings visuais locais e uma sessão que fixa a revisão de cada
+amistoso. Não inclui captura de resultados ou FixtureId/ExecutionId de B4.
 Não criar assemblies vazias ou serviços fictícios somente para marcar uma etapa.
 
 ## B. Primeiro marco: competição jogável

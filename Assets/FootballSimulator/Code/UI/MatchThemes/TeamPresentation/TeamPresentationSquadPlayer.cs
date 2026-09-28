@@ -38,6 +38,7 @@ namespace FStudio.UI.MatchThemes.TeamPresentation {
             }
 
             overallText.text = member.player.Overall.ToString ();
+            nameText.richText = false;
             nameText.text = member.player.Name;
             squadPosition.SetPosition(PositionRules.GetBasePosition (member.position));
 

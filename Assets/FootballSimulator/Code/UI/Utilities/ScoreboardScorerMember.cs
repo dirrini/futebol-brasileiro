@@ -28,6 +28,7 @@ namespace FStudio.UI.Events {
 
         public void SetMinute (int minute) {
             minuteText.text = minute + "\'";
+            scorerNameText.richText = false;
             scorerNameText.text = Member.Name;
         }
 

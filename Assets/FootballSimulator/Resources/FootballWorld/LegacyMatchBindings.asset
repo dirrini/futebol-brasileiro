@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: befeafa97edd4ae7b39ee142ab02d0f0, type: 3}
+  m_Name: LegacyMatchBindings
+  m_EditorClassIdentifier:
+  DefaultVisualTemplate: {fileID: 11400000, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  DefaultFormation: 0
+  DefaultPlayerAppearance: {fileID: -3653291091690066148, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  Clubs:
+  - ClubId: club-1038368881024191b8c294069e1d1870
+    VisualTemplate: {fileID: 11400000, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+    Formation: 2
+  - ClubId: club-693114dde0d84c34ba6c73647f0b91ba
+    VisualTemplate: {fileID: 11400000, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+    Formation: 6
+  - ClubId: club-8143073533e7441db9b47a06e6e1503e
+    VisualTemplate: {fileID: 11400000, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+    Formation: 2
+  - ClubId: club-560982a07573454c9cc5ee551216e265
+    VisualTemplate: {fileID: 11400000, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+    Formation: 2
+  Players:
+  - PlayerId: player-def4f340a75e4e7f8830145fa4242c72
+    Appearance: {fileID: -4102521140375655140, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-8b149ca22e61449dba7a2e8276b710ce
+    Appearance: {fileID: -3653291091690066148, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-e543fc314fe54b88afe535e05b1aa2a7
+    Appearance: {fileID: -6156918087230257368, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-663b7f0c08a84622af2aece3f0264fb5
+    Appearance: {fileID: 6852096375240402825, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-eff5b8442bfd4646801a47afaaa847c5
+    Appearance: {fileID: -5719658995493961716, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-512201b498484c89b215b00f6a72270c
+    Appearance: {fileID: 7347501963391760594, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-3f52c3561011456694f0b05a0172aa45
+    Appearance: {fileID: -3884514985975937666, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-792419d3a69e4a23b64cfec17612a8dd
+    Appearance: {fileID: 7046522227521505224, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-f5f79df68a9641bbb3b6b684d358b38a
+    Appearance: {fileID: -3350929016953907667, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-d4cbb538466245ff8f64ae92053c20b4
+    Appearance: {fileID: 8316914256210131567, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-25730f4ce1514ab6bea7b846cab32c39
+    Appearance: {fileID: -5422780293323520128, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  - PlayerId: player-c13fe57e2ef94a0590c34f4385be6dfe
+    Appearance: {fileID: 4496894129067823149, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-c991ae5979174515b4ece4e0a9bc4cd1
+    Appearance: {fileID: 8285264434553364085, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-330cf679f39641ff9fe41b79c04a861e
+    Appearance: {fileID: -347376946389235592, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-37483cdd022942f38eb5db7432669631
+    Appearance: {fileID: 6091120840614407728, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-3fe82909112d4108932b41605ff0aa19
+    Appearance: {fileID: -202783665239450935, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-93ccdba472ea48f498bbd936162d8441
+    Appearance: {fileID: -4233983802622558738, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-8e721ee824cf4939bec0f6f0d3749ec2
+    Appearance: {fileID: 2685668273722230516, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-f9a6551a56834d909c1f2eca31a7ecea
+    Appearance: {fileID: -3844048931604584175, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-0071212f48434f50b50b428f1a7b595f
+    Appearance: {fileID: -1291842204274745290, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-b4c7e189128c490ba88689fb7dbdd862
+    Appearance: {fileID: 7219076373468960285, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-8b681a7f0b8843fd8df0d7f994f8ef5f
+    Appearance: {fileID: -813258575147390419, guid: 01efa42822756bf44b39f0ce542a75f8, type: 2}
+  - PlayerId: player-9dd78a1349d64c55ba9d710f39797fbc
+    Appearance: {fileID: -1878274192352403488, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-db9248c9635e4baab226e69cf19aae39
+    Appearance: {fileID: 5524460846655558850, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-c5c72dd362b04c5f8563b9c49105f7fe
+    Appearance: {fileID: 6482359000556781215, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-491c8e5e9c1b46d1b395ee3bc5d7ffcd
+    Appearance: {fileID: -3903149915965840616, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-2120b3c3532e453b8b0974e084a0443e
+    Appearance: {fileID: -178964163030422498, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-1c172d828cb648febd1d328060700666
+    Appearance: {fileID: 6508944865086709241, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-c4fd899fc3414dd0a0a9d6e3ccee60c9
+    Appearance: {fileID: -6598470696967288008, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-e8ab12e72de844039ba70888dd8d5f80
+    Appearance: {fileID: 7931545937158480144, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-7bcff3da56d54621aec19f4ff6532b81
+    Appearance: {fileID: -5075097694649751538, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-61c4c42b901f4265a4fd60e19c8a6082
+    Appearance: {fileID: -783463200734231585, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-c18831d151864c77b4043dd3807d194e
+    Appearance: {fileID: -5702018892321914367, guid: 1a1dab4096935a444a16fa7480b03d16, type: 2}
+  - PlayerId: player-6e92abf927334967978f590277c18d7c
+    Appearance: {fileID: 6421620868343928880, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-47c1684f03554d28add03855f9f6b2ea
+    Appearance: {fileID: -3420051993262848358, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-0ff89f543407441d910baa7ed384883b
+    Appearance: {fileID: 7674497500244390219, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-e9a039d9c664451ba5e71e8da364b29a
+    Appearance: {fileID: -8801619087022888843, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-b848807e1d3847bb96c743b1e7c7dde6
+    Appearance: {fileID: 1944300196055557624, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-42da0b7679b1400cb559f7144a1bc71a
+    Appearance: {fileID: -8727728778607047899, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-a4ab23ada9344fb088ae3f072f3c3eef
+    Appearance: {fileID: 1285570670533204340, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-3a0257f684e7478cbce072493fc9b88a
+    Appearance: {fileID: -7783741475661306333, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-fdfe746ebdfb4f229be82281a20356c6
+    Appearance: {fileID: 784098673773082156, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-29ab85dc0c814fae82af545aeaaf7f71
+    Appearance: {fileID: -6021614646998056580, guid: fa076eb79b265a248a635db73836cd38, type: 2}
+  - PlayerId: player-34ccf8328bc642d8906285e67253a363
+    Appearance: {fileID: 3117318617289163049, guid: fa076eb79b265a248a635db73836cd38, type: 2}

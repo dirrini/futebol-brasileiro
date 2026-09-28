@@ -15,6 +15,8 @@ using FStudio.MatchEngine.Graphics.GraphicsModes;
 using FStudio.Graphics.Cameras;
 using FStudio.UI.MatchThemes.MatchEvents;
 using FStudio.MatchEngine.Enums;
+using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using System;
 
 namespace FStudio.MatchEngine {
     public class MatchEngineLoader : SceneObjectSingleton<MatchEngineLoader> {
@@ -22,6 +24,10 @@ namespace FStudio.MatchEngine {
 
         private bool isLoading;
         private bool isLoaded;
+        private bool isUnloading;
+        private int loadGeneration;
+        private Task engineLoadTask;
+        private Task unloadTask;
 
         public static async Task CreateMatch(MatchCreateRequest matchData) {
             // close all UI.
@@ -46,23 +52,43 @@ namespace FStudio.MatchEngine {
             bool homeKit,
             bool awayKit) {
 
-            if (isLoading) {
+            if (isLoading || isLoaded || isUnloading) {
                 return;
             }
-
-            if (isLoaded) {
-                // unload.
-                await UnloadMatch();
+            isLoading = true;
+            var generation = ++loadGeneration;
+            var session = FriendlyMatchSession.Current;
+            var lease = session.ActiveMatch;
+            // Unload awaits the creation work, not this wrapper: failure recovery
+            // may itself call UnloadMatch and must not wait for its own completion.
+            engineLoadTask = LoadMatchEngine(matchEvent, homeKit, awayKit, generation);
+            try {
+                await engineLoadTask;
+            } catch (Exception exception) {
+                if (IsCurrentLoad(generation) && session != null &&
+                    ReferenceEquals(session.ActiveMatch, lease)) {
+                    await session.ReportMatchFailure(exception);
+                }
+            } finally {
+                if (generation == loadGeneration) {
+                    isLoading = false;
+                    EventManager.Trigger<BigLoadingEvent>(null);
+                }
             }
+        }
 
+        private bool IsCurrentLoad(int generation) {
+            return this != null && generation == loadGeneration && !isUnloading;
+        }
+
+        private async Task LoadMatchEngine(UpcomingMatchEvent matchEvent,
+            bool homeKit, bool awayKit, int generation) {
             // match kits.
             EventManager.Trigger(
                 new MatchKitsEvent(
                 homeKit ? matchEvent.details.homeTeam.AwayKit : matchEvent.details.homeTeam.HomeKit,
                 awayKit ? matchEvent.details.awayTeam.AwayKit : matchEvent.details.awayTeam.HomeKit));
             //
-
-            isLoading = true;
 
             // close all UI.
             EventManager.Trigger(new CloseAllPanelsEvent());
@@ -75,13 +101,16 @@ namespace FStudio.MatchEngine {
             // load stadium scene
             StadiumType stadium = StadiumType.SmallStadium;
             await template.stadiumLoader.LoadStadium(stadium);
-            // 
+            if (!IsCurrentLoad(generation)) return;
+            //
 
             await loader.Load(); // load match prefab.
+            if (!IsCurrentLoad(generation)) return;
 
             if (TimeOfDaySystem.Current != null) {
                 // load time of day.
                 await TimeOfDaySystem.Current.LoadTemplate(matchEvent.details.dayTime);
+                if (!IsCurrentLoad(generation)) return;
             }
 
             MainCamera.Current.Camera.cullingMask = template.renderLayer;
@@ -97,53 +126,78 @@ namespace FStudio.MatchEngine {
                     homeKit,
                     awayKit)
                 );
+            if (!IsCurrentLoad(generation)) return;
 
             Debug.Log("Loading ball...");
 
             // load random ball.
             await template.ballLoader.LoadRandomBall();
+            if (!IsCurrentLoad(generation)) return;
             
             isLoaded = true;
-            isLoading = false;
 
             Debug.Log("Done...");
-
-            // close loading.
-            EventManager.Trigger<BigLoadingEvent>(null);
+            var catalogMatch = FriendlyMatchSession.Current.ActiveMatch;
+            if (catalogMatch != null) {
+                Debug.Log("[FootballWorld] 3D friendly started with " + catalogMatch.Players.Count +
+                    " imported players from database revision " + catalogMatch.Catalog.DatabaseRevision + ".");
+            }
         }
 
-        public async Task UnloadMatch () {
-            if (MatchManager.Current == null) {
-                Debug.LogWarning($"Match is not loaded to unload.");
-                return;
+        public Task UnloadMatch () {
+            if (unloadTask != null && !unloadTask.IsCompleted) return unloadTask;
+            isUnloading = true;
+            ++loadGeneration;
+            unloadTask = UnloadMatchCore(engineLoadTask);
+            return unloadTask;
+        }
+
+        private async Task UnloadMatchCore(Task pendingCreation) {
+            // Publish the shared unload task before events can reenter UnloadMatch.
+            // Yield stays on Unity's synchronization context, including WebGL.
+            await Task.Yield();
+            try {
+                EventManager.Trigger(new CloseAllPanelsEvent());
+                SnapManager.Clear();
+
+                if (pendingCreation != null) {
+                    try {
+                        // Addressables and player creation are not cancellable here.
+                        // Keep their consumers and database lease alive until they settle.
+                        await pendingCreation;
+                    } catch (Exception) {
+                        // The start wrapper reports an active failure. A cancelled
+                        // generation must only finish cleanup, never reopen recovery.
+                    }
+                }
+
+                if (MainCamera.Current != null)
+                    MainCamera.Current.Camera.clearFlags = CameraClearFlags.SolidColor;
+
+                // This also handles cancelling the preparation screen, before a
+                // MatchManager exists. Release consumers before their database lease.
+                if (MatchManager.Current != null) MatchManager.Current.ClearMatch();
+                UILoader.Current.MatchUILoader.Unload();
+                loader.Unload();
+
+                var template = GraphicLoaders.Current;
+                if (template != null) {
+                    template.ballLoader.UnloadBall();
+                    template.stadiumLoader.Unload();
+                }
+
+                await UnityAsync.Delay(1);
+                FriendlyMatchSession.ReleaseActiveMatch();
+                if (UILoader.Current.GeneralUILoader.CurrentInstantiated == null)
+                    await UILoader.Current.GeneralUILoader.Load();
+                GameInput.SwitchToUI();
+            } finally {
+                engineLoadTask = null;
+                isLoaded = false;
+                isLoading = false;
+                isUnloading = false;
+                EventManager.Trigger<BigLoadingEvent>(null);
             }
-
-            // skybox mode off.
-            MainCamera.Current.Camera.clearFlags = CameraClearFlags.SolidColor;
-
-            // close all UI.
-            EventManager.Trigger(new CloseAllPanelsEvent());
-
-            var template = GraphicLoaders.Current;
-
-            // unload ball & stadium.
-            template.ballLoader.UnloadBall();
-            template.stadiumLoader.Unload();
-            // 
-
-            SnapManager.Clear();
-
-            UILoader.Current.MatchUILoader.Unload();
-
-            MatchManager.Current.ClearMatch(); // clear field.
-
-            loader.Unload(); // clear match manager prefab.
-
-            await UILoader.Current.GeneralUILoader.Load();
-
-            GameInput.SwitchToUI();
-
-            isLoaded = false;
         }
     }
 }

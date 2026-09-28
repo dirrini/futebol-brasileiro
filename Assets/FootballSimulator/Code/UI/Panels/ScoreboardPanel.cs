@@ -66,6 +66,8 @@ namespace FStudio.UI {
                 return;
             }
 
+            homeTeamName.richText = false;
+            awayTeamName.richText = false;
             homeTeamName.text = eventObject.details.homeTeam.TeamName.ToUpper();
             awayTeamName.text = eventObject.details.awayTeam.TeamName.ToUpper();
 

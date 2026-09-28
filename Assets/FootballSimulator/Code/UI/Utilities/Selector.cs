@@ -17,6 +17,11 @@ namespace FStudio.UI {
         }
 
         public void Next () {
+            if (Max <= 0) {
+                CurrentSelected = 0;
+                return;
+            }
+
             var target = CurrentSelected + 1;
             if (target >= Max) {
                 target = 0;
@@ -32,6 +37,11 @@ namespace FStudio.UI {
         }
 
         public void Back () {
+            if (Max <= 0) {
+                CurrentSelected = 0;
+                return;
+            }
+
             var target = CurrentSelected - 1;
             if (target < 0) {
                 target = Max - 1;
@@ -47,13 +57,13 @@ namespace FStudio.UI {
         }
 
         public void SetSelected (int index) {
-            CurrentSelected = index - 1;
+            CurrentSelected = Mathf.Clamp(index, 0, Mathf.Max(0, Max - 1)) - 1;
             Next();
         }
 
         public void SetSelectedSilent (int index) {
             updateSilently = true;
-            CurrentSelected = index - 1;
+            CurrentSelected = Mathf.Clamp(index, 0, Mathf.Max(0, Max - 1)) - 1;
             Next();
             updateSilently = false;
         }
