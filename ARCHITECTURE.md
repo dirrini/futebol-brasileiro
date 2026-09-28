@@ -23,7 +23,7 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
   objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
   preparação e descarregamento; CatalogMatchLease mantém a revisão e os IDs.
 
-O exemplo contém Royal, Milano, London e Catalagna, com 44 jogadores. A seleção
+O exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores. A seleção
 aguarda o catálogo e apresenta seus clubes; o amistoso recebe nomes, medidas e
 atributos importados. TeamEntry/PlayerEntry persistentes fornecem apenas recursos
 visuais e formação via LegacyMatchBindings. Não há fallback para DatabaseService.
@@ -258,7 +258,10 @@ player. [Referência Addressables 1.22](https://docs.unity3d.com/Packages/com.un
 ## Verificação
 
 Cada etapa segue o [AGENTS.md](AGENTS.md): preservar mudanças alheias, gerar build
-WebGL novo, servir com Compose e validar o comportamento afetado. Testes de regras
+WebGL novo para código e recursos compilados, servir com Compose e validar o
+comportamento afetado. Edições compatíveis exclusivamente no JSON externo são
+servidas diretamente pelo bind local e verificadas com refresh, sem novo build.
+Testes de regras
 puros cobrem calendário, pontuação e duplicidade; testes de integração cobrem
 transições do motor e importação; testes visuais cobrem material e animação de
 skins. Aprovar compilação não comprova que uma skin funciona durante uma partida.

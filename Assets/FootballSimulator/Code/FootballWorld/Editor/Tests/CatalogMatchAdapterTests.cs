@@ -19,8 +19,10 @@ namespace FStudio.FootballWorld.Editor.Tests
     // legacy engine are in Assembly-CSharp, which an asmdef cannot reference.
     public sealed class CatalogMatchAdapterTests
     {
-        private const string BindingsPath = "Assets/FootballSimulator/Resources/FootballWorld/LegacyMatchBindings.asset";
-        private const string DatabasePath = "Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json";
+        private const string BindingsPath = "Assets/FootballSimulator/Code/FootballWorld/Editor/Tests/Fixtures/LegacyMatchBindings.asset";
+        private const string DatabasePath = "Assets/FootballSimulator/Code/FootballWorld/Tests/Fixtures/legacy-four-clubs.database.json";
+        private const string AuthoredBindingsPath = "Assets/FootballSimulator/Resources/FootballWorld/LegacyMatchBindings.asset";
+        private const string AuthoredDatabasePath = "Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json";
         private readonly List<IDisposable> ownedSessions = new List<IDisposable>();
         private readonly List<UnityEngine.Object> ownedObjects = new List<UnityEngine.Object>();
         private readonly Dictionary<UnityEngine.Object, string> sourceSnapshots = new Dictionary<UnityEngine.Object, string>();
@@ -33,7 +35,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             imported = new JsonDatabaseImporter().Import(File.ReadAllText(Path.GetFullPath(DatabasePath)));
             Assert.IsTrue(imported.Success, string.Join("; ", imported.Errors.Select(error => error.Message)));
             bindings = AssetDatabase.LoadAssetAtPath<LegacyMatchBindings>(BindingsPath);
-            Assert.IsTrue(bindings != null, "The authored bindings asset must import successfully.");
+            Assert.IsTrue(bindings != null, "The fixture bindings asset must import successfully.");
             Snapshot(bindings);
             foreach (var club in bindings.Clubs)
             {
@@ -62,7 +64,7 @@ namespace FStudio.FootballWorld.Editor.Tests
         }
 
         [Test]
-        public void AuthoredBindingsCreateFourPreviewsAndMapAllFortyFourPlayers()
+        public void LegacyFixtureBindingsCreateFourPreviewsAndMapAllFortyFourPlayers()
         {
             Assert.AreEqual(4, bindings.Clubs.Length);
             Assert.AreEqual(44, bindings.Players.Length);
@@ -105,6 +107,49 @@ namespace FStudio.FootballWorld.Editor.Tests
                 }
             }
             Assert.AreEqual(44, checkedPlayers.Count);
+        }
+
+        [Test]
+        public void AuthoredDatabaseAndBindingsCreateMatchesWithoutTruncatingFullRosters()
+        {
+            var authored = new JsonDatabaseImporter().Import(File.ReadAllText(Path.GetFullPath(AuthoredDatabasePath)));
+            Assert.IsTrue(authored.Success, string.Join("; ", authored.Errors.Select(error => error.Message)));
+            var authoredBindings = AssetDatabase.LoadAssetAtPath<LegacyMatchBindings>(AuthoredBindingsPath);
+            Assert.IsTrue(authoredBindings != null, "The live bindings must import successfully.");
+            Snapshot(authoredBindings);
+            foreach (var binding in authoredBindings.Clubs)
+            {
+                Snapshot(binding.VisualTemplate);
+                Snapshot(binding.VisualTemplate.TeamLogo);
+                Snapshot(binding.VisualTemplate.HomeKit);
+                Snapshot(binding.VisualTemplate.AwayKit);
+            }
+
+            var catalog = authored.Catalog;
+            var rosterSizes = catalog.Clubs.ToDictionary(club => club.Id, club => catalog.GetRoster(club.Id).Count);
+            var adapter = CreateAdapter(catalog, authored.VisualProfiles, authoredBindings);
+            Assert.That(adapter.Teams.Count, Is.EqualTo(catalog.Clubs.Count).And.GreaterThanOrEqualTo(2));
+            for (var index = 0; index < adapter.Teams.Count; index++)
+            {
+                var option = adapter.Teams[index];
+                Assert.IsTrue(option.CanPlay, option.Name + ": " + option.Error);
+                Assert.AreEqual(catalog.GetClub(option.ClubId).Name, option.Name);
+                Assert.AreEqual(11, option.Preview.Players.Length);
+                var opponent = adapter.Teams[(index + 1) % adapter.Teams.Count];
+                var lease = CreateLease(adapter, option.ClubId, opponent.ClubId);
+                Assert.AreSame(catalog, lease.Catalog);
+                Assert.AreEqual(22, lease.Players.Count);
+                Assert.AreEqual(22, lease.Players.Select(player => player.PlayerId).Distinct().Count());
+                foreach (var identity in lease.Players)
+                {
+                    var team = identity.LocalId < 11 ? lease.Request.homeTeam : lease.Request.awayTeam;
+                    Assert.IsTrue(catalog.GetRoster(identity.ClubId).Any(player => player.Id == identity.PlayerId));
+                    AssertSportingData(catalog.GetPlayer(identity.PlayerId), team.Players[identity.LocalId % 11]);
+                }
+            }
+            foreach (var club in catalog.Clubs)
+                Assert.AreEqual(rosterSizes[club.Id], catalog.GetRoster(club.Id).Count,
+                    "Preparing a match must preserve every registered reserve.");
         }
 
         [Test]

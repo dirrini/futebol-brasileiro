@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 512 512">
+<title>São Paulo FC — geometric badge for prototype</title>
+<style>.white{fill:#ffffff}.red{fill:#e31b23}.black{fill:#000000}</style>
+<defs><g id="crest"><path class="black" d="M0 0H100V43L50 96 0 43Z"/><path class="white" d="M3 3H97V42L50 91 3 42Z"/><path class="black" d="M6 6H94V40H6Z"/><path class="white" fill-rule="evenodd" d="M0 0H18V5H5V10H18V27H0V22H13V16H0Z" transform="translate(10,10)"/><path class="white" fill-rule="evenodd" d="M0 0H18V16H5V27H0ZM5 5V11H13V5Z" transform="translate(31,10)"/><path class="white" fill-rule="evenodd" d="M0 0H18V5H5V11H16V16H5V27H0Z" transform="translate(52,10)"/><path class="white" fill-rule="evenodd" d="M0 0H18V5H5V22H18V27H0Z" transform="translate(73,10)"/><path class="red" d="M9 44H43V77Z"/><path class="black" d="M57 44H91L57 77Z"/></g></defs>
+<use xlink:href="#crest" transform="translate(30,39) scale(4.52)"/>
+</svg>

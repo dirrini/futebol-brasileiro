@@ -60,9 +60,14 @@ O bootstrap só chama `CatalogSession.Activate` depois do sucesso; falhas conser
 o catálogo e os perfis visuais anteriores.
 
 Os IDs aleatórios do exemplo foram gerados uma vez e ficam gravados no arquivo;
-não devem ser regenerados ao editar nomes. Nomes, medidas e atributos foram
-copiados dos quatro assets originais. As posições iniciais foram inferidas das
-formações existentes numa migração pontual; desde então são dados independentes.
+não devem ser regenerados ao editar nomes. Milano, London e Catalagna preservam
+os dados copiados dos assets originais e posições inferidas das formações na
+migração inicial. A revisão 2 substitui Royal por São Paulo FC e seus 39 atletas,
+com novas identidades. Nomes e alturas têm fontes oficiais; pesos, atributos e
+adaptações táticas são demonstrativos, conforme [SAO-PAULO-DATA.md](SAO-PAULO-DATA.md).
+Escudo e dois uniformes são recursos Unity associados ao ClubId, sem acrescentar
+campos de mídia ao JSON v1. A edição local compatível do JSON é lida por refresh
+no Compose; novos recursos compilados ainda requerem build.
 
 ## Extensões planejadas
 

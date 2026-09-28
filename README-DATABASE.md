@@ -1,8 +1,10 @@
 # Base externa e amistoso
 
 O jogo carrega um catálogo de clubes/jogadores independente do motor Unity.
-A base de exemplo contém Royal, Milano, London e Catalagna, com 44 jogadores e
-44 vínculos. A seleção e o amistoso usam esse catálogo para os dados esportivos.
+A base de exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores e
+72 vínculos. O São Paulo tem 39 atletas, conforme o elenco oficial consultado em
+28/09/2026; ver [fontes e limitações da amostra](SAO-PAULO-DATA.md).
+A seleção e o amistoso usam esse catálogo para os dados esportivos.
 Escudos, uniformes, formações e aparência continuam editáveis em recursos Unity.
 
 ## Arquivos de autoria
@@ -13,10 +15,23 @@ Escudos, uniformes, formações e aparência continuam editáveis em recursos Un
 - [Contrato e limites](DATA-FORMAT.md).
 - [Arquitetura](ARCHITECTURE.md) e [próximas entregas](ROADMAP.md).
 
-Os dados de exemplo são uma cópia pontual dos assets atuais. Alterar o JSON não
-modifica TeamEntry nem PlayerEntry. Manter IDs ao editar ou reorganizar registros.
+Os outros três clubes conservam os dados demonstrativos extraídos dos assets
+legados. Alterar o JSON não modifica TeamEntry nem PlayerEntry. Manter IDs ao editar ou reorganizar registros.
 As posições naturais já são independentes de uma formação e podem ser editadas.
 Elenco não é escalação: não há limite de onze jogadores no catálogo.
+
+## Características físicas editáveis
+
+Cada jogador possui `heightCm` (150–210 cm) e `weightKg` (45–100 kg) no JSON.
+No motor atual, altura ajusta a escala vertical do personagem; peso ajusta sua
+largura e profundidade. Esses valores também participam do dimensionamento do
+collider legado. Salvar uma revisão compatível e atualizar o navegador aplica
+os valores na próxima partida, sem recompilar no fluxo local descrito abaixo.
+
+Pele, cabelo, barba, chuteiras e meias continuam nos templates de aparência
+associados por `PlayerId` em `LegacyMatchBindings`, editáveis no Unity. O JSON v1
+ainda não oferece esses campos nem um editor de rosto/corpo. Modelos e skins
+personalizados dependem das etapas de mídia previstas no ROADMAP.
 
 ## Carregamento no Editor e WebGL
 
@@ -25,7 +40,8 @@ URI de arquivo. No player, lê `StreamingAssets/FootballWorld/database.json` por
 UnityWebRequest. O processador de build valida a base e registra JSON/schema como
 StreamingAssets adicionais sem copiar fontes para `Assets/StreamingAssets`.
 
-Gere e publique usando o fluxo existente:
+Para instalar ou atualizar o código e os recursos visuais compilados, gere e
+publique usando o fluxo existente:
 
 ```powershell
 .\scripts\webgl.ps1
@@ -40,7 +56,7 @@ no navegador, pois compilar e disponibilizar o JSON não prova sua ativação.
 Depois de abrir [o jogo](http://localhost:8080), o console registra:
 
 ```text
-[FootballWorld] Loaded database <id> revision 1: 4 clubs, 44 players, 44 memberships.
+[FootballWorld] Loaded database <id> revision 2: 4 clubs, 72 players, 72 memberships.
 ```
 
 O JSON e seu schema podem ser inspecionados no servidor local:
@@ -48,10 +64,26 @@ O JSON e seu schema podem ser inspecionados no servidor local:
 - [database.json](http://localhost:8080/StreamingAssets/FootballWorld/database.json)
 - [database.schema.json](http://localhost:8080/StreamingAssets/FootballWorld/database.schema.json)
 
-São arquivos externos ao WebAssembly, não dados embutidos em classes C#. Uma
-futura ferramenta poderá fornecer outra revisão compatível sem recompilar C#.
-O fluxo atual do projeto continua exigindo build novo após alterações, conforme
-AGENTS.md. Não editar a cópia em Builds/UnityWebGLProject; ela é gerada pelo script.
+O Compose monta o diretório de autoria somente para leitura, e o Nginx entrega
+o JSON original nesse endereço com `Cache-Control: no-store`. Para testar nomes,
+elenco, posições, medidas ou atributos:
+
+1. Edite e salve `Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json`.
+2. Preserve os IDs existentes e incremente `databaseRevision` a cada revisão.
+3. Atualize `http://localhost:8080` no navegador. Não é necessário executar o
+   script, reiniciar o container ou recompilar o Unity.
+
+A revisão é lida durante o carregamento da página; editar o arquivo não altera uma
+partida que já está em andamento. Refresh encerra essa partida. JSON inválido
+mostra o diagnóstico de importação; corrija a fonte e use Retry ou atualize.
+O diretório é montado para suportar editores que salvam substituindo o arquivo.
+Não editar a cópia em Builds/UnityWebGLProject; ela é gerada pelo script.
+
+Essa atualização direta é o fluxo local do Compose. A exportação ainda inclui
+uma cópia validada para outros servidores; nesses destinos, publique o JSON
+atualizado no mesmo endereço. O bind local não publica imagens nem outros arquivos
+da pasta. Escudos, uniformes, bindings, modelos 3D e contratos novos ainda precisam
+de build. Alterar `visualProfiles` não instala uma skin externa automaticamente.
 
 O bootstrap persiste entre cenas. Expõe `Current.Session.ActiveCatalog`, `State`,
 `Errors`, `VisualProfiles`, `SourceUri` e `ActiveSourceUri`. Para integrações Unity,
@@ -95,8 +127,8 @@ ou persistência da seleção após recarregar o navegador nesta entrega.
 O console registra também a origem da seleção e da partida:
 
 ```text
-[FootballWorld] Friendly selection uses database <id> revision 1: 4 clubs.
-[FootballWorld] 3D friendly started with 22 imported players from database revision 1.
+[FootballWorld] Friendly selection uses database <id> revision 2: 4 clubs.
+[FootballWorld] 3D friendly started with 22 imported players from database revision 2.
 ```
 
 ## Validação e testes
@@ -110,6 +142,9 @@ EditMode cobre contrato, referências, invariantes, escalação, mapeamento dos 
 atributos, bindings por IDs e vida independente dos clones. PlayMode verifica
 leitura externa e o ciclo de vida do bootstrap. As fixtures do adaptador ficam em
 Code/FootballWorld/Editor/Tests, na assembly Editor padrão, pois usam o legado.
+Os testes determinísticos usam uma cópia fixa da antiga base Royal/44 atletas e
+dos bindings em diretórios `Tests/Fixtures`, separados da base editável. A
+integração também verifica a base autoral e seus bindings reais.
 Testes ficam fora do player final. Validar também navegação e partida no navegador;
 testes do adaptador não comprovam o comportamento da física ou IA.
 

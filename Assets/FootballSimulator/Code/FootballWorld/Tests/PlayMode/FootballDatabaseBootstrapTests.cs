@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using FStudio.FootballWorld.Bootstrap;
+using FStudio.FootballWorld.Domain;
+using FStudio.FootballWorld.Infrastructure.Importing;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,6 +22,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
         private FootballDatabaseBootstrap bootstrap;
         private Scene originalScene;
         private string validJson;
+        private DatabaseImportResult expectedImport;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -33,9 +37,12 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             var sourcePath = Path.GetFullPath(Path.Combine(UnityApplication.dataPath, "..",
                 FootballDatabaseBootstrap.SourceDatabaseAssetPath));
             validJson = File.ReadAllText(sourcePath);
+            expectedImport = new JsonDatabaseImporter().Import(validJson);
+            Assert.That(expectedImport.Success, Is.True,
+                string.Join("; ", expectedImport.Errors.Select(error => error.Path + ": " + error.Message)));
             bootstrap.Load(new Uri(sourcePath).AbsoluteUri);
             yield return WaitForLoad(FootballDatabaseLoadState.Ready);
-            AssertSampleCounts();
+            AssertAuthoredContent();
         }
 
         [UnityTearDown]
@@ -93,7 +100,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             bootstrap.Reload();
             yield return WaitForLoad(FootballDatabaseLoadState.Ready);
 
-            AssertSampleCounts();
+            AssertAuthoredContent();
             Assert.That(bootstrap.Session.ActiveCatalog, Is.Not.SameAs(previousCatalog));
             Assert.That(bootstrap.VisualProfiles, Is.Not.SameAs(previousProfiles));
             Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(invalidUri));
@@ -123,7 +130,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
                 yield return null;
                 yield return null;
 
-                Assert.That(bootstrap.Session.ActiveCatalog.DatabaseRevision, Is.EqualTo(3));
+                AssertAuthoredContent(3);
                 Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(latestUri));
                 Assert.That(bootstrap.Errors, Is.Empty);
                 Assert.That(loadMessages, Has.Count.EqualTo(1));
@@ -157,7 +164,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             Assert.That(host.Session, Is.SameAs(session));
             Assert.That(host.Session.ActiveCatalog, Is.SameAs(catalog));
             Assert.That(host.State, Is.EqualTo(FootballDatabaseLoadState.Ready));
-            AssertSampleCounts();
+            AssertAuthoredContent();
         }
 
         [UnityTest]
@@ -190,7 +197,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             Assert.That(bootstrap.Session.ActiveCatalog.DatabaseRevision, Is.EqualTo(2));
             Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(uri));
             Assert.That(bootstrap.Errors, Is.Empty);
-            AssertSampleCounts();
+            AssertAuthoredContent(2);
         }
 
         private IEnumerator WaitForLoad(FootballDatabaseLoadState expected)
@@ -204,14 +211,42 @@ namespace FStudio.FootballWorld.Tests.PlayMode
                 "The local database request did not reach the expected state within 20 seconds. Source: " + bootstrap.SourceUri);
         }
 
-        private void AssertSampleCounts()
+        private void AssertAuthoredContent(int? expectedRevision = null)
         {
-            Assert.That(bootstrap.Session.ActiveCatalog, Is.Not.Null);
-            Assert.That(bootstrap.Session.ActiveCatalog.Clubs, Has.Count.EqualTo(4));
-            Assert.That(bootstrap.Session.ActiveCatalog.Players, Has.Count.EqualTo(44));
-            Assert.That(bootstrap.Session.ActiveCatalog.Memberships, Has.Count.EqualTo(44));
-            Assert.That(bootstrap.VisualProfiles, Has.Count.EqualTo(44));
+            var expected = expectedImport.Catalog;
+            var actual = bootstrap.Session.ActiveCatalog;
+            Assert.That(actual, Is.Not.Null);
+            Assert.That(actual.DatabaseId, Is.EqualTo(expected.DatabaseId));
+            Assert.That(actual.DatabaseRevision, Is.EqualTo(expectedRevision ?? expected.DatabaseRevision));
+            Assert.That(actual.Clubs.Select(club => new { club.Id, club.Name }),
+                Is.EqualTo(expected.Clubs.Select(club => new { club.Id, club.Name })));
+            Assert.That(actual.Players.Select(player => player.Id), Is.EqualTo(expected.Players.Select(player => player.Id)));
+            foreach (var player in actual.Players)
+            {
+                var source = expected.GetPlayer(player.Id);
+                Assert.That(player.Name, Is.EqualTo(source.Name));
+                Assert.That(player.NaturalPositions, Is.EqualTo(source.NaturalPositions));
+                Assert.That(player.HeightCm, Is.EqualTo(source.HeightCm));
+                Assert.That(player.WeightKg, Is.EqualTo(source.WeightKg));
+                Assert.That(AttributeValues(player.Attributes), Is.EqualTo(AttributeValues(source.Attributes)));
+            }
+            Assert.That(actual.Memberships.Select(member => new { member.ClubId, member.PlayerId }),
+                Is.EqualTo(expected.Memberships.Select(member => new { member.ClubId, member.PlayerId })));
+            foreach (var club in expected.Clubs)
+                Assert.That(actual.GetRoster(club.Id).Select(player => player.Id),
+                    Is.EqualTo(expected.GetRoster(club.Id).Select(player => player.Id)));
+            Assert.That(bootstrap.VisualProfiles.Select(profile => new {
+                    profile.PlayerId, profile.Skin.SkinId, profile.Skin.Revision, profile.Skin.CompatibilityProfile }),
+                Is.EqualTo(expectedImport.VisualProfiles.Select(profile => new {
+                    profile.PlayerId, profile.Skin.SkinId, profile.Skin.Revision, profile.Skin.CompatibilityProfile })));
         }
+
+        private static int[] AttributeValues(PlayerAttributes attributes) => new[] {
+            attributes.Strength, attributes.Acceleration, attributes.TopSpeed, attributes.DribbleSpeed,
+            attributes.Jump, attributes.Tackling, attributes.BallKeeping, attributes.Passing,
+            attributes.LongBall, attributes.Agility, attributes.Shooting, attributes.ShootPower,
+            attributes.Positioning, attributes.Reaction, attributes.BallControl
+        };
 
         private string CreateTemporaryDatabase(string json)
         {

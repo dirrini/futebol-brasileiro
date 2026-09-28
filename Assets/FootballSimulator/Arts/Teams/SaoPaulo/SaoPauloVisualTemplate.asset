@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c613a3d0b206295429bcdf69eef2c59c, type: 3}
+  m_Name: Sao Paulo - Visual template
+  m_EditorClassIdentifier: 
+  TeamName: Sao Paulo FC (visual template)
+  TeamLogo: {fileID: 11400000, guid: 8b707d0c89774ae6b403ce8142f27c22, type: 2}
+  HomeKit: {fileID: 11400000, guid: 269b84cb94b641668e62b7ece5a09cc1, type: 2}
+  AwayKit: {fileID: 11400000, guid: d291de9ad0dc48cda406a1d856020798, type: 2}
+  Players: []
+  Formation: 6
+  IsValid: 0

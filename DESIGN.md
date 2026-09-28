@@ -100,3 +100,27 @@ editáveis no Unity Editor; os dois novos botões reutilizam `TextButton`.
 Os scripts coordenam dados, assinaturas de eventos e interação. A verificação
 visual deve cobrir loading, erro/retry, clubes inválidos, seleção repetida,
 retorno do vestiário e retorno de uma partida no build WebGL.
+
+## Amostra São Paulo FC
+
+A revisão 2 do catálogo substitui Royal por São Paulo FC. Os menus preservam
+seus componentes e mostram o nome importado, o escudo tricolor e os dois kits
+associados ao ClubId. O escudo deve continuar reconhecível nas dimensões dos
+cartões e placares existentes; o nome não deve invadir as setas.
+
+Os uniformes são uma emulação simplificada dos modelos de 2026: primeiro branco
+com faixas horizontais vermelha e preta e escudo central; segundo com listras
+verticais vermelhas, brancas e pretas e escudo no lado esquerdo do peito. Sem
+patrocinadores ou reprodução de detalhes de fabricação. O goleiro usa um kit de
+contraste do protótipo. Referências e procedência estão em SAO-PAULO-DATA.md.
+
+Texturas, escudo e templates ficam em `Arts/Teams/SaoPaulo`, sob
+`Assets/FootballSimulator`. A arte vetorial de origem é editável; cores e
+referências são ajustáveis nos ScriptableObjects do Unity. Os shaders legados
+usam vermelho como máscara de Color1 (branco) e azul para Color2 (vermelho), além
+de preto e alpha. Não usar a máscara sem essa conversão como imagem de referência
+visual. O escudo no peito faz parte dos atlas e dos previews dos kits.
+
+Jogadores usam aparências genéricas existentes. A amostra demonstra dados e
+identidade do clube; não representa rostos ou skins personalizadas dos atletas.
+Verificar os dois kits na preparação e o primeiro em partida no navegador.

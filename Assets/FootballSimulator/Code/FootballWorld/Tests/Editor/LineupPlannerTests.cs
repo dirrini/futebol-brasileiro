@@ -27,10 +27,10 @@ namespace FStudio.FootballWorld.Tests
         [TestCase("Milano", false, 2)]
         [TestCase("London", false, 0)]
         [TestCase("Catalagna", false, 0)]
-        public void PlansPublishedClubsFor4141And433(string clubName, bool use433, int expectedOutOfPosition)
+        public void PlansLegacyFixtureClubsFor4141And433(string clubName, bool use433, int expectedOutOfPosition)
         {
             var path = Path.Combine(UnityEngine.Application.dataPath,
-                "FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json");
+                "FootballSimulator/Code/FootballWorld/Tests/Fixtures/legacy-four-clubs.database.json");
             var imported = new JsonDatabaseImporter().Import(File.ReadAllText(path));
             Assert.That(imported.Success, Is.True);
             var club = imported.Catalog.Clubs.Single(item => item.Name == clubName);

@@ -17,10 +17,10 @@ namespace FStudio.FootballWorld.Tests
         private readonly JsonDatabaseImporter importer = new JsonDatabaseImporter();
 
         [Test]
-        public void PublishedExampleImportsFourClubsAndFortyFourPlayers()
+        public void LegacyFixtureImportsFourClubsAndFortyFourPlayers()
         {
             var path = Path.Combine(UnityEngine.Application.dataPath,
-                "FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json");
+                "FootballSimulator/Code/FootballWorld/Tests/Fixtures/legacy-four-clubs.database.json");
             var result = importer.Import(File.ReadAllText(path));
             AssertSuccess(result);
             Assert.That(result.Catalog.Clubs.Count, Is.EqualTo(4));

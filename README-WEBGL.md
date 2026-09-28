@@ -65,9 +65,55 @@ docker compose logs --tail=50 soccer-web
 docker compose down
 ```
 
-Depois de alterar o jogo, execute novamente `.\scripts\webgl.ps1` e recarregue
-o navegador. `docker compose up --build` sozinho reconstrói apenas a imagem do
-servidor: ele usa os arquivos WebGL que já estiverem em `Builds/WebGL`.
+Depois de alterar código ou recursos compilados do jogo, execute novamente
+`.\scripts\webgl.ps1` e recarregue o navegador. `docker compose up --build` sozinho
+reconstrói apenas a imagem do servidor: ele usa os arquivos WebGL que já estiverem
+em `Builds/WebGL`. A edição do JSON externo tem o fluxo sem build descrito abaixo.
+
+## Editar a base e atualizar o navegador
+
+Com `soccer-web` iniciado pelo Compose, edite e salve
+`Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json`.
+Mantenha os IDs existentes e incremente `databaseRevision` para uma nova revisão.
+Recarregue [o jogo](http://localhost:8080): o catálogo será lido novamente.
+Não é necessário executar o script, reconstruir a imagem ou reiniciar o container
+quando a única alteração for nesse JSON compatível. A recarga reinicia o jogo;
+não atualiza uma partida em andamento nem preserva seu progresso.
+
+O Compose monta o diretório de autoria em `/opt/football-database`, somente para
+leitura. Isso também acompanha editores que salvam substituindo o arquivo.
+É um bind da pasta já existente no computador, não um volume persistente Docker.
+`create_host_path: false` impede criar uma pasta vazia se a origem estiver errada.
+O Nginx publica somente o JSON no endereço que o player já utiliza:
+
+[StreamingAssets/FootballWorld/database.json](http://localhost:8080/StreamingAssets/FootballWorld/database.json).
+
+Essa resposta usa `Cache-Control: no-store`, sem ETag ou respostas condicionais
+por data, para que a atualização não recupere uma revisão antiga do navegador.
+O schema e os outros arquivos StreamingAssets continuam vindo do build. A pasta
+de autoria completa, incluindo arquivos `.meta`, não é exposta por essa rota.
+O JSON empacotado pelo Unity continua existindo no export, mas o servidor local
+usa a origem montada. Um arquivo ausente retorna erro; não há fallback silencioso
+para uma cópia antiga. A imagem com essa configuração deve ser iniciada por este
+Compose, que fornece a pasta da base.
+
+Antes de atualizar o navegador, a validação estrutural opcional em PowerShell 7 é:
+
+```powershell
+Test-Json `
+  -LiteralPath 'Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json' `
+  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json'
+```
+
+O importador do jogo também valida referências, posições, IDs e limites; consulte
+[README-DATABASE.md](README-DATABASE.md). Se o menu mostrar erro na base, corrija
+e salve o JSON e use Retry ou recarregue a página. Os erros detalhados ficam no
+console do navegador. Uma base inválida não é aceita parcialmente.
+
+Escudos, uniformes, modelos 3D e bindings ainda são recursos compilados Unity.
+Alterá-los exige `.\scripts\webgl.ps1`; colocar uma imagem ou um campo novo no
+JSON não cria suporte de importação. Novos tipos de dados ou versões de contrato
+também exigem adaptar, testar e publicar o player compatível.
 
 ## Como o build é configurado
 
@@ -131,5 +177,6 @@ Conferidos HTTP 200 para arquivos do player e configuração dos Addressables,
 A verificação inicial não cobre todas as ações de gameplay e dispositivos.
 
 Somente o build e a configuração Nginx entram na imagem. Fontes, `.git`, caches
-e credenciais são excluídos pelo `.dockerignore`.
+e credenciais são excluídos pelo `.dockerignore`. No ambiente local, o Compose
+acrescenta o bind somente para leitura da base, conforme descrito acima.
 A porta está vinculada a `127.0.0.1`: o serviço fica acessível neste computador.

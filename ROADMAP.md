@@ -18,7 +18,9 @@ o campeonato e a importação de skins ainda não estão implementados. Consulte
 A1 está concluída. A2 está implementada no recorte JSON v1 de clubes, jogadores,
 vínculos e referências visuais; schemas de competições, pacotes e skins ficam nas
 respectivas etapas futuras. A3 está implementada com Domain/Application isolados,
-importador e bootstrap que carrega quatro clubes e 44 jogadores no player.
+importador e bootstrap que carrega quatro clubes no player. A amostra atual tem
+72 jogadores, incluindo 39 do São Paulo FC; o JSON é editável por refresh no
+Compose, sem recompilar. Os visuais locais do São Paulo continuam compilados.
 Nenhum resultado ou temporada foi acrescentado ao catálogo. A4 está implementada
 com LineupPlanner, bindings visuais locais e uma sessão que fixa a revisão de cada
 amistoso. Não inclui captura de resultados ou FixtureId/ExecutionId de B4.
@@ -90,7 +92,9 @@ local deve permitir importar, preparar e compartilhar pacotes como arquivos.
 
 1. Implementar apenas o escopo da etapa e atualizar contratos/documentos afetados.
 2. Executar verificações significativas para as regras ou integração alteradas.
-3. Gerar WebGL novo com `./scripts/webgl.ps1` e confirmar `soccer-web` saudável.
+3. Para código ou recursos compilados, gerar WebGL novo com `./scripts/webgl.ps1`
+   e confirmar `soccer-web` saudável. Edições apenas no JSON externo compatível
+   seguem a exceção de refresh do AGENTS.md, com validação e teste no navegador.
 4. Testar no navegador o comportamento afetado e descrever a cobertura real.
 5. Informar arquivos alterados e comandos Git restritos à entrega; não executar
    comandos Git sem pedido explícito do usuário.

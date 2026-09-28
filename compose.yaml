@@ -8,6 +8,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "127.0.0.1:8080:80"
+    # Serve saved database edits directly; this is a host bind, not a Docker volume.
+    # Mount the directory so editors that replace files atomically remain visible.
+    volumes:
+      - type: bind
+        source: ./Assets/FootballSimulator/Data/FootballWorld/Examples
+        target: /opt/football-database
+        read_only: true
+        bind:
+          create_host_path: false
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/index.html"]
