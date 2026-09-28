@@ -1,9 +1,10 @@
 # Entregas incrementais
 
-Revisão de planejamento: 28/09/2026. As etapas podem ser revisadas com evidência
-da implementação. Documentação de arquitetura não significa importador, editor ou
-skins já funcionais. Consulte [ARCHITECTURE.md](ARCHITECTURE.md) e
-[DATA-FORMAT.md](DATA-FORMAT.md).
+Revisão: 28/09/2026. A fundação de importação de clubes/jogadores está implementada.
+As etapas podem ser revisadas com evidência da implementação. O editor externo,
+o campeonato e a importação de skins ainda não estão implementados. Consulte
+[ARCHITECTURE.md](ARCHITECTURE.md), [DATA-FORMAT.md](DATA-FORMAT.md) e
+[README-DATABASE.md](README-DATABASE.md).
 
 ## A. Base arquitetural
 
@@ -13,7 +14,12 @@ skins já funcionais. Consulte [ARCHITECTURE.md](ARCHITECTURE.md) e
 | A2 | Contrato v1 executável: schemas, exemplos e validação | Exemplo mínimo válido; erros claros para IDs/referências/versões inválidos; fonte visual separada do core |
 | A3 | Domain/Application em C# puro e adaptadores de importação | Quatro clubes e seus jogadores carregados de base externa; nenhuma dependência de Unity/JSON no core |
 
-A1 é a entrega documental atual. A2 em diante ainda não estão implementadas.
+A1 está concluída. A2 está implementada no recorte JSON v1 de clubes, jogadores,
+vínculos e referências visuais; schemas de competições, pacotes e skins ficam nas
+respectivas etapas futuras. A3 está implementada com Domain/Application isolados,
+importador e bootstrap que carrega quatro clubes e 44 jogadores no player.
+Nenhum resultado ou temporada foi acrescentado ao catálogo. A ponte para usar
+esses dados no amistoso existente é a próxima entrega de integração.
 Não criar assemblies vazias ou serviços fictícios somente para marcar uma etapa.
 
 ## B. Primeiro marco: competição jogável

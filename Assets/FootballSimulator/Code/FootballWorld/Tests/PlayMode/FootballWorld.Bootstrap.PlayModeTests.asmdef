@@ -1,0 +1,21 @@
+{
+    "name": "FootballWorld.Bootstrap.PlayModeTests",
+    "rootNamespace": "FStudio.FootballWorld.Tests.PlayMode",
+    "references": [
+        "FootballWorld.Bootstrap",
+        "FootballWorld.Application",
+        "FootballWorld.Domain",
+        "FootballWorld.DataContracts",
+        "FootballWorld.Importing"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "versionDefines": [],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "noEngineReferences": false
+}

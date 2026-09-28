@@ -1,0 +1,14 @@
+{
+    "name": "FootballWorld.DataContracts",
+    "rootNamespace": "FStudio.FootballWorld.DataContracts",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

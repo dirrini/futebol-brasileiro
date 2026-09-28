@@ -48,6 +48,9 @@ arquivos incompletos nem substitui a imagem que já estava servindo o jogo.
 # Gerar arquivos WebGL sem iniciar o Docker.
 .\scripts\webgl.ps1 -BuildOnly
 
+# Reconstruir scripts e dados do player quando o cache incremental estiver desatualizado.
+.\scripts\webgl.ps1 -CleanBuild
+
 # Publicar o build que já existe, sem recompilar o Unity.
 .\scripts\webgl.ps1 -SkipBuild
 
@@ -81,6 +84,26 @@ O método `FStudio.Build.WebGLBuild.Run` fica em
 A plataforma ativa e o cache do projeto original são preservados. Somente a
 cópia de build usa WebGL. Os caches são gerados pelo Unity; não é necessário
 apagá-los entre builds.
+
+### Recuperar dados de build desatualizados
+
+Use `.\scripts\webgl.ps1 -CleanBuild` quando, após adicionar novas assemblies,
+o build terminar sem erros mas o navegador continuar sem executar seus pontos
+de inicialização. Um caso observado foi `ScriptingAssemblies.json` antigo no
+cache do player: os novos scripts e hooks estavam compilados, mas suas assemblies
+não constavam na lista empacotada no WebGL.
+
+Essa opção passa `WEBGL_CLEAN_BUILD=1` ao Unity e usa
+[`BuildOptions.CleanBuildCache`](https://docs.unity3d.com/2022.3/Documentation/ScriptReference/BuildOptions.CleanBuildCache.html)
+para reconstruir scripts e dados do player na cópia isolada. O build normal
+continua incremental. A reconstrução pode demorar mais e preserva o último
+export válido se falhar. Para apenas compilar, combine `-CleanBuild -BuildOnly`;
+`-CleanBuild -SkipBuild` é rejeitado antes de iniciar qualquer ação.
+
+O script restaura `WEBGL_CLEAN_BUILD` e `WEBGL_BUILD_PATH` ao terminar. Em uma
+invocação direta do método `FStudio.Build.WebGLBuild.Run`, definir
+`WEBGL_CLEAN_BUILD=1` também solicita a reconstrução completa. A ausência desse
+valor mantém o comportamento incremental.
 
 O Nginx envia `Content-Encoding: gzip` e os tipos corretos para JavaScript e
 WebAssembly, sem comprimir novamente arquivos `.gz`. Os arquivos são

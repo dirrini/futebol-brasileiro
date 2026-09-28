@@ -1,0 +1,14 @@
+{
+    "name": "FootballWorld.Importing",
+    "rootNamespace": "FStudio.FootballWorld.Infrastructure.Importing",
+    "references": ["FootballWorld.Domain", "FootballWorld.DataContracts"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["Newtonsoft.Json.dll"],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

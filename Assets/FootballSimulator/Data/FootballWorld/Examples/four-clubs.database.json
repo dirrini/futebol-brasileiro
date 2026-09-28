@@ -1,0 +1,1701 @@
+{
+  "schemaVersion": 1,
+  "databaseId": "db-2bc0ad3f537e4fadbd99aa1addb41feb",
+  "databaseRevision": 1,
+  "clubs": [
+    {
+      "id": "club-1038368881024191b8c294069e1d1870",
+      "name": "Royal"
+    },
+    {
+      "id": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "name": "Milano"
+    },
+    {
+      "id": "club-8143073533e7441db9b47a06e6e1503e",
+      "name": "London"
+    },
+    {
+      "id": "club-560982a07573454c9cc5ee551216e265",
+      "name": "Catalagna"
+    }
+  ],
+  "players": [
+    {
+      "id": "player-def4f340a75e4e7f8830145fa4242c72",
+      "name": "Kourta",
+      "naturalPositions": [
+        "GK"
+      ],
+      "heightCm": 200,
+      "weightKg": 77,
+      "attributes": {
+        "strength": 83,
+        "acceleration": 80,
+        "topSpeed": 78,
+        "dribbleSpeed": 47,
+        "jump": 90,
+        "tackling": 75,
+        "ballKeeping": 73,
+        "passing": 77,
+        "longBall": 84,
+        "agility": 75,
+        "shooting": 64,
+        "shootPower": 59,
+        "positioning": 98,
+        "reaction": 97,
+        "ballControl": 99
+      }
+    },
+    {
+      "id": "player-8b149ca22e61449dba7a2e8276b710ce",
+      "name": "Kalaba",
+      "naturalPositions": [
+        "LB"
+      ],
+      "heightCm": 180,
+      "weightKg": 75,
+      "attributes": {
+        "strength": 70,
+        "acceleration": 75,
+        "topSpeed": 76,
+        "dribbleSpeed": 73,
+        "jump": 80,
+        "tackling": 82,
+        "ballKeeping": 72,
+        "passing": 78,
+        "longBall": 75,
+        "agility": 74,
+        "shooting": 67,
+        "shootPower": 63,
+        "positioning": 82,
+        "reaction": 80,
+        "ballControl": 80
+      }
+    },
+    {
+      "id": "player-e543fc314fe54b88afe535e05b1aa2a7",
+      "name": "Necha",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 180,
+      "weightKg": 73,
+      "attributes": {
+        "strength": 79,
+        "acceleration": 81,
+        "topSpeed": 79,
+        "dribbleSpeed": 75,
+        "jump": 83,
+        "tackling": 84,
+        "ballKeeping": 73,
+        "passing": 82,
+        "longBall": 74,
+        "agility": 68,
+        "shooting": 71,
+        "shootPower": 73,
+        "positioning": 94,
+        "reaction": 93,
+        "ballControl": 76
+      }
+    },
+    {
+      "id": "player-663b7f0c08a84622af2aece3f0264fb5",
+      "name": "Rudi",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 190,
+      "weightKg": 80,
+      "attributes": {
+        "strength": 94,
+        "acceleration": 83,
+        "topSpeed": 87,
+        "dribbleSpeed": 75,
+        "jump": 90,
+        "tackling": 92,
+        "ballKeeping": 72,
+        "passing": 80,
+        "longBall": 70,
+        "agility": 74,
+        "shooting": 66,
+        "shootPower": 64,
+        "positioning": 91,
+        "reaction": 87,
+        "ballControl": 75
+      }
+    },
+    {
+      "id": "player-eff5b8442bfd4646801a47afaaa847c5",
+      "name": "Carvaas",
+      "naturalPositions": [
+        "RB"
+      ],
+      "heightCm": 173,
+      "weightKg": 68,
+      "attributes": {
+        "strength": 68,
+        "acceleration": 88,
+        "topSpeed": 85,
+        "dribbleSpeed": 84,
+        "jump": 73,
+        "tackling": 76,
+        "ballKeeping": 82,
+        "passing": 84,
+        "longBall": 88,
+        "agility": 84,
+        "shooting": 75,
+        "shootPower": 82,
+        "positioning": 86,
+        "reaction": 87,
+        "ballControl": 83
+      }
+    },
+    {
+      "id": "player-512201b498484c89b215b00f6a72270c",
+      "name": "Kemekonga",
+      "naturalPositions": [
+        "DM"
+      ],
+      "heightCm": 182,
+      "weightKg": 76,
+      "attributes": {
+        "strength": 79,
+        "acceleration": 82,
+        "topSpeed": 80,
+        "dribbleSpeed": 82,
+        "jump": 77,
+        "tackling": 82,
+        "ballKeeping": 77,
+        "passing": 80,
+        "longBall": 76,
+        "agility": 78,
+        "shooting": 72,
+        "shootPower": 69,
+        "positioning": 76,
+        "reaction": 78,
+        "ballControl": 80
+      }
+    },
+    {
+      "id": "player-3f52c3561011456694f0b05a0172aa45",
+      "name": "Vinny",
+      "naturalPositions": [
+        "LM"
+      ],
+      "heightCm": 176,
+      "weightKg": 65,
+      "attributes": {
+        "strength": 73,
+        "acceleration": 99,
+        "topSpeed": 99,
+        "dribbleSpeed": 99,
+        "jump": 70,
+        "tackling": 69,
+        "ballKeeping": 95,
+        "passing": 85,
+        "longBall": 80,
+        "agility": 98,
+        "shooting": 91,
+        "shootPower": 93,
+        "positioning": 84,
+        "reaction": 95,
+        "ballControl": 92
+      }
+    },
+    {
+      "id": "player-792419d3a69e4a23b64cfec17612a8dd",
+      "name": "Modry",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 172,
+      "weightKg": 65,
+      "attributes": {
+        "strength": 70,
+        "acceleration": 86,
+        "topSpeed": 88,
+        "dribbleSpeed": 90,
+        "jump": 68,
+        "tackling": 80,
+        "ballKeeping": 98,
+        "passing": 98,
+        "longBall": 99,
+        "agility": 96,
+        "shooting": 86,
+        "shootPower": 84,
+        "positioning": 95,
+        "reaction": 97,
+        "ballControl": 96
+      }
+    },
+    {
+      "id": "player-f5f79df68a9641bbb3b6b684d358b38a",
+      "name": "Verda",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 182,
+      "weightKg": 78,
+      "attributes": {
+        "strength": 77,
+        "acceleration": 88,
+        "topSpeed": 91,
+        "dribbleSpeed": 93,
+        "jump": 77,
+        "tackling": 72,
+        "ballKeeping": 90,
+        "passing": 88,
+        "longBall": 87,
+        "agility": 90,
+        "shooting": 92,
+        "shootPower": 94,
+        "positioning": 87,
+        "reaction": 86,
+        "ballControl": 84
+      }
+    },
+    {
+      "id": "player-d4cbb538466245ff8f64ae92053c20b4",
+      "name": "Rodgo",
+      "naturalPositions": [
+        "RM"
+      ],
+      "heightCm": 174,
+      "weightKg": 68,
+      "attributes": {
+        "strength": 67,
+        "acceleration": 89,
+        "topSpeed": 91,
+        "dribbleSpeed": 91,
+        "jump": 84,
+        "tackling": 65,
+        "ballKeeping": 89,
+        "passing": 76,
+        "longBall": 82,
+        "agility": 91,
+        "shooting": 81,
+        "shootPower": 80,
+        "positioning": 78,
+        "reaction": 84,
+        "ballControl": 86
+      }
+    },
+    {
+      "id": "player-25730f4ce1514ab6bea7b846cab32c39",
+      "name": "Banzames",
+      "naturalPositions": [
+        "ST"
+      ],
+      "heightCm": 185,
+      "weightKg": 79,
+      "attributes": {
+        "strength": 84,
+        "acceleration": 83,
+        "topSpeed": 87,
+        "dribbleSpeed": 84,
+        "jump": 90,
+        "tackling": 74,
+        "ballKeeping": 86,
+        "passing": 86,
+        "longBall": 76,
+        "agility": 85,
+        "shooting": 99,
+        "shootPower": 88,
+        "positioning": 99,
+        "reaction": 90,
+        "ballControl": 94
+      }
+    },
+    {
+      "id": "player-c13fe57e2ef94a0590c34f4385be6dfe",
+      "name": "Onnas",
+      "naturalPositions": [
+        "GK"
+      ],
+      "heightCm": 190,
+      "weightKg": 78,
+      "attributes": {
+        "strength": 79,
+        "acceleration": 78,
+        "topSpeed": 80,
+        "dribbleSpeed": 55,
+        "jump": 85,
+        "tackling": 69,
+        "ballKeeping": 44,
+        "passing": 67,
+        "longBall": 68,
+        "agility": 84,
+        "shooting": 47,
+        "shootPower": 44,
+        "positioning": 86,
+        "reaction": 84,
+        "ballControl": 88
+      }
+    },
+    {
+      "id": "player-c991ae5979174515b4ece4e0a9bc4cd1",
+      "name": "Bastonea",
+      "naturalPositions": [
+        "LB"
+      ],
+      "heightCm": 190,
+      "weightKg": 81,
+      "attributes": {
+        "strength": 86,
+        "acceleration": 82,
+        "topSpeed": 76,
+        "dribbleSpeed": 61,
+        "jump": 86,
+        "tackling": 92,
+        "ballKeeping": 66,
+        "passing": 72,
+        "longBall": 62,
+        "agility": 59,
+        "shooting": 43,
+        "shootPower": 37,
+        "positioning": 89,
+        "reaction": 85,
+        "ballControl": 59
+      }
+    },
+    {
+      "id": "player-330cf679f39641ff9fe41b79c04a861e",
+      "name": "Acarbe",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 192,
+      "weightKg": 83,
+      "attributes": {
+        "strength": 91,
+        "acceleration": 71,
+        "topSpeed": 72,
+        "dribbleSpeed": 64,
+        "jump": 80,
+        "tackling": 87,
+        "ballKeeping": 62,
+        "passing": 67,
+        "longBall": 55,
+        "agility": 51,
+        "shooting": 49,
+        "shootPower": 41,
+        "positioning": 91,
+        "reaction": 80,
+        "ballControl": 57
+      }
+    },
+    {
+      "id": "player-37483cdd022942f38eb5db7432669631",
+      "name": "Vrieh",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 189,
+      "weightKg": 77,
+      "attributes": {
+        "strength": 86,
+        "acceleration": 68,
+        "topSpeed": 77,
+        "dribbleSpeed": 62,
+        "jump": 73,
+        "tackling": 84,
+        "ballKeeping": 60,
+        "passing": 76,
+        "longBall": 65,
+        "agility": 64,
+        "shooting": 55,
+        "shootPower": 62,
+        "positioning": 93,
+        "reaction": 90,
+        "ballControl": 70
+      }
+    },
+    {
+      "id": "player-3fe82909112d4108932b41605ff0aa19",
+      "name": "Gosa",
+      "naturalPositions": [
+        "RB"
+      ],
+      "heightCm": 183,
+      "weightKg": 74,
+      "attributes": {
+        "strength": 76,
+        "acceleration": 80,
+        "topSpeed": 79,
+        "dribbleSpeed": 79,
+        "jump": 77,
+        "tackling": 71,
+        "ballKeeping": 79,
+        "passing": 72,
+        "longBall": 84,
+        "agility": 87,
+        "shooting": 78,
+        "shootPower": 72,
+        "positioning": 84,
+        "reaction": 77,
+        "ballControl": 81
+      }
+    },
+    {
+      "id": "player-93ccdba472ea48f498bbd936162d8441",
+      "name": "Broz",
+      "naturalPositions": [
+        "LM"
+      ],
+      "heightCm": 181,
+      "weightKg": 75,
+      "attributes": {
+        "strength": 82,
+        "acceleration": 78,
+        "topSpeed": 79,
+        "dribbleSpeed": 75,
+        "jump": 78,
+        "tackling": 88,
+        "ballKeeping": 77,
+        "passing": 86,
+        "longBall": 77,
+        "agility": 77,
+        "shooting": 75,
+        "shootPower": 86,
+        "positioning": 86,
+        "reaction": 83,
+        "ballControl": 72
+      }
+    },
+    {
+      "id": "player-8e721ee824cf4939bec0f6f0d3749ec2",
+      "name": "Barallea",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 175,
+      "weightKg": 65,
+      "attributes": {
+        "strength": 68,
+        "acceleration": 83,
+        "topSpeed": 80,
+        "dribbleSpeed": 88,
+        "jump": 73,
+        "tackling": 78,
+        "ballKeeping": 90,
+        "passing": 86,
+        "longBall": 81,
+        "agility": 92,
+        "shooting": 77,
+        "shootPower": 74,
+        "positioning": 85,
+        "reaction": 88,
+        "ballControl": 83
+      }
+    },
+    {
+      "id": "player-f9a6551a56834d909c1f2eca31a7ecea",
+      "name": "Calhan",
+      "naturalPositions": [
+        "RM"
+      ],
+      "heightCm": 178,
+      "weightKg": 70,
+      "attributes": {
+        "strength": 64,
+        "acceleration": 74,
+        "topSpeed": 77,
+        "dribbleSpeed": 86,
+        "jump": 72,
+        "tackling": 68,
+        "ballKeeping": 94,
+        "passing": 95,
+        "longBall": 96,
+        "agility": 85,
+        "shooting": 91,
+        "shootPower": 86,
+        "positioning": 92,
+        "reaction": 90,
+        "ballControl": 92
+      }
+    },
+    {
+      "id": "player-0071212f48434f50b50b428f1a7b595f",
+      "name": "Dumfy",
+      "naturalPositions": [
+        "LW"
+      ],
+      "heightCm": 188,
+      "weightKg": 77,
+      "attributes": {
+        "strength": 80,
+        "acceleration": 85,
+        "topSpeed": 90,
+        "dribbleSpeed": 83,
+        "jump": 77,
+        "tackling": 75,
+        "ballKeeping": 75,
+        "passing": 78,
+        "longBall": 78,
+        "agility": 74,
+        "shooting": 72,
+        "shootPower": 76,
+        "positioning": 80,
+        "reaction": 78,
+        "ballControl": 73
+      }
+    },
+    {
+      "id": "player-b4c7e189128c490ba88689fb7dbdd862",
+      "name": "Lokoko",
+      "naturalPositions": [
+        "RW"
+      ],
+      "heightCm": 191,
+      "weightKg": 96,
+      "attributes": {
+        "strength": 97,
+        "acceleration": 78,
+        "topSpeed": 87,
+        "dribbleSpeed": 85,
+        "jump": 90,
+        "tackling": 73,
+        "ballKeeping": 78,
+        "passing": 74,
+        "longBall": 66,
+        "agility": 71,
+        "shooting": 88,
+        "shootPower": 94,
+        "positioning": 89,
+        "reaction": 85,
+        "ballControl": 83
+      }
+    },
+    {
+      "id": "player-8b681a7f0b8843fd8df0d7f994f8ef5f",
+      "name": "Martinas",
+      "naturalPositions": [
+        "ST"
+      ],
+      "heightCm": 174,
+      "weightKg": 70,
+      "attributes": {
+        "strength": 73,
+        "acceleration": 84,
+        "topSpeed": 86,
+        "dribbleSpeed": 86,
+        "jump": 78,
+        "tackling": 67,
+        "ballKeeping": 83,
+        "passing": 80,
+        "longBall": 74,
+        "agility": 82,
+        "shooting": 84,
+        "shootPower": 81,
+        "positioning": 85,
+        "reaction": 82,
+        "ballControl": 82
+      }
+    },
+    {
+      "id": "player-9dd78a1349d64c55ba9d710f39797fbc",
+      "name": "Remstale",
+      "naturalPositions": [
+        "GK"
+      ],
+      "heightCm": 190,
+      "weightKg": 87,
+      "attributes": {
+        "strength": 81,
+        "acceleration": 74,
+        "topSpeed": 77,
+        "dribbleSpeed": 60,
+        "jump": 80,
+        "tackling": 68,
+        "ballKeeping": 44,
+        "passing": 68,
+        "longBall": 83,
+        "agility": 78,
+        "shooting": 45,
+        "shootPower": 39,
+        "positioning": 85,
+        "reaction": 88,
+        "ballControl": 85
+      }
+    },
+    {
+      "id": "player-db9248c9635e4baab226e69cf19aae39",
+      "name": "Sinchenkovic",
+      "naturalPositions": [
+        "LB"
+      ],
+      "heightCm": 175,
+      "weightKg": 66,
+      "attributes": {
+        "strength": 69,
+        "acceleration": 82,
+        "topSpeed": 84,
+        "dribbleSpeed": 83,
+        "jump": 72,
+        "tackling": 80,
+        "ballKeeping": 82,
+        "passing": 83,
+        "longBall": 82,
+        "agility": 83,
+        "shooting": 74,
+        "shootPower": 79,
+        "positioning": 82,
+        "reaction": 83,
+        "ballControl": 80
+      }
+    },
+    {
+      "id": "player-c5c72dd362b04c5f8563b9c49105f7fe",
+      "name": "Magals",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 190,
+      "weightKg": 83,
+      "attributes": {
+        "strength": 84,
+        "acceleration": 76,
+        "topSpeed": 77,
+        "dribbleSpeed": 56,
+        "jump": 78,
+        "tackling": 83,
+        "ballKeeping": 73,
+        "passing": 68,
+        "longBall": 64,
+        "agility": 67,
+        "shooting": 57,
+        "shootPower": 66,
+        "positioning": 82,
+        "reaction": 88,
+        "ballControl": 69
+      }
+    },
+    {
+      "id": "player-491c8e5e9c1b46d1b395ee3bc5d7ffcd",
+      "name": "Selibe",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 192,
+      "weightKg": 84,
+      "attributes": {
+        "strength": 83,
+        "acceleration": 74,
+        "topSpeed": 78,
+        "dribbleSpeed": 58,
+        "jump": 81,
+        "tackling": 83,
+        "ballKeeping": 66,
+        "passing": 73,
+        "longBall": 60,
+        "agility": 72,
+        "shooting": 63,
+        "shootPower": 67,
+        "positioning": 84,
+        "reaction": 81,
+        "ballControl": 70
+      }
+    },
+    {
+      "id": "player-2120b3c3532e453b8b0974e084a0443e",
+      "name": "Whiteah",
+      "naturalPositions": [
+        "RB"
+      ],
+      "heightCm": 186,
+      "weightKg": 76,
+      "attributes": {
+        "strength": 77,
+        "acceleration": 79,
+        "topSpeed": 78,
+        "dribbleSpeed": 74,
+        "jump": 78,
+        "tackling": 80,
+        "ballKeeping": 74,
+        "passing": 78,
+        "longBall": 82,
+        "agility": 77,
+        "shooting": 71,
+        "shootPower": 81,
+        "positioning": 82,
+        "reaction": 83,
+        "ballControl": 79
+      }
+    },
+    {
+      "id": "player-1c172d828cb648febd1d328060700666",
+      "name": "Partieh",
+      "naturalPositions": [
+        "DM"
+      ],
+      "heightCm": 185,
+      "weightKg": 82,
+      "attributes": {
+        "strength": 85,
+        "acceleration": 78,
+        "topSpeed": 78,
+        "dribbleSpeed": 75,
+        "jump": 83,
+        "tackling": 82,
+        "ballKeeping": 76,
+        "passing": 78,
+        "longBall": 73,
+        "agility": 78,
+        "shooting": 77,
+        "shootPower": 86,
+        "positioning": 83,
+        "reaction": 81,
+        "ballControl": 75
+      }
+    },
+    {
+      "id": "player-c4fd899fc3414dd0a0a9d6e3ccee60c9",
+      "name": "Martinelas",
+      "naturalPositions": [
+        "LM"
+      ],
+      "heightCm": 178,
+      "weightKg": 74,
+      "attributes": {
+        "strength": 77,
+        "acceleration": 91,
+        "topSpeed": 91,
+        "dribbleSpeed": 92,
+        "jump": 82,
+        "tackling": 67,
+        "ballKeeping": 87,
+        "passing": 83,
+        "longBall": 86,
+        "agility": 87,
+        "shooting": 83,
+        "shootPower": 85,
+        "positioning": 82,
+        "reaction": 86,
+        "ballControl": 85
+      }
+    },
+    {
+      "id": "player-e8ab12e72de844039ba70888dd8d5f80",
+      "name": "Jorgerinho",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 178,
+      "weightKg": 70,
+      "attributes": {
+        "strength": 68,
+        "acceleration": 76,
+        "topSpeed": 74,
+        "dribbleSpeed": 75,
+        "jump": 72,
+        "tackling": 82,
+        "ballKeeping": 77,
+        "passing": 94,
+        "longBall": 88,
+        "agility": 85,
+        "shooting": 82,
+        "shootPower": 78,
+        "positioning": 92,
+        "reaction": 88,
+        "ballControl": 91
+      }
+    },
+    {
+      "id": "player-7bcff3da56d54621aec19f4ff6532b81",
+      "name": "Xhekeae",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 186,
+      "weightKg": 76,
+      "attributes": {
+        "strength": 78,
+        "acceleration": 75,
+        "topSpeed": 71,
+        "dribbleSpeed": 80,
+        "jump": 82,
+        "tackling": 85,
+        "ballKeeping": 78,
+        "passing": 88,
+        "longBall": 92,
+        "agility": 76,
+        "shooting": 83,
+        "shootPower": 90,
+        "positioning": 86,
+        "reaction": 77,
+        "ballControl": 82
+      }
+    },
+    {
+      "id": "player-61c4c42b901f4265a4fd60e19c8a6082",
+      "name": "Odengeardes",
+      "naturalPositions": [
+        "RM"
+      ],
+      "heightCm": 178,
+      "weightKg": 73,
+      "attributes": {
+        "strength": 68,
+        "acceleration": 81,
+        "topSpeed": 79,
+        "dribbleSpeed": 82,
+        "jump": 74,
+        "tackling": 66,
+        "ballKeeping": 83,
+        "passing": 86,
+        "longBall": 85,
+        "agility": 82,
+        "shooting": 83,
+        "shootPower": 84,
+        "positioning": 86,
+        "reaction": 84,
+        "ballControl": 88
+      }
+    },
+    {
+      "id": "player-c18831d151864c77b4043dd3807d194e",
+      "name": "Jasus",
+      "naturalPositions": [
+        "ST"
+      ],
+      "heightCm": 175,
+      "weightKg": 68,
+      "attributes": {
+        "strength": 61,
+        "acceleration": 93,
+        "topSpeed": 95,
+        "dribbleSpeed": 90,
+        "jump": 82,
+        "tackling": 48,
+        "ballKeeping": 89,
+        "passing": 83,
+        "longBall": 76,
+        "agility": 94,
+        "shooting": 82,
+        "shootPower": 80,
+        "positioning": 85,
+        "reaction": 92,
+        "ballControl": 86
+      }
+    },
+    {
+      "id": "player-6e92abf927334967978f590277c18d7c",
+      "name": "Stefen",
+      "naturalPositions": [
+        "GK"
+      ],
+      "heightCm": 187,
+      "weightKg": 78,
+      "attributes": {
+        "strength": 78,
+        "acceleration": 73,
+        "topSpeed": 74,
+        "dribbleSpeed": 44,
+        "jump": 85,
+        "tackling": 68,
+        "ballKeeping": 52,
+        "passing": 78,
+        "longBall": 85,
+        "agility": 74,
+        "shooting": 57,
+        "shootPower": 57,
+        "positioning": 92,
+        "reaction": 91,
+        "ballControl": 92
+      }
+    },
+    {
+      "id": "player-47c1684f03554d28add03855f9f6b2ea",
+      "name": "Alonsa",
+      "naturalPositions": [
+        "LB"
+      ],
+      "heightCm": 189,
+      "weightKg": 80,
+      "attributes": {
+        "strength": 78,
+        "acceleration": 83,
+        "topSpeed": 84,
+        "dribbleSpeed": 78,
+        "jump": 84,
+        "tackling": 82,
+        "ballKeeping": 74,
+        "passing": 80,
+        "longBall": 87,
+        "agility": 77,
+        "shooting": 78,
+        "shootPower": 86,
+        "positioning": 82,
+        "reaction": 78,
+        "ballControl": 76
+      }
+    },
+    {
+      "id": "player-0ff89f543407441d910baa7ed384883b",
+      "name": "Christian",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 187,
+      "weightKg": 78,
+      "attributes": {
+        "strength": 83,
+        "acceleration": 77,
+        "topSpeed": 81,
+        "dribbleSpeed": 66,
+        "jump": 82,
+        "tackling": 80,
+        "ballKeeping": 64,
+        "passing": 78,
+        "longBall": 74,
+        "agility": 69,
+        "shooting": 71,
+        "shootPower": 67,
+        "positioning": 86,
+        "reaction": 84,
+        "ballControl": 67
+      }
+    },
+    {
+      "id": "player-e9a039d9c664451ba5e71e8da364b29a",
+      "name": "Koundiah",
+      "naturalPositions": [
+        "CB"
+      ],
+      "heightCm": 180,
+      "weightKg": 77,
+      "attributes": {
+        "strength": 74,
+        "acceleration": 87,
+        "topSpeed": 86,
+        "dribbleSpeed": 65,
+        "jump": 87,
+        "tackling": 84,
+        "ballKeeping": 68,
+        "passing": 78,
+        "longBall": 82,
+        "agility": 79,
+        "shooting": 66,
+        "shootPower": 65,
+        "positioning": 86,
+        "reaction": 91,
+        "ballControl": 72
+      }
+    },
+    {
+      "id": "player-b848807e1d3847bb96c743b1e7c7dde6",
+      "name": "Serginero Roberta",
+      "naturalPositions": [
+        "RB"
+      ],
+      "heightCm": 178,
+      "weightKg": 69,
+      "attributes": {
+        "strength": 64,
+        "acceleration": 83,
+        "topSpeed": 86,
+        "dribbleSpeed": 83,
+        "jump": 81,
+        "tackling": 67,
+        "ballKeeping": 82,
+        "passing": 83,
+        "longBall": 86,
+        "agility": 82,
+        "shooting": 77,
+        "shootPower": 75,
+        "positioning": 85,
+        "reaction": 81,
+        "ballControl": 81
+      }
+    },
+    {
+      "id": "player-42da0b7679b1400cb559f7144a1bc71a",
+      "name": "Busqua",
+      "naturalPositions": [
+        "DM"
+      ],
+      "heightCm": 189,
+      "weightKg": 80,
+      "attributes": {
+        "strength": 75,
+        "acceleration": 69,
+        "topSpeed": 66,
+        "dribbleSpeed": 65,
+        "jump": 74,
+        "tackling": 91,
+        "ballKeeping": 87,
+        "passing": 95,
+        "longBall": 88,
+        "agility": 65,
+        "shooting": 83,
+        "shootPower": 82,
+        "positioning": 92,
+        "reaction": 77,
+        "ballControl": 86
+      }
+    },
+    {
+      "id": "player-a4ab23ada9344fb088ae3f072f3c3eef",
+      "name": "Fatty",
+      "naturalPositions": [
+        "LM"
+      ],
+      "heightCm": 178,
+      "weightKg": 67,
+      "attributes": {
+        "strength": 64,
+        "acceleration": 92,
+        "topSpeed": 94,
+        "dribbleSpeed": 92,
+        "jump": 64,
+        "tackling": 53,
+        "ballKeeping": 91,
+        "passing": 77,
+        "longBall": 74,
+        "agility": 94,
+        "shooting": 80,
+        "shootPower": 75,
+        "positioning": 74,
+        "reaction": 90,
+        "ballControl": 82
+      }
+    },
+    {
+      "id": "player-3a0257f684e7478cbce072493fc9b88a",
+      "name": "Pedrinski",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 174,
+      "weightKg": 64,
+      "attributes": {
+        "strength": 55,
+        "acceleration": 81,
+        "topSpeed": 82,
+        "dribbleSpeed": 82,
+        "jump": 63,
+        "tackling": 66,
+        "ballKeeping": 90,
+        "passing": 88,
+        "longBall": 82,
+        "agility": 93,
+        "shooting": 77,
+        "shootPower": 72,
+        "positioning": 78,
+        "reaction": 88,
+        "ballControl": 90
+      }
+    },
+    {
+      "id": "player-fdfe746ebdfb4f229be82281a20356c6",
+      "name": "Gavinero",
+      "naturalPositions": [
+        "CM"
+      ],
+      "heightCm": 173,
+      "weightKg": 60,
+      "attributes": {
+        "strength": 52,
+        "acceleration": 88,
+        "topSpeed": 80,
+        "dribbleSpeed": 94,
+        "jump": 59,
+        "tackling": 65,
+        "ballKeeping": 92,
+        "passing": 86,
+        "longBall": 84,
+        "agility": 94,
+        "shooting": 82,
+        "shootPower": 73,
+        "positioning": 83,
+        "reaction": 88,
+        "ballControl": 92
+      }
+    },
+    {
+      "id": "player-29ab85dc0c814fae82af545aeaaf7f71",
+      "name": "Osman Dambe",
+      "naturalPositions": [
+        "RM"
+      ],
+      "heightCm": 178,
+      "weightKg": 70,
+      "attributes": {
+        "strength": 81,
+        "acceleration": 94,
+        "topSpeed": 97,
+        "dribbleSpeed": 92,
+        "jump": 78,
+        "tackling": 65,
+        "ballKeeping": 92,
+        "passing": 83,
+        "longBall": 80,
+        "agility": 89,
+        "shooting": 83,
+        "shootPower": 89,
+        "positioning": 77,
+        "reaction": 87,
+        "ballControl": 90
+      }
+    },
+    {
+      "id": "player-34ccf8328bc642d8906285e67253a363",
+      "name": "Levendos",
+      "naturalPositions": [
+        "ST"
+      ],
+      "heightCm": 185,
+      "weightKg": 80,
+      "attributes": {
+        "strength": 83,
+        "acceleration": 77,
+        "topSpeed": 78,
+        "dribbleSpeed": 74,
+        "jump": 95,
+        "tackling": 81,
+        "ballKeeping": 89,
+        "passing": 83,
+        "longBall": 67,
+        "agility": 78,
+        "shooting": 98,
+        "shootPower": 93,
+        "positioning": 96,
+        "reaction": 94,
+        "ballControl": 90
+      }
+    }
+  ],
+  "memberships": [
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-def4f340a75e4e7f8830145fa4242c72"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-8b149ca22e61449dba7a2e8276b710ce"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-e543fc314fe54b88afe535e05b1aa2a7"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-663b7f0c08a84622af2aece3f0264fb5"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-eff5b8442bfd4646801a47afaaa847c5"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-512201b498484c89b215b00f6a72270c"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-3f52c3561011456694f0b05a0172aa45"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-792419d3a69e4a23b64cfec17612a8dd"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-f5f79df68a9641bbb3b6b684d358b38a"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-d4cbb538466245ff8f64ae92053c20b4"
+    },
+    {
+      "clubId": "club-1038368881024191b8c294069e1d1870",
+      "playerId": "player-25730f4ce1514ab6bea7b846cab32c39"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-c13fe57e2ef94a0590c34f4385be6dfe"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-c991ae5979174515b4ece4e0a9bc4cd1"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-330cf679f39641ff9fe41b79c04a861e"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-37483cdd022942f38eb5db7432669631"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-3fe82909112d4108932b41605ff0aa19"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-93ccdba472ea48f498bbd936162d8441"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-8e721ee824cf4939bec0f6f0d3749ec2"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-f9a6551a56834d909c1f2eca31a7ecea"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-0071212f48434f50b50b428f1a7b595f"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-b4c7e189128c490ba88689fb7dbdd862"
+    },
+    {
+      "clubId": "club-693114dde0d84c34ba6c73647f0b91ba",
+      "playerId": "player-8b681a7f0b8843fd8df0d7f994f8ef5f"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-9dd78a1349d64c55ba9d710f39797fbc"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-db9248c9635e4baab226e69cf19aae39"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-c5c72dd362b04c5f8563b9c49105f7fe"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-491c8e5e9c1b46d1b395ee3bc5d7ffcd"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-2120b3c3532e453b8b0974e084a0443e"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-1c172d828cb648febd1d328060700666"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-c4fd899fc3414dd0a0a9d6e3ccee60c9"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-e8ab12e72de844039ba70888dd8d5f80"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-7bcff3da56d54621aec19f4ff6532b81"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-61c4c42b901f4265a4fd60e19c8a6082"
+    },
+    {
+      "clubId": "club-8143073533e7441db9b47a06e6e1503e",
+      "playerId": "player-c18831d151864c77b4043dd3807d194e"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-6e92abf927334967978f590277c18d7c"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-47c1684f03554d28add03855f9f6b2ea"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-0ff89f543407441d910baa7ed384883b"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-e9a039d9c664451ba5e71e8da364b29a"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-b848807e1d3847bb96c743b1e7c7dde6"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-42da0b7679b1400cb559f7144a1bc71a"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-a4ab23ada9344fb088ae3f072f3c3eef"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-3a0257f684e7478cbce072493fc9b88a"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-fdfe746ebdfb4f229be82281a20356c6"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-29ab85dc0c814fae82af545aeaaf7f71"
+    },
+    {
+      "clubId": "club-560982a07573454c9cc5ee551216e265",
+      "playerId": "player-34ccf8328bc642d8906285e67253a363"
+    }
+  ],
+  "visualProfiles": [
+    {
+      "playerId": "player-def4f340a75e4e7f8830145fa4242c72",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-8b149ca22e61449dba7a2e8276b710ce",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-e543fc314fe54b88afe535e05b1aa2a7",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-663b7f0c08a84622af2aece3f0264fb5",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-eff5b8442bfd4646801a47afaaa847c5",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-512201b498484c89b215b00f6a72270c",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-3f52c3561011456694f0b05a0172aa45",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-792419d3a69e4a23b64cfec17612a8dd",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-f5f79df68a9641bbb3b6b684d358b38a",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-d4cbb538466245ff8f64ae92053c20b4",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-25730f4ce1514ab6bea7b846cab32c39",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-c13fe57e2ef94a0590c34f4385be6dfe",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-c991ae5979174515b4ece4e0a9bc4cd1",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-330cf679f39641ff9fe41b79c04a861e",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-37483cdd022942f38eb5db7432669631",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-3fe82909112d4108932b41605ff0aa19",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-93ccdba472ea48f498bbd936162d8441",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-8e721ee824cf4939bec0f6f0d3749ec2",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-f9a6551a56834d909c1f2eca31a7ecea",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-0071212f48434f50b50b428f1a7b595f",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-b4c7e189128c490ba88689fb7dbdd862",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-8b681a7f0b8843fd8df0d7f994f8ef5f",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-9dd78a1349d64c55ba9d710f39797fbc",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-db9248c9635e4baab226e69cf19aae39",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-c5c72dd362b04c5f8563b9c49105f7fe",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-491c8e5e9c1b46d1b395ee3bc5d7ffcd",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-2120b3c3532e453b8b0974e084a0443e",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-1c172d828cb648febd1d328060700666",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-c4fd899fc3414dd0a0a9d6e3ccee60c9",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-e8ab12e72de844039ba70888dd8d5f80",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-7bcff3da56d54621aec19f4ff6532b81",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-61c4c42b901f4265a4fd60e19c8a6082",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-c18831d151864c77b4043dd3807d194e",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-6e92abf927334967978f590277c18d7c",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-47c1684f03554d28add03855f9f6b2ea",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-0ff89f543407441d910baa7ed384883b",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-e9a039d9c664451ba5e71e8da364b29a",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-b848807e1d3847bb96c743b1e7c7dde6",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-42da0b7679b1400cb559f7144a1bc71a",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-a4ab23ada9344fb088ae3f072f3c3eef",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-3a0257f684e7478cbce072493fc9b88a",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-fdfe746ebdfb4f229be82281a20356c6",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-29ab85dc0c814fae82af545aeaaf7f71",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    },
+    {
+      "playerId": "player-34ccf8328bc642d8906285e67253a363",
+      "skin": {
+        "skinId": "builtin-player",
+        "revision": 1,
+        "compatibilityProfile": "football-player-v1"
+      }
+    }
+  ]
+}

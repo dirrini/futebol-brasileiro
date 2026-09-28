@@ -1,0 +1,16 @@
+{
+    "name": "FootballWorld.Application",
+    "rootNamespace": "FStudio.FootballWorld.Application",
+    "references": [
+        "FootballWorld.Domain"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

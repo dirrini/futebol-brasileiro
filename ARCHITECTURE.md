@@ -1,9 +1,30 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: decisões de arquitetura, revisão 0.1, 28/09/2026. Esta entrega é
-documental. O campeonato, o importador, o editor externo e o processamento de
-skins descritos aqui ainda serão implementados conforme [ROADMAP.md](ROADMAP.md).
-O formato proposto está em [DATA-FORMAT.md](DATA-FORMAT.md).
+Estado: fundação de dados implementada, 28/09/2026. Domain, Application, DTOs,
+importador JSON e bootstrap de catálogo estão implementados. Campeonato, ponte
+com a partida 3D, editor externo e processamento de skins continuam planejados
+conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
+[DATA-FORMAT.md](DATA-FORMAT.md); uso e testes em [README-DATABASE.md](README-DATABASE.md).
+
+## Fundação atual
+
+- `Domain`: ClubDefinition, PlayerDefinition, PlayerAttributes, PlayerPosition,
+  RosterMembership e DatabaseCatalog imutáveis, com invariantes próprias.
+- `Application`: CatalogSession ativa um catálogo completo e permite consultar
+  seu elenco. Não representa ainda uma temporada em andamento.
+- `DataContracts`: DTOs de intercâmbio, incluindo referências visuais separadas.
+- `Infrastructure/Importing`: JsonDatabaseImporter valida JSON e suas referências,
+  cria DTOs e mapeia explicitamente para o domínio; não lê arquivos ou muda sessões.
+- `Bootstrap`: FootballDatabaseBootstrap lê a base externa com UnityWebRequest e
+  só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
+- `Editor`: FootballDatabaseBuildProcessor valida a base e a registra como arquivo
+  StreamingAssets adicional, sem criar fontes fora de FootballSimulator.
+
+O exemplo contém Royal, Milano, London e Catalagna, com 44 jogadores. O bootstrap
+o carrega em paralelo ao menu. O amistoso atual continua usando DatabaseService e
+TeamEntry; consumir o catálogo novo na partida é a próxima integração, não um
+efeito desta entrega. Referências de skins são dados versionados, sem resolução
+ou download gráfico implementado nesta etapa.
 
 ## Objetivos
 
@@ -49,8 +70,11 @@ Domain/Application não dependem da representação JSON nem de seus atributos d
 serialização. O editor externo compartilha schemas, exemplos e regras de
 compatibilidade; não precisa usar a mesma linguagem ou carregar o jogo.
 
-Começar com assemblies separados para Domain e Application, sem referências ao
-Unity. Adaptadores que usam o legado permanecem inicialmente na assembly padrão:
+Domain e Application possuem assemblies separados, sem referências ao Unity;
+Application referencia somente Domain. DataContracts e Importing também têm
+assemblies próprios: apenas Importing referencia Newtonsoft.Json. Bootstrap é
+uma assembly Unity que conecta os módulos, sem depender do motor legado.
+Adaptadores futuros que usam o legado podem permanecer inicialmente na assembly padrão:
 uma assembly criada por `.asmdef` não pode depender de classes em
 `Assembly-CSharp`. Extrair o legado será uma mudança futura delimitada, se houver
 necessidade. [Referência Unity](https://docs.unity3d.com/2022.3/Documentation/Manual/ScriptCompilationAssemblyDefinitionFiles.html).
@@ -125,7 +149,11 @@ Limitações observadas do legado que orientam a implementação:
 Fluxo: leitura do pacote -> validação estrutural -> validação de referências e
 capacidades -> mapeamento -> ativação de uma nova revisão do catálogo.
 
-A validação estrutural usa o contrato descrito por JSON Schema. O importador
+O contrato estrutural é publicado em JSON Schema. Nesta primeira implementação,
+o importador executa validações C# explícitas equivalentes ao recorte do contrato,
+sem dependência de uma biblioteca de avaliação de schemas no player. O schema
+também pode validar o arquivo externamente; não substitui verificações semânticas.
+O importador
 também verifica referências cruzadas, IDs repetidos, valores válidos e tipos de
 regras suportados. O domínio mantém suas próprias invariantes. Um pacote inválido
 não substitui a base ativa. Não executar scripts ou nomes de tipos recebidos em

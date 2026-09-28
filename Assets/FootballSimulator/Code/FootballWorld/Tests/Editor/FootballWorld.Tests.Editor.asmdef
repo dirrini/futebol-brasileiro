@@ -1,0 +1,20 @@
+{
+    "name": "FootballWorld.Tests.Editor",
+    "rootNamespace": "FStudio.FootballWorld.Tests",
+    "references": [
+        "FootballWorld.Domain",
+        "FootballWorld.Application",
+        "FootballWorld.DataContracts",
+        "FootballWorld.Importing"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll", "Newtonsoft.Json.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

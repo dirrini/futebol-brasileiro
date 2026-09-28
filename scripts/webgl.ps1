@@ -2,6 +2,7 @@
 param(
     [switch]$BuildOnly,
     [switch]$SkipBuild,
+    [switch]$CleanBuild,
     [string]$UnityPath
 )
 
@@ -9,6 +10,9 @@ $ErrorActionPreference = 'Stop'
 
 if ($BuildOnly -and $SkipBuild) {
     throw 'Use apenas uma das opcoes: -BuildOnly ou -SkipBuild.'
+}
+if ($SkipBuild -and $CleanBuild) {
+    throw '-CleanBuild recompila o Unity e nao pode ser usado junto com -SkipBuild.'
 }
 
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -229,10 +233,16 @@ try {
 
         $arguments = '-batchmode -nographics -quit -buildTarget WebGL -projectPath "{0}" -executeMethod FStudio.Build.WebGLBuild.Run -logFile "{1}"' -f $buildProjectPath, $logPath
         $previousBuildPath = [Environment]::GetEnvironmentVariable('WEBGL_BUILD_PATH', 'Process')
+        $previousCleanBuild = [Environment]::GetEnvironmentVariable('WEBGL_CLEAN_BUILD', 'Process')
         Write-Host 'Compilando Addressables e jogo WebGL no Unity local. A primeira compilacao pode demorar.'
+        if ($CleanBuild) {
+            Write-Host 'Build limpo solicitado: o Unity vai reconstruir scripts e dados do player na copia isolada. Isso pode demorar mais.'
+        }
         Write-Host "Log: $logPath"
         try {
             [Environment]::SetEnvironmentVariable('WEBGL_BUILD_PATH', $stagePath, 'Process')
+            $cleanBuildValue = if ($CleanBuild) { '1' } else { '0' }
+            [Environment]::SetEnvironmentVariable('WEBGL_CLEAN_BUILD', $cleanBuildValue, 'Process')
             $unityProcess = Start-Process -FilePath $editorPath -ArgumentList $arguments -WorkingDirectory $buildProjectPath -WindowStyle Hidden -PassThru
             # Start-Process -Wait also waits for descendants such as the licensing
             # client. Only this editor process determines when the build has ended.
@@ -240,6 +250,7 @@ try {
             $unityProcess.Refresh()
         } finally {
             [Environment]::SetEnvironmentVariable('WEBGL_BUILD_PATH', $previousBuildPath, 'Process')
+            [Environment]::SetEnvironmentVariable('WEBGL_CLEAN_BUILD', $previousCleanBuild, 'Process')
         }
 
         if ($unityProcess.ExitCode -ne 0) {

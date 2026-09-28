@@ -50,6 +50,8 @@ namespace FStudio.Build {
             var requestedOutput = Environment.GetEnvironmentVariable("WEBGL_BUILD_PATH");
             var outputPath = Path.GetFullPath(Path.Combine(projectPath,
                 string.IsNullOrWhiteSpace(requestedOutput) ? "Builds/WebGL" : requestedOutput));
+            var cleanBuild = string.Equals(Environment.GetEnvironmentVariable("WEBGL_CLEAN_BUILD"),
+                "1", StringComparison.Ordinal);
 
             var previousCompression = PlayerSettings.WebGL.compressionFormat;
             var previousFallback = PlayerSettings.WebGL.decompressionFallback;
@@ -76,6 +78,10 @@ namespace FStudio.Build {
                     " locations, " + contentResult.Duration.ToString("F1") + " seconds, output " + contentResult.OutputPath);
 
                 Directory.CreateDirectory(outputPath);
+                if (cleanBuild) {
+                    Debug.Log(LOG_PREFIX + "Clean build requested: rebuilding all scripts and player data " +
+                        "with BuildOptions.CleanBuildCache.");
+                }
                 Debug.Log(LOG_PREFIX + "Building " + scenes.Length + " scenes to " + outputPath +
                     " with Gzip compression, browser decompression, and WebGL threads disabled.");
                 var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
@@ -83,7 +89,7 @@ namespace FStudio.Build {
                     locationPathName = outputPath,
                     target = BuildTarget.WebGL,
                     targetGroup = BuildTargetGroup.WebGL,
-                    options = BuildOptions.None
+                    options = cleanBuild ? BuildOptions.CleanBuildCache : BuildOptions.None
                 });
                 if (report == null) {
                     throw new BuildFailedException("The WebGL player build returned no report.");

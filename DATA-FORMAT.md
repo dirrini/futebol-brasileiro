@@ -1,9 +1,71 @@
 # Contratos de base e mídia
 
-Estado: desenho 0.1, 28/09/2026. Este documento define a direção do contrato v1;
-não é um schema executável nem afirma que os importadores já existem. O schema,
-os exemplos completos e seus validadores serão implementados nas etapas do
-[ROADMAP.md](ROADMAP.md). Fronteiras de código: [ARCHITECTURE.md](ARCHITECTURE.md).
+Estado: contrato JSON v1 de clubes e jogadores implementado em 28/09/2026.
+Pacotes ZIP, campeonatos, mídia carregável e skins completas nas seções seguintes
+continuam sendo extensões planejadas. Consulte [README-DATABASE.md](README-DATABASE.md),
+[ROADMAP.md](ROADMAP.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Contrato executável atual: JSON v1
+
+Schema: [database-v1.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
+Exemplo: [four-clubs.database.json](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
+
+O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
+
+| Campo obrigatório | Conteúdo |
+| --- | --- |
+| schemaVersion | Inteiro 1 |
+| databaseId | ID permanente da base |
+| databaseRevision | Inteiro de 1 a 2147483647 |
+| clubs | Um ou mais objetos com id e name |
+| players | Um ou mais jogadores com id, name, naturalPositions, heightCm, weightKg e attributes |
+| memberships | Zero ou mais vínculos clubId/playerId; um clube inicial por jogador |
+| visualProfiles | Zero ou mais perfis com playerId e skin; no máximo um por jogador |
+
+`skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
+O importador valida a forma da referência e a existência de PlayerId. Disponibilidade
+do modelo, rig, compatibilidade gráfica e download ainda não são verificados:
+esta etapa não carrega skins. `builtin-player`, usado no exemplo, é uma referência
+descritiva reservada para a futura ponte visual, não um registro já resolvido.
+
+Cada jogador declara suas posições dentre GK, RB, LB, CB, DM, CM, RM, LM, AM, LW,
+RW e ST, sem repetição. Altura é um inteiro entre 150 e 210 cm; peso entre 45 e
+100 kg. Os quinze atributos obrigatórios são strength, acceleration, topSpeed,
+dribbleSpeed, jump, tackling, ballKeeping, passing, longBall, agility, shooting,
+shootPower, positioning, reaction e ballControl; todos inteiros entre 0 e 100.
+
+Nomes têm até 100 pontos de código Unicode e não podem conter apenas espaços.
+Não são normalizados silenciosamente. IDs têm 1 a 64 caracteres ASCII dentre
+letras, números, ponto, sublinhado e hífen, começando por letra ou número. São
+sensíveis a maiúsculas. Jogador sem vínculo representa um jogador sem clube;
+elencos vazios ou maiores que onze são válidos no catálogo. Verificar a capacidade
+de escalar uma partida será responsabilidade da futura aplicação de partidas.
+
+Objetos não aceitam propriedades desconhecidas. Null, campos ausentes e conversões
+implícitas de strings para números são rejeitados. Regras, competições, caminhos
+de arquivo e recursos binários não podem ser acrescentados ao v1 sem uma evolução
+explícita de versão e importador; não são campos silenciosamente ignorados.
+
+O runtime impõe até 1 MiB UTF-8 e profundidade 32. JSON deve usar aspas duplas,
+sem comentários, vírgulas finais ou chaves repetidas. Campos inteiros exigem token
+inteiro: `1.0` e `1e0` são rejeitados, mesmo que validadores JSON Schema os tratem
+matematicamente como inteiros. Essas verificações de sintaxe/tamanho, a unicidade
+de IDs e as referências cruzadas complementam o schema Draft 7 fornecido.
+
+O importador devolve sucesso com um snapshot completo, ou erros com `Code`,
+`Path` e `Message`, sem catálogo parcial. Uma importação não altera a sessão.
+O bootstrap só chama `CatalogSession.Activate` depois do sucesso; falhas conservam
+o catálogo e os perfis visuais anteriores.
+
+Os IDs aleatórios do exemplo foram gerados uma vez e ficam gravados no arquivo;
+não devem ser regenerados ao editar nomes. Nomes, medidas e atributos foram
+copiados dos quatro assets originais. As posições iniciais foram inferidas das
+formações existentes numa migração pontual; desde então são dados independentes.
+
+## Extensões planejadas
+
+As seções abaixo orientam as próximas versões. Elas não descrevem campos extras
+aceitos pelo importador v1 nem funcionalidades já disponíveis.
 
 ## Versões e identidades
 
@@ -129,7 +191,7 @@ Exemplo parcial de associação em um perfil visual:
   "portraitAssetId": "portrait-001",
   "skin": {
     "skinId": "skin-001",
-    "revision": "1",
+    "revision": 1,
     "compatibilityProfile": "football-player-v1",
     "fallbackSkinId": "builtin-player-v1"
   }

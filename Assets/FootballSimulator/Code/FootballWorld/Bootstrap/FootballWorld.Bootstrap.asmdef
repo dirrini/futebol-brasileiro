@@ -1,0 +1,19 @@
+{
+    "name": "FootballWorld.Bootstrap",
+    "rootNamespace": "FStudio.FootballWorld.Bootstrap",
+    "references": [
+        "FootballWorld.Application",
+        "FootballWorld.Domain",
+        "FootballWorld.DataContracts",
+        "FootballWorld.Importing"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
