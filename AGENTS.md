@@ -5,6 +5,21 @@
 - Keep project assets and gameplay code organized under `Assets/FootballSimulator`. Preserve the existing URP, Addressables, Input System, UGUI, and TextMeshPro workflows.
 - Consult `DESIGN.md` when changing presentation and keep it consistent with the implemented visuals.
 
+# Architecture and portable content
+
+- Consult `ARCHITECTURE.md`, `DATA-FORMAT.md`, and `ROADMAP.md` before implementing competitions, database import/export, the database editor, or community skins. These documents distinguish planned contracts from implemented features.
+- Keep new domain rules and application coordination independent of Unity, file formats, storage, and the external editor. Import adapters validate portable DTOs and map them into domain models; do not deserialize external files directly into domain objects.
+- Keep authored database content, mutable season progress, and temporary match objects separate. Use stable IDs; never use names, array positions, Unity GUIDs, or match-local player IDs as persistent identity.
+- Keep rosters and natural player positions independent of the legacy eleven-player `TeamEntry` and match formation slots.
+- Keep the season session alive across UI unloads. Route match completion through one application operation correlated by fixture and execution IDs; duplicate completion must not award points twice.
+- Community player skins are a required capability of the first usable external database editor, including custom model/texture import and assignment to a player. A preset-only selector does not fulfill this requirement.
+- Keep `SkinId` and immutable skin revisions separate from `PlayerId`. Resolve media and skins through visual adapters; the competition core must not load textures, prefabs, or AssetBundles.
+- Separate portable skin source packages from platform-specific prepared content. Use a versioned compatibility profile for rig, materials, kit integration, and resource budgets; retain gameplay controllers and animation-event ownership in game code.
+- Preserve custom skin face/body materials when applying team uniforms. Changing a skin must not change player attributes, physics, hitboxes, or shot timing.
+- Do not promise arbitrary FBX/GLB compatibility or automatic rig repair. Report validation failures in the database editor and provide a reference authoring template.
+- Keep package import transactional, preserve the last valid content, and pin content revisions for active seasons. Reject unsupported rule types or versions. Fallback is allowed only for visual resources when declared by the contract, with a visible diagnostic.
+- Introduce assemblies for new pure C# modules incrementally; do not reorganize the legacy engine as an incidental change. Follow the staged acceptance criteria in `ROADMAP.md`.
+
 # Docker
 
 - The project must use Docker Compose to serve the generated WebGL build.
