@@ -61,9 +61,9 @@ feedback e rascunho continuam únicos e compartilhados.
 ## Overview
 
 HUD funcional para acompanhar a partida sem desviar o olhar do jogador.
-Esta referência documenta o indicador de chute e os estados da seleção de times.
+Esta referência documenta o indicador de potência e os estados da seleção de times.
 Preserva a composição dos menus, os nomes de jogadores e a seta de controle
-existentes. A carga de chute leva 500 ms e passa de verde para vermelho.
+existentes. A carga de chute e passes leva 500 ms e passa de verde para vermelho.
 
 ## Colors
 
@@ -80,14 +80,17 @@ Fica oculta quando o ponto está atrás da câmera ou fora dos limites da tela.
 
 ## Components
 
-`Assets/FootballSimulator/Code/MatchEngine/UI/ShotPowerBar.cs` é a fonte dos
-valores visuais e cria as imagens UGUI sob o Canvas de `UI/InputPointer`.
-Este documento espelha esses valores; não há geração de CSS ou tema web.
+`Resources/FootballWorld/MatchControlSettings.asset` guarda tamanho, ancoragem,
+escala mínima e Gradient de cores editáveis no Inspector. `ShotPowerBar.cs`
+consome esses parâmetros e cria o indicador UGUI sob o Canvas de `UI/InputPointer`.
+Este documento espelha os padrões; não há geração de CSS ou tema web.
 
-`TeamInputListener` controla a carga: apertar inicia, soltar dispara, 500 ms reais
+`TeamInputListener` controla a carga: apertar inicia, soltar executa a ação, 500 ms reais
 atingem o máximo. A barra enche linearmente e não pisca. Pausa, perda de foco,
 perda de posse, troca de jogador e saída da partida cancelam o indicador.
-O indicador não recebe cliques nem altera os controles existentes.
+O indicador não recebe cliques. A mesma barra serve chute, passe curto, passe em
+profundidade e passe alto, com apenas uma carga ativa por jogador. Sem posse,
+X pressiona o portador e círculo pede carrinho; esses comandos não mostram carga.
 
 ## Do's and Don'ts
 
@@ -290,3 +293,66 @@ existente, sem repetir regras de escalação na UI; a tela explica a ausência d
 escalação manual nesta etapa. As três páginas usam os mesmos papéis do tema e
 templates UGUI/TMP editáveis em `GameHub.prefab`. O partial Editor adiciona apenas
 os controles ausentes e preserva as outras páginas e ajustes posteriores.
+
+## Inspeção de jogadores e quadro tático
+
+A ficha e a prévia tática usam painéis de inspeção escuros dentro do hub petróleo,
+seguindo as referências de gestão de futebol fornecidas pelo usuário. O destaque
+é o campo com posições, acompanhado dos mesmos nomes legíveis na lista do XI.
+Não são exibidas estrelas, avaliações de potencial, retratos ou estatísticas que
+a base e a carreira ainda não fornecem.
+
+O tema existente permanece canônico: `GameHubTheme.asset` → papéis de
+`GameHubThemeBinding` → Images/TMP do prefab. Os papéis adicionais são
+InspectionPanel (`#102733`), InspectionRow (`#1D3640`), InspectionText (`#F0F6F4`),
+InspectionMuted (`#AEC5C5`), PitchSurface (`#255B47`) e PitchMarking (`#70A88B`).
+`AttributeColor`, também editável no tema, colore números conhecidos na escala
+0–100; o número permanece explícito e ausências usam “—”. Tipografia continua
+LiberationSans SDF, com títulos bold, rótulos regulares e valores destacados.
+
+Elenco e Mercado compartilham a ficha larga à direita, com identificação e
+biografia no cabeçalho, minimapa de posições naturais e três grupos de cinco
+atributos: Técnica, Físico e Jogo. A lista de jogadores permanece à esquerda,
+com busca, filtros, contagem, paginação e scrollbar próprios. Mercado conserva
+valor da oferta, confirmação e ação abaixo da ficha. O rodapé global continua
+reservado a avisos. As posições naturais não são confundidas com vagas do XI.
+
+Tática usa três colunas: controles e padrão salvo, campo da formação e lista dos
+onze jogadores. O campo e a lista acompanham o rascunho local; somente Salvar
+padrão tático altera a carreira. Os três layouts 4-4-2, 4-3-3 e 4-2-3-1 são árvores
+UGUI separadas com posições e dimensões ajustáveis no Inspector. O arrastamento
+ajusta as posições do XI automático; a escolha manual de titulares continua fora
+do escopo. `CareerTacticalBoard` apresenta o plano tático em rascunho sem alterar
+os jogadores nem seus atributos.
+
+`GameHubAuthoring.CareerInspection` aplica a migração uma vez, indicada por
+`CareerInspectionLayoutV1`. Reutiliza controles e referências existentes,
+reposiciona as scrollbars sem remover o reparo `VerticalScrollbarLayoutV2` e
+preserva ajustes visuais posteriores. `CareerNaturalPositionMap` e a ficha são
+componentes de apresentação; não alteram posições, atributos ou escalação.
+A evolução intencional substitui o antigo XI exclusivamente salvo por uma prévia
+do rascunho, sempre identificada na tela. A verificação deve cobrir formação sem
+salvar, salvar/retomar, PT/EN, nomes extensos, ficha vazia e oferta no Mercado.
+
+## Ajustes de posição e função no quadro tático
+
+Selecionar um marcador ou uma linha do XI destaca a vaga nos dois lugares. O
+painel esquerdo reúne formação, postura, função compatível e uma descrição curta
+do efeito. O arraste mantém o ponto de captura e respeita os limites da posição;
+o goleiro permanece em sua zona própria. Com o marcador focado, as setas fazem
+ajustes pequenos e Esc devolve o foco aos controles. O passo do teclado, as áreas
+clicáveis, os contornos e todos os controles são editáveis no Inspector.
+
+Restaurar vaga devolve posição e função padrão da vaga selecionada. Restaurar
+tudo faz o mesmo para as onze vagas da formação atual. Trocar formação também
+restaura seu padrão; trocar somente a postura preserva os ajustes. Essas ações
+alteram o rascunho, e somente Salvar padrão tático grava a configuração da
+carreira. As mensagens informam esse comportamento e a seleção automática do XI.
+
+A migração incremental `CareerTacticsInteractionV3` reaproveita o campo e a lista
+do prefab, adiciona interação UGUI aos marcadores existentes e reorganiza somente
+a coluna de controles. Coordenadas salvas são relativas ao campo, nunca em pixels
+ou posições da tela. Funções usam as opções e limites do núcleo, sem atribuir
+estrelas, atributos extras ou promessas de sistemas de jogo ausentes. A verificação
+inclui arraste, limites, teclado, compatibilidade por posição, restauração,
+troca de formação/postura, rascunho ao navegar e persistência após salvar/retomar.

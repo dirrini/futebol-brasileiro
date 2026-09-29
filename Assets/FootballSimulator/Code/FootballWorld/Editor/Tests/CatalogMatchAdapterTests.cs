@@ -378,6 +378,10 @@ namespace FStudio.FootballWorld.Editor.Tests
             Assert.That(controlled.Formation, Is.EqualTo(expectedFormation));
             Assert.That(opponent.Formation, Is.EqualTo(ordinary.Teams.Single(value => value.ClubId == opponentId).Preview.Formation));
             Assert.That(lease.Request.InitialUserTactic, Is.EqualTo(expectedTactic));
+            var instructions = controlledAway ? lease.Request.AwayPlayerInstructions : lease.Request.HomePlayerInstructions;
+            Assert.That(instructions.Count, Is.EqualTo(11));
+            Assert.That(instructions.All(value => value.HorizontalOffset == 0 && value.DepthOffset == 0), Is.True);
+            Assert.That(controlledAway ? lease.Request.HomePlayerInstructions : lease.Request.AwayPlayerInstructions, Is.Null);
             Assert.That(ordinary.Teams.Single(value => value.ClubId == controlledId).Preview.Formation, Is.EqualTo(ordinaryFormation));
             Assert.That(controlled.Players[0].Position, Is.EqualTo(Positions.GK));
             Assert.That(lease.Players.Count, Is.EqualTo(22));
@@ -388,8 +392,36 @@ namespace FStudio.FootballWorld.Editor.Tests
             }
             var unrelated = CreateLease(career, catalog.Clubs[1].Id, catalog.Clubs[2].Id);
             Assert.That(unrelated.Request.InitialUserTactic, Is.Null);
+            Assert.That(unrelated.Request.HomePlayerInstructions, Is.Null);
+            Assert.That(unrelated.Request.AwayPlayerInstructions, Is.Null);
             var quick = CreateLease(ordinary, controlledId, opponentId);
             Assert.That(quick.Request.InitialUserTactic, Is.Null);
+            Assert.That(quick.Request.HomePlayerInstructions, Is.Null);
+            Assert.That(quick.Request.AwayPlayerInstructions, Is.Null);
+        }
+
+        [Test]
+        public void CareerAdjustedRoleRemainsPinnedToControlledSlotWithoutChangingPlayerDataOrAssets()
+        {
+            var catalog = imported.Catalog;
+            var plan = CareerTacticPlan.CreateDefault(CareerFormation.FourFourTwo);
+            var slot = plan.GetSlot("left-back");
+            plan = plan.WithSlot(slot.SlotId, slot.X + .08f, slot.Depth + .05f, CareerPlayerRole.CrossingFullBack);
+            var adapter = CreateAdapter(careerOptions: new CareerMatchOptions(catalog.Clubs[0].Id,
+                plan.Formation, CareerMentality.Balanced, plan));
+            var lease = CreateLease(adapter, catalog.Clubs[1].Id, catalog.Clubs[0].Id);
+            var instruction = lease.Request.AwayPlayerInstructions[1];
+            Assert.That(instruction.SlotId, Is.EqualTo("left-back"));
+            Assert.That(instruction.Position, Is.EqualTo(Positions.LB));
+            Assert.That(instruction.HorizontalOffset, Is.EqualTo(-.08f).Within(.0001));
+            Assert.That(instruction.DepthOffset, Is.EqualTo(.05f).Within(.0001));
+            Assert.That(instruction.Role.EarlyCross, Is.True);
+            Assert.That(lease.Request.HomePlayerInstructions, Is.Null);
+            var identity = lease.Players.Single(value => value.LocalId == 12);
+            AssertSportingData(catalog.GetPlayer(identity.PlayerId), lease.Request.awayTeam.Players[1]);
+            // Disposal owns only the temporary players/teams; the immutable instruction survives unchanged.
+            lease.Dispose();
+            Assert.That(instruction.Role.EarlyCross, Is.True);
         }
 
         [Test]

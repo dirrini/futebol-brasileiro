@@ -25,7 +25,7 @@ namespace FStudio.MatchEngine.Players {
         /// </summary>
         /// <param name="ball"></param>
         public void DoTackle (Ball ball) {
-            if (IsHoldingBall) {
+            if (ball == null || IsHoldingBall || !PlayerController.IsPhysicsEnabled) {
                 return;
             }
 
@@ -37,11 +37,7 @@ namespace FStudio.MatchEngine.Players {
 
             PlayerController.Animator.SetTrigger(PlayerAnimatorVariable.Tackling);
 
-            DirtRenderer.Current.SetPosition(1, Position, Rotation);
-
-            if (ball.HolderPlayer.IsGK) {
-                return;
-            }
+            DirtRenderer.Current?.SetPosition(1, Position, Rotation);
 
             new TimerAction(TACKLING_RESPONSE_TIME).GetQuery().Start(MatchManager.Current, () => {
                 calculateTackling();
@@ -56,7 +52,7 @@ namespace FStudio.MatchEngine.Players {
 
             void calculateTackling() {
                 if (ball.HolderPlayer == null || 
-                    ball.HolderPlayer.IsGKUntouchable || 
+                    ball.HolderPlayer.IsGK || ball.HolderPlayer.IsGKUntouchable ||
                     ball.HolderPlayer.GameTeam == GameTeam) {
 
                     restoreTackler();

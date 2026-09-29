@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using static FStudio.MatchEngine.Players.PlayerBase;
 using FStudio.MatchEngine.Players.Behaviours;
+using FStudio.MatchEngine.Input;
 
 namespace FStudio.MatchEngine.Players.InputBehaviours {
     public abstract class AbstractInputPassBehaviour : BaseBehaviour, IInputBehaviour {
@@ -26,6 +27,19 @@ namespace FStudio.MatchEngine.Players.InputBehaviours {
         private Vector3 cornerTarget;
 
         private PassTarget passTarget;
+        private float normalizedCharge = 1;
+
+        public void SetCharge(float charge) {
+            normalizedCharge = Mathf.Clamp01(charge);
+            passTarget = default;
+        }
+
+        public static float GroundPassPower(float charge) => Mathf.Lerp(MatchControlSettings.Current.PassMinPower,
+            MatchControlSettings.Current.PassMaxPower, Mathf.Clamp01(charge));
+
+        public static Vector3 ChargedCrossTarget(Vector3 origin, Vector3 target, float charge)
+            => origin + (target - origin) * Mathf.Lerp(MatchControlSettings.Current.CrossMinRange,
+                MatchControlSettings.Current.CrossMaxRange, Mathf.Clamp01(charge));
 
         public bool IsTriggered { private get; set; }
 
@@ -36,11 +50,13 @@ namespace FStudio.MatchEngine.Players.InputBehaviours {
             
             if (!Player.isInputControlled) {
                 IsTriggered = false;
+                passTarget = default;
                 return false;
             }
 
             if (ball.HolderPlayer != Player) {
                 IsTriggered = false;
+                passTarget = default;
                 return false;
             }
 
@@ -60,7 +76,7 @@ namespace FStudio.MatchEngine.Players.InputBehaviours {
                 var closest = teammates.OrderBy(x => Vector3.Distance(x.Position, cornerTarget)).FirstOrDefault();
                 cornerTarget = Vector3.Lerp(cornerTarget, closest.Position, CORNER_TO_TARGET) + CORNER_DIRECTION_MULTIPLIER * (closest.Position - Player.Position).normalized;
 
-                Player.Cross(cornerTarget);
+                Player.Cross(ChargedCrossTarget(Player.Position, cornerTarget, normalizedCharge));
 
                 // teammates chase the ball directly.
                 foreach (var e in Player.GameTeam.GamePlayers) {
@@ -115,12 +131,13 @@ namespace FStudio.MatchEngine.Players.InputBehaviours {
                     var m_distance = EngineSettings.Current.PassPowerByAngledPassDistanceCurve.Evaluate(usToPoint.magnitude);
                     var passPowerMod = m_angle * m_distance;
 
-                    passTarget = new PassTarget (_found.passTypes.FirstOrDefault(), _found.optionName, _found.position, _found.actualTarget, passPowerMod);
+                    passTarget = new PassTarget (passType, _found.optionName, _found.position, _found.actualTarget, passPowerMod);
                 }
 
                 if (!passTarget.IsValid) {
                     isAlreadyActive = false;
                 } else {
+                    isAlreadyActive = true;
                     Debug.Log($"[InputPassBehaviour] OptionName: {passTarget._OptionName}");
                     Debug.Log(passTarget, passTarget._ActualTarget.PlayerController.UnityObject);
                 }
@@ -145,9 +162,9 @@ namespace FStudio.MatchEngine.Players.InputBehaviours {
 
                         var crossAddition = dir.normalized * add * passTarget._PassPower;
 
-                        Player.Cross(passTarget._Position + crossAddition);
+                        Player.Cross(ChargedCrossTarget(Player.Position, passTarget._Position + crossAddition, normalizedCharge));
                     } else {
-                        Player.Pass(passTarget._Position, speedMod * passTarget._PassPower);
+                        Player.Pass(passTarget._Position, speedMod * passTarget._PassPower * GroundPassPower(normalizedCharge));
                     }
 
                     passTarget = default; // reset target.

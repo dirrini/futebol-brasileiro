@@ -11,10 +11,12 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
     {
         private static ClubData ReadClub(JToken token, string path, int version, List<DatabaseImportError> errors)
         {
+            var optional = version >= 4 ? new List<string> {"officialName", "shortName", "stadiumId", "reputation", "supporterCount", "transferBudget",
+                "monthlyWageBudget", "currency", "sponsorship", "notes"} : new List<string>();
+            if (version >= 6) optional.Add("stateCode");
             var obj = ObjectWithOptionalFields(token, path, errors,
                 version >= 4 ? new[] {"id", "name", "countryCode", "city"} : new[] {"id", "name"},
-                version >= 4 ? new[] {"officialName", "shortName", "stadiumId", "reputation", "supporterCount", "transferBudget",
-                    "monthlyWageBudget", "currency", "sponsorship", "notes"} : Array.Empty<string>());
+                optional.ToArray());
             if (obj == null) return null;
             var currency = OptionalCode(obj, "currency", path, 3, errors);
             if ((obj.Property("transferBudget") != null || obj.Property("monthlyWageBudget") != null) && obj.Property("currency") == null)
@@ -26,7 +28,16 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 obj.Property("stadiumId") == null ? null : Id(obj["stadiumId"], path + ".stadiumId", errors),
                 OptionalInteger(obj, "reputation", path, 0, 100, errors), OptionalInteger(obj, "supporterCount", path, 0, int.MaxValue, errors),
                 OptionalInteger(obj, "transferBudget", path, 0, int.MaxValue, errors), OptionalInteger(obj, "monthlyWageBudget", path, 0, int.MaxValue, errors),
-                currency, OptionalText(obj, "sponsorship", path, 200, false, errors), OptionalText(obj, "notes", path, 4000, true, errors));
+                currency, OptionalText(obj, "sponsorship", path, 200, false, errors), OptionalText(obj, "notes", path, 4000, true, errors),
+                obj.Property("stateCode") == null ? null : StateCode(obj["stateCode"], path + ".stateCode", errors));
+        }
+
+        private static string StateCode(JToken token, string path, List<DatabaseImportError> errors)
+        {
+            var value = String(token, path, errors);
+            if (value != null && !Regex.IsMatch(value, @"\A[A-Z0-9]{1,8}\z"))
+                Error(errors, "invalid_code", path, "Use 1 to 8 uppercase ASCII letters or digits for a subdivision code.");
+            return value;
         }
 
         private static DatabaseSnapshotData ReadHistoricalCatalog(JObject root, List<CountryData> countries,

@@ -5,6 +5,7 @@ namespace FStudio.FootballWorld.Domain
         public string Id { get; }
         public string Name { get; }
         public string CountryCode { get; }
+        public string StateCode { get; }
         public string City { get; }
         public string OfficialName { get; }
         public string ShortName { get; }
@@ -20,12 +21,14 @@ namespace FStudio.FootballWorld.Domain
         public ClubDefinition(string id, string name, string countryCode = null, string city = null,
             string officialName = null, string shortName = null, string stadiumId = null, int? reputation = null,
             int? supporterCount = null, int? transferBudget = null, int? monthlyWageBudget = null,
-            string currency = null, string sponsorship = null, string notes = null)
+            string currency = null, string sponsorship = null, string notes = null, string stateCode = null)
         {
             Id = DomainValidation.Id(id, nameof(id));
             Name = DomainValidation.Name(name, nameof(name));
             if ((countryCode == null) != (city == null)) throw new System.ArgumentException("Country and city must be supplied together.");
             CountryCode = countryCode == null ? null : DomainValidation.Code(countryCode, 2, nameof(countryCode));
+            StateCode = stateCode == null ? null : CompetitionRuleValidation.StateCode(stateCode, nameof(stateCode));
+            if (stateCode != null && countryCode == null) throw new System.ArgumentException("A state code requires a country.");
             City = city == null ? null : DomainValidation.Name(city, nameof(city));
             OfficialName = officialName == null ? null : DomainValidation.Text(officialName, 200, false, nameof(officialName));
             ShortName = shortName == null ? null : DomainValidation.Name(shortName, nameof(shortName));

@@ -262,5 +262,13 @@ namespace FStudio.MatchEngine.Players.PlayerController {
 
             return (PlayerAnimatorVariable)System.Enum.Parse(typeof(PlayerAnimatorVariable), anim);
         }
+
+        public bool PlayAerialShotAnimation(in Vector3 targetVelocity, PlayerAnimatorVariable animation) {
+            var settings = EngineOptions.EngineOptions_BallHitAnimations.Current;
+            if (!gameObject.activeSelf || GetBool(PlayerAnimatorVariable.ThrowInIdle) ||
+                IsCurrentClipBlocker(in settings.BallHitActionBlockers) || !settings.AnimSettings.Find(animation)) return false;
+            SetTrigger(FootedAnim(animation, targetVelocity));
+            return true;
+        }
     }
 }

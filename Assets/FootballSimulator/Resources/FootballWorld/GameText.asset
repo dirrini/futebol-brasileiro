@@ -567,8 +567,9 @@ MonoBehaviour:
     Portuguese: Campanha acumulada
     English: Cumulative record
   - Key: hub.awaitingPhase
-    Portuguese: "Nenhum pr\xF3ximo jogo definido. Avance os dias no centro do treinador."
-    English: No next fixture defined. Advance days from the manager office.
+    Portuguese: "Nenhum pr\xF3ximo jogo definido. Acompanhe os jogos restantes da
+      competi\xE7\xE3o."
+    English: No next fixture defined. Follow the remaining competition matches.
   - Key: career.squad
     Portuguese: Elenco
     English: Squad
@@ -931,3 +932,146 @@ MonoBehaviour:
   - Key: career.clubFilter
     Portuguese: Clube
     English: Club
+  - Key: hub.neutralVenue
+    Portuguese: Campo neutro
+    English: Neutral venue
+  - Key: ledger.prize-participation
+    Portuguese: "Premia\xE7\xE3o por participa\xE7\xE3o"
+    English: Participation award
+  - Key: ledger.prize-win
+    Portuguese: "Premia\xE7\xE3o por vit\xF3ria"
+    English: Match win award
+  - Key: ledger.prize-draw
+    Portuguese: "Premia\xE7\xE3o por empate"
+    English: Match draw award
+  - Key: ledger.prize-ranking
+    Portuguese: "Premia\xE7\xE3o por classifica\xE7\xE3o"
+    English: Standings award
+  - Key: news.competition-prize
+    Portuguese: "{0} recebeu {3} de premia\xE7\xE3o nesta competi\xE7\xE3o. Valor
+      de simula\xE7\xE3o definido no regulamento."
+    English: '{0} received a competition award of {3}. Simulation amount set in the
+      competition rules.'
+  - Key: career.lineupPreview
+    Portuguese: "Pr\xE9via da forma\xE7\xE3o"
+    English: Formation preview
+  - Key: career.previewPlayers
+    Portuguese: "XI da pr\xE9via"
+    English: Preview XI
+  - Key: career.previewPositions
+    Portuguese: "Posi\xE7\xE3o na forma\xE7\xE3o selecionada"
+    English: Slot in the selected formation
+  - Key: career.previewHelp
+    Portuguese: "A pr\xE9via acompanha o rascunho. Salve para aplicar. O XI \xE9
+      autom\xE1tico; os jogadores ainda n\xE3o podem ser arrastados ou escolhidos
+      manualmente."
+    English: The preview follows your draft. Save to apply. The XI is automatic;
+      dragging and manual player selection are not available yet.
+  - Key: career.previewUnavailable
+    Portuguese: "N\xE3o foi poss\xEDvel montar os onze jogadores para esta forma\xE7\xE3o.
+      Verifique o elenco."
+    English: Eleven players could not be selected for this formation. Check your
+      squad.
+  - Key: career.naturalPositionMap
+    Portuguese: "Posi\xE7\xF5es naturais"
+    English: Natural positions
+  - Key: career.attributeScale
+    Portuguese: "Atributos \xB7 escala de 0 a 100"
+    English: "Attributes \xB7 scale from 0 to 100"
+  - Key: career.attributesTechnical
+    Portuguese: "T\xE9cnica"
+    English: Technical
+  - Key: career.attributesPhysical
+    Portuguese: "F\xEDsico"
+    English: Physical
+  - Key: career.attributesGame
+    Portuguese: Jogo
+    English: Game
+  - Key: career.tacticsEffectCompact
+    Portuguese: "A forma\xE7\xE3o define as posi\xE7\xF5es. A postura orienta a equipe
+      em campo."
+    English: Formation sets the positions. Mentality guides the team on the pitch.
+  - Key: career.tacticsInteractiveHelp
+    Portuguese: "Arraste para ajustar posi\xE7\xF5es e escolha a fun\xE7\xE3o. Salve
+      para aplicar. O XI \xE9 autom\xE1tico; trocar a forma\xE7\xE3o restaura posi\xE7\xF5es
+      e fun\xE7\xF5es."
+    English: Drag to adjust positions and choose roles. Save to apply. The XI is
+      automatic; changing formation resets positions and roles.
+  - Key: career.selectedTacticSlot
+    Portuguese: "Fun\xE7\xE3o \xB7 {0} {1}"
+    English: "Role \xB7 {0} {1}"
+  - Key: career.resetTacticSlot
+    Portuguese: Restaurar vaga
+    English: Reset slot
+  - Key: career.resetTacticPlan
+    Portuguese: Restaurar tudo
+    English: Reset all
+  - Key: career.tacticsKeyboard
+    Portuguese: "Setas: mover \xB7 Esc: controles"
+    English: "Arrows: move \xB7 Esc: controls"
+  - Key: career.role.Standard
+    Portuguese: "Padr\xE3o da posi\xE7\xE3o"
+    English: Position default
+  - Key: career.roleEffect.Standard
+    Portuguese: "Segue o comportamento padr\xE3o da posi\xE7\xE3o."
+    English: Uses the position's default behaviour.
+  - Key: career.role.AdvancingCentreBack
+    Portuguese: Zagueiro de apoio
+    English: Advancing centre-back
+  - Key: career.roleEffect.AdvancingCentreBack
+    Portuguese: "Avan\xE7a para apoiar quando a equipe tem a bola."
+    English: Moves forward to support the team in possession.
+  - Key: career.role.CrossingFullBack
+    Portuguese: Lateral cruzador
+    English: Crossing full-back
+  - Key: career.roleEffect.CrossingFullBack
+    Portuguese: "Mant\xE9m a largura e favorece cruzamentos."
+    English: Stays wide and favours crosses.
+  - Key: career.role.InvertedFullBack
+    Portuguese: Lateral invertido
+    English: Inverted full-back
+  - Key: career.roleEffect.InvertedFullBack
+    Portuguese: Aproxima-se do centro para apoiar a jogada.
+    English: Moves inside to support the play.
+  - Key: career.role.BallWinningMidfielder
+    Portuguese: Volante marcador
+    English: Ball-winning midfielder
+  - Key: career.roleEffect.BallWinningMidfielder
+    Portuguese: "Fecha a marca\xE7\xE3o e avan\xE7a menos."
+    English: Marks tighter and holds position.
+  - Key: career.role.DeepLyingPlaymaker
+    Portuguese: Armador recuado
+    English: Deep-lying playmaker
+  - Key: career.roleEffect.DeepLyingPlaymaker
+    Portuguese: "Apoia a sa\xEDda de bola e prioriza passes."
+    English: Supports the build-up and prioritizes passing.
+  - Key: career.role.CreativePlaymaker
+    Portuguese: Meia criativo
+    English: Creative playmaker
+  - Key: career.roleEffect.CreativePlaymaker
+    Portuguese: Busca passes mais progressivos.
+    English: Looks for more progressive passes.
+  - Key: career.role.TargetForward
+    Portuguese: "Atacante piv\xF4"
+    English: Target forward
+  - Key: career.roleEffect.TargetForward
+    Portuguese: "Oferece apoio central e devolu\xE7\xF5es curtas."
+    English: Offers central support and short layoffs.
+  - Key: career.role.MobileForward
+    Portuguese: "Atacante m\xF3vel"
+    English: Mobile forward
+  - Key: career.roleEffect.MobileForward
+    Portuguese: "Avan\xE7a e aproxima-se da jogada."
+    English: Moves forward and supports the play.
+  - Key: career.role.WideWinger
+    Portuguese: Ponta aberto
+    English: Wide winger
+  - Key: career.roleEffect.WideWinger
+    Portuguese: "Mant\xE9m amplitude e oferece op\xE7\xE3o por fora."
+    English: Stays wide to offer an outside passing option.
+  - Key: career.role.InsideForward
+    Portuguese: Ponta por dentro
+    English: Inside forward
+  - Key: career.roleEffect.InsideForward
+    Portuguese: Sai da faixa lateral para apoiar por dentro.
+    English: Leaves the flank to support through the middle.

@@ -107,6 +107,10 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                 request.InitialUserTactic = careerOptions.LegacyMentality;
             try
             {
+                if (careerOptions != null && careerOptions.ControlledClubId == homeId)
+                    request.HomePlayerInstructions = careerOptions.CreateInstructions();
+                else if (careerOptions != null && careerOptions.ControlledClubId == awayId)
+                    request.AwayPlayerInstructions = careerOptions.CreateInstructions();
                 PrepareOwnedClones(request.homeTeam);
                 PrepareOwnedClones(request.awayTeam);
                 var identities = new List<CatalogPlayerIdentity>(22);
@@ -300,7 +304,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             target.SockAccessoryColor = source.SockAccessoryColor;
         }
 
-        private static PlayerPosition ToCatalogPosition(Positions slot)
+        internal static PlayerPosition ToCatalogPosition(Positions slot)
         {
             switch (PositionRules.GetBasePosition(slot))
             {

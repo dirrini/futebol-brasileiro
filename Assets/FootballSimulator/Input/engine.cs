@@ -174,8 +174,17 @@ public partial class @Engine: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""ThroughtPass"",
-                    ""type"": ""Button"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""d2534aff-72e2-4aa5-a7b1-2189e31cb4aa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""6ca54c25-b855-446c-b632-dbe53c5a3b2c"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -345,39 +354,6 @@ public partial class @Engine: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse;Touch"",
                     ""action"": ""Pass"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ed71d1cd-c2a2-42d0-a2da-99835087d553"",
-                    ""path"": ""<XInputController>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XBoxController"",
-                    ""action"": ""Tackle"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""2257f9ba-6d1d-4a6d-9aaf-36f362520053"",
-                    ""path"": ""<Gamepad>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""Tackle"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""22d9c3b1-58ff-4e40-880b-e19c69f95fdf"",
-                    ""path"": ""<Keyboard>/a"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse;Touch"",
-                    ""action"": ""Tackle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -576,6 +552,28 @@ public partial class @Engine: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse;Touch"",
                     ""action"": ""ThroughtPass"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9cd3a9c8-2ea4-406c-802e-91b31a9718d6"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad;XBoxController;Touch"",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ccb81f91-3329-42e2-84b1-01e7eb6738d3"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1401,6 +1399,7 @@ public partial class @Engine: IInputActionCollection2, IDisposable
         m_MatchEngine_ChangeTacticHigh = m_MatchEngine.FindAction("ChangeTacticHigh", throwIfNotFound: true);
         m_MatchEngine_ChangeTacticLow = m_MatchEngine.FindAction("ChangeTacticLow", throwIfNotFound: true);
         m_MatchEngine_ThroughtPass = m_MatchEngine.FindAction("ThroughtPass", throwIfNotFound: true);
+        m_MatchEngine_Sprint = m_MatchEngine.FindAction("Sprint", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1511,6 +1510,7 @@ public partial class @Engine: IInputActionCollection2, IDisposable
     private readonly InputAction m_MatchEngine_ChangeTacticHigh;
     private readonly InputAction m_MatchEngine_ChangeTacticLow;
     private readonly InputAction m_MatchEngine_ThroughtPass;
+    private readonly InputAction m_MatchEngine_Sprint;
     /// <summary>
     /// Provides access to input actions defined in input action map "MatchEngine".
     /// </summary>
@@ -1562,6 +1562,10 @@ public partial class @Engine: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "MatchEngine/ThroughtPass".
         /// </summary>
         public InputAction @ThroughtPass => m_Wrapper.m_MatchEngine_ThroughtPass;
+        /// <summary>
+        /// Provides access to the underlying input action "MatchEngine/Sprint".
+        /// </summary>
+        public InputAction @Sprint => m_Wrapper.m_MatchEngine_Sprint;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1618,6 +1622,9 @@ public partial class @Engine: IInputActionCollection2, IDisposable
             @ThroughtPass.started += instance.OnThroughtPass;
             @ThroughtPass.performed += instance.OnThroughtPass;
             @ThroughtPass.canceled += instance.OnThroughtPass;
+            @Sprint.started += instance.OnSprint;
+            @Sprint.performed += instance.OnSprint;
+            @Sprint.canceled += instance.OnSprint;
         }
 
         /// <summary>
@@ -1659,6 +1666,9 @@ public partial class @Engine: IInputActionCollection2, IDisposable
             @ThroughtPass.started -= instance.OnThroughtPass;
             @ThroughtPass.performed -= instance.OnThroughtPass;
             @ThroughtPass.canceled -= instance.OnThroughtPass;
+            @Sprint.started -= instance.OnSprint;
+            @Sprint.performed -= instance.OnSprint;
+            @Sprint.canceled -= instance.OnSprint;
         }
 
         /// <summary>
@@ -2119,6 +2129,13 @@ public partial class @Engine: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThroughtPass(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSprint(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

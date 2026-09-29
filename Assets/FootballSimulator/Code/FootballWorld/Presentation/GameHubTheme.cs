@@ -23,6 +23,18 @@ namespace FStudio.FootballWorld.Presentation
         public Color Selected = new Color32(187, 220, 203, 255);
         public Color Pressed = new Color32(159, 202, 180, 255);
         public Color Disabled = new Color(.65f, .65f, .65f, .6f);
+        [Header("Career inspection panels")]
+        public Color InspectionPanel = new Color32(16, 39, 51, 255);
+        public Color InspectionRow = new Color32(29, 54, 64, 255);
+        public Color InspectionText = new Color32(240, 246, 244, 255);
+        public Color InspectionMuted = new Color32(174, 197, 197, 255);
+        public Color PitchSurface = new Color32(37, 91, 71, 255);
+        public Color PitchMarking = new Color32(112, 168, 139, 255);
+        public Gradient AttributeColor = new Gradient {
+            colorKeys = new[] { new GradientColorKey(new Color32(191, 207, 212, 255), 0),
+                new GradientColorKey(new Color32(234, 206, 114, 255), .5f), new GradientColorKey(new Color32(120, 231, 161, 255), 1) },
+            alphaKeys = new[] { new GradientAlphaKey(1, 0), new GradientAlphaKey(1, 1) }
+        };
         public CoachPortrait[] Portraits = new CoachPortrait[0];
     }
 

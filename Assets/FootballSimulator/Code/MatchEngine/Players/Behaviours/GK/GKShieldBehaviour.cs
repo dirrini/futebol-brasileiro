@@ -32,6 +32,14 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
         private float positionError;
 
+        public void ResetJump() {
+            IsOnJump = false;
+            ForceBehaviour = false;
+            expireJump = 0;
+            jumpTarget = default;
+            positionError = 0;
+        }
+
         private readonly AnimationCurve REACTION_ROLL_RATE_BY_SKILL = new AnimationCurve(new Keyframe[] {
              new Keyframe (0, 65f),
              new Keyframe (100, 100f),
@@ -70,8 +78,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
         public override sealed bool Behave(bool isAlreadyActive) {
             if (Player.IsHoldingBall || Player.IsGoalKickHolder) {
-                IsOnJump = false;
-                ForceBehaviour = false;
+                ResetJump();
 
                 return false;
             }
@@ -189,6 +196,10 @@ namespace FStudio.MatchEngine.Players.Behaviours {
                         fieldEndY);
 
                     goToPosition = new Vector3(goalNet.Position.x + shield.forward * goalNet.Direction.x, 0, shield.side);
+                    // Move the normal guard position, never the predicted save/interception point.
+                    if (Player.MatchPlayer.TacticalInstruction != null)
+                        goToPosition = Player.MatchPlayer.TacticalInstruction.ApplyPosition(goToPosition,
+                            goalNet.Direction, fieldEndX, fieldEndY, false, ballPositionEnd);
                 }
             }
 
@@ -197,6 +208,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
             goToPosition += Player.PositioningMistake * distanceToBall * POS_MISTAKE_BY_BALL_DIST * GK_POS_MISTAKE_MOD;
 
             goToPosition.x = Mathf.Clamp(goToPosition.x, 0, fieldEndX);
+            if (Player.MatchPlayer.TacticalInstruction?.HasPositionAdjustment == true) goToPosition.z = Mathf.Clamp(goToPosition.z, 0, fieldEndY);
 
             Player.FocusToBall(deltaTime, ball);
 

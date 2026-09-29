@@ -147,7 +147,9 @@ namespace FStudio.MatchEngine.Tactics {
             in Vector3 ballPosition,
             in PlayerBase markingTarget,
             GoalNet goalNet, 
-            bool debug = false) {
+            bool debug = false,
+            PlayerTacticalInstruction instruction = null,
+            bool hasPossession = false) {
 
             var tactic = GetTacticSettings(tacticPresetType, teamBehaviour);
 
@@ -262,8 +264,13 @@ namespace FStudio.MatchEngine.Tactics {
             #endregion
 
             #region Marking
+            if (instruction != null)
+                playerVectorPosition = instruction.ApplyPosition(playerVectorPosition, goalNet.Direction,
+                    fieldXLength, fieldYLength, hasPossession, ballPosition);
+
             if (markingTarget != null && markingTarget != null) {
                 var markingDistance = MarkingDistanceByPlayerFieldProgress.Evaluate (1- markingTarget.PlayerFieldProgress);
+                if (instruction != null) markingDistance *= instruction.Role.MarkingDistance;
 
                 var targetPos = markingTarget.Position;
 
@@ -271,6 +278,7 @@ namespace FStudio.MatchEngine.Tactics {
                 var target = targetPos + (goalNet.Position - targetPos).normalized * markingDistance;
 
                 var markTheOpponent = tactic.MarkOpponentByBallProgress.Evaluate(1- markingTarget.PlayerFieldProgress);
+                if (instruction != null && !hasPossession) markTheOpponent = Mathf.Clamp01(markTheOpponent * instruction.Role.MarkingWeight);
 
                 playerVectorPosition = Vector3.Lerp(playerVectorPosition, target, markTheOpponent);
 

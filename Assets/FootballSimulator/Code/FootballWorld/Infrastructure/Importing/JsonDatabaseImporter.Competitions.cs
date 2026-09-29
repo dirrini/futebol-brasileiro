@@ -18,12 +18,17 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
         {
             ReadBoundedItems(root["competitions"], "$.competitions", 0, 128, errors, (item, path) =>
             {
-                var obj = Object(item, path, errors, "id", "name");
-                if (obj != null) competitions.Add(new CompetitionData(Id(obj["id"], path + ".id", errors),
-                    Name(obj["name"], path + ".name", errors)));
+                var competition = ReadCompetition(item, path, schemaVersion, errors);
+                if (competition != null) competitions.Add(competition);
             });
             ReadBoundedItems(root["competitionEditions"], "$.competitionEditions", 0, 128, errors, (item, path) =>
             {
+                if (schemaVersion >= 6 && item is JObject declaration && declaration.Property("formatId") != null)
+                {
+                    var declarativeEdition = ReadDeclarativeEdition(item, path, errors);
+                    if (declarativeEdition != null) editions.Add(declarativeEdition);
+                    return;
+                }
                 var obj = ObjectWithOptionalFields(item, path, errors,
                     new[] {"id", "competitionId", "name", "participantClubIds", "roundDates", "rules"},
                     schemaVersion >= 5 ? new[] {"authoredFixtures", "playoffDates"} : Array.Empty<string>());
@@ -126,6 +131,7 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                     if (!clubs.Contains(clubId)) Error(errors, "unknown_reference", participantPath, "Club does not exist.");
                     if (!seen.Add(clubId)) Error(errors, "duplicate_participant", participantPath, "Edition participants must be unique.");
                 }
+                if (edition.FormatId != null) continue;
                 var count = edition.ParticipantClubIds.Count;
                 var expectedRounds = edition.Rules.Type == "paulista-2026" ? 8 : (count % 2 == 0 ? count - 1 : count) * edition.Rules.Legs;
                 if (edition.RoundDates.Count != expectedRounds)

@@ -16,7 +16,7 @@ export function createValidator(schemas) {
   const validators = new Map(schemas.map(schema => [schema.properties.schemaVersion.const, ajv.compile(schema)]));
   return document => {
     const validate = validators.get(document?.schemaVersion);
-    if (!validate) throw new EditorError(422, 'unsupported_schema_version', 'A versão da base deve ser 1, 2, 3, 4 ou 5.');
+    if (!validate) throw new EditorError(422, 'unsupported_schema_version', 'A versão da base deve ser 1, 2, 3, 4, 5 ou 6.');
     if (!validate(document)) {
       const issues = validate.errors.slice(0, 40).map(error => ({
         path: error.instancePath + (error.params.missingProperty ? '/' + error.params.missingProperty : ''),

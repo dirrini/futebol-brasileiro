@@ -268,9 +268,11 @@ namespace FStudio.FootballWorld.Presentation
             if (championship == null) return;
             championshipTitle.text = championship.Name + " · " + championship.EditionName;
             standingsTitle.GetComponent<LocalizedText>().Key = championship.IsPaulista ? "hub.cumulative" : "hub.standings";
+            if (championship.AuthoredStageName != null)
+                standingsTitle.text = GameText.Get("hub.standings") + " · " + championship.AuthoredStageName;
             rulesHint.gameObject.SetActive(championship.IsPaulista && string.IsNullOrEmpty(session.StatusMessage));
             snapshotText.text = championship.UserClubName + "  ·  " + GameText.Get("hub.revision", championship.DatabaseRevision)
-                + "  ·  " + GameText.Get("phase." + championship.Phase);
+                + "  ·  " + (championship.AuthoredStageName ?? GameText.Get("phase." + championship.Phase));
             for (var index = 0; index < championship.Standings.Count; index++)
             {
                 if (index == standings.Count) standings.Add(Instantiate(standingTemplate, standingTemplate.transform.parent));
@@ -287,9 +289,11 @@ namespace FStudio.FootballWorld.Presentation
             for (var index = championship.Fixtures.Count; index < fixtures.Count; index++) fixtures[index].gameObject.SetActive(false);
             var next = championship.NextFixture;
             nextFixtureText.text = championship.IsComplete ? (championship.ChampionName == null ? GameText.Get("hub.complete") : GameText.Get("hub.champion", championship.ChampionName))
-                : next == null ? GameText.Get(session.IsCareerCalendar ? "hub.awaitingPhase" : "hub.eliminated") : GameText.FormatDate(next.Date) + "\n" + next.HomeName + " × " + next.AwayName;
+                : next == null ? GameText.Get("hub.awaitingPhase") : GameText.FormatDate(next.Date) + "\n" + next.HomeName + " × " + next.AwayName;
             if (championship.RelegatedNames.Count > 0 && championship.IsComplete)
                 nextFixtureText.text += "\n" + GameText.Get("hub.relegated", string.Join(", ", championship.RelegatedNames));
+            if (championship.UserOutcomes.Count > 0)
+                nextFixtureText.text += "\n" + string.Join(" · ", championship.UserOutcomes.Take(2));
             playFixtureButton.interactable = championship.CanPlayNext && !session.IsBusy && (!session.IsCareerCalendar || session.CareerCanPlay);
             simulateFixtureButton.interactable = !championship.IsComplete && !session.IsBusy && (!session.IsCareerCalendar || session.CareerCanPlay);
             simulateFixtureButton.GetComponentInChildren<LocalizedText>(true).Key = next == null ? "hub.simulateRound" : "hub.simulateMatch";

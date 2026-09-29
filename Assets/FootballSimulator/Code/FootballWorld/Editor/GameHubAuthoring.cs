@@ -39,6 +39,7 @@ namespace FStudio.FootballWorld.Editor
             EnsureCountryFilters();
             EnsureCareerOffice();
             EnsureCareerManagement();
+            EnsureCareerInspectionLayout();
             LocalizeLegacyPrefabs();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -55,6 +56,7 @@ namespace FStudio.FootballWorld.Editor
             EnsureCountryFilters();
             EnsureCareerOffice();
             EnsureCareerManagement();
+            EnsureCareerInspectionLayout();
             LocalizeLegacyPrefabs();
             AssetDatabase.SaveAssets();
         }
@@ -496,7 +498,8 @@ namespace FStudio.FootballWorld.Editor
 
         private static void BindTheme(Graphic graphic, Color color, bool font = false)
         {
-            var colors = new[] { theme.Background, theme.Surface, theme.White, theme.Ink, theme.Muted, theme.Primary, theme.Accent, theme.Line, theme.Danger };
+            var colors = new[] { theme.Background, theme.Surface, theme.White, theme.Ink, theme.Muted, theme.Primary, theme.Accent, theme.Line, theme.Danger,
+                theme.InspectionPanel, theme.InspectionRow, theme.InspectionText, theme.InspectionMuted, theme.PitchSurface, theme.PitchMarking };
             var index = Array.FindIndex(colors, value => value.Equals(color));
             if (index < 0) return;
             var binding = graphic.GetComponent<GameHubThemeBinding>() ?? graphic.gameObject.AddComponent<GameHubThemeBinding>();

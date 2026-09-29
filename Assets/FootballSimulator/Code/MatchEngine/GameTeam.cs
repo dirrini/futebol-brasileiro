@@ -60,6 +60,13 @@ namespace FStudio.MatchEngine {
             return false;
         }
 
+        public bool ShouldAssistReceiver(PlayerBase player)
+        {
+            foreach (var listener in inputListeners)
+                if (listener != null && listener.IsAssistingReceiver(player)) return true;
+            return false;
+        }
+
         private void OnEnable() {
             EventManager.Subscribe<PlayerControlBallEvent>(OnBallHold);
         }

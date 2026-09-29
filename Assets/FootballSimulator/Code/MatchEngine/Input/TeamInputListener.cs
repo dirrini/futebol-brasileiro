@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 using FStudio.MatchEngine.Players;
@@ -19,7 +19,7 @@ using FStudio.MatchEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
 namespace FStudio.MatchEngine.Input {
-    public class TeamInputListener : InputListener {
+    public partial class TeamInputListener : InputListener {
         private static Vector3 inputWorldOffset = Vector3.up * 2;
 
         public enum ActionType {
@@ -29,13 +29,11 @@ namespace FStudio.MatchEngine.Input {
         }
 
         private const float MOVE_DEADZONE = 0.3f;
-        private const float SHOT_CHARGE_SECONDS = 0.5f;
-        private static readonly Vector3 shotBarWorldOffset = Vector3.up * 2.8f;
-
         private readonly ShotPowerBar shotPowerBar;
         private readonly InputAction shootAction;
-        private PlayerBase chargingPlayer;
-        private float shotChargeStartedAt;
+        private readonly InputAction passAction, throughAction, crossAction, sprintAction, moveAction;
+        private readonly BallActionCharge actionCharge = new BallActionCharge();
+        private Ball chargingBall;
 
         private PlayerBase m_ActivePlayer;
         public PlayerBase ActivePlayer { get => m_ActivePlayer; private set {
@@ -43,6 +41,8 @@ namespace FStudio.MatchEngine.Input {
                     CancelShotCharge();
                 }
                 Debug.Log("Assigned active player: " + value);
+                if (m_ActivePlayer != value && direction.magnitude < MOVE_DEADZONE)
+                    m_lastValidDirection = value != null ? value.Rotation * Vector3.forward : Vector3.zero;
                 m_ActivePlayer = value;
             } }
 
@@ -64,14 +64,19 @@ namespace FStudio.MatchEngine.Input {
             GameTeam gameTeam) : base("MatchEngine", playerIndex) {
 
             this.gameTeam = gameTeam;
+            InitializeControlSwitching();
 
             inputPointer = Object.Instantiate(Resources.Load<Transform>("UI/InputPointer"));
             inputPointerFollower = inputPointer.GetChild(0);
             shotPowerBar = new ShotPowerBar(inputPointer);
             shootAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("Shoot");
-            if (shootAction != null) {
-                shootAction.canceled += OnShootCanceled;
-            }
+            passAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("Pass");
+            throughAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("ThroughtPass");
+            crossAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("Cross");
+            sprintAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("Sprint");
+            moveAction = PlayerInput?.actions.FindActionMap("MatchEngine").FindAction("Move");
+            foreach (var action in new[] { shootAction, passAction, throughAction, crossAction })
+                if (action != null) action.canceled += OnShootCanceled;
             EventManager.Subscribe<MatchPauseEvent>(OnMatchPause);
             Application.focusChanged += OnFocusChanged;
 
@@ -91,12 +96,12 @@ namespace FStudio.MatchEngine.Input {
         }
 
         public override void Clear() {
+            ClearControlSwitching();
             CancelShotCharge();
             EventManager.UnSubscribe<MatchPauseEvent>(OnMatchPause);
             Application.focusChanged -= OnFocusChanged;
-            if (shootAction != null) {
-                shootAction.canceled -= OnShootCanceled;
-            }
+            foreach (var action in new[] { shootAction, passAction, throughAction, crossAction })
+                if (action != null) action.canceled -= OnShootCanceled;
             if (inputPointer != null) {
                 Object.Destroy(inputPointer.gameObject);
             }
@@ -129,26 +134,19 @@ namespace FStudio.MatchEngine.Input {
         }
 
         private bool MoveInput (InputAction.CallbackContext ctx) {
-            if (MatchPause.IsPaused) {
-                return false;
-            }
-
-            if (ActivePlayer == null || !ActivePlayer.PlayerController.IsPhysicsEnabled) {
-                direction = Vector3.zero;
-                return true;
-            }
-
-            var value = ctx.ReadValue<Vector2>();
-
-            var camMod = CameraSystem.Current.transform.rotation;
-            var camMul = Quaternion.Euler(0, camMod.eulerAngles.y, 0);
-
-            direction = camMul * new Vector3(value.x, 0, value.y);
-
+            ReadMovementDirection();
             return true;
         }
 
+        private void ReadMovementDirection() {
+            if (!Application.isFocused || MatchPause.IsPaused || moveAction?.enabled != true) { direction = Vector3.zero; return; }
+            var value = moveAction.ReadValue<Vector2>();
+            var yaw = CameraSystem.Current != null ? CameraSystem.Current.transform.rotation.eulerAngles.y : 0;
+            direction = Quaternion.Euler(0, yaw, 0) * new Vector3(value.x, 0, value.y);
+        }
+
         private void ActivatePlayerBehaviour<T>() where T : BaseBehaviour, IInputBehaviour {
+            if (ActivePlayer == null) return;
             if (ActivePlayer.ActiveBehaviour is IInputBehaviour) {
                 return;
             }
@@ -156,7 +154,9 @@ namespace FStudio.MatchEngine.Input {
             var tBehaviour = ActivePlayer.Behaviours.
                 Where(x => x is T).
                 Select(x => (T)x).
-                First();
+                FirstOrDefault();
+
+            if (tBehaviour == null) return;
 
             tBehaviour.IsTriggered = true;
 
@@ -171,7 +171,9 @@ namespace FStudio.MatchEngine.Input {
             var tBehaviour = ActivePlayer.Behaviours.
                 Where(x => x is T).
                 Select(x => (T)x).
-                First();
+                FirstOrDefault();
+
+            if (tBehaviour == null) return;
 
             tBehaviour.IsTriggered = false;
 
@@ -179,166 +181,140 @@ namespace FStudio.MatchEngine.Input {
         }
 
         private bool PassInput(InputAction.CallbackContext ctx) {
-            if (MatchPause.IsPaused) {
-                return false;
-            }
-
-            var value = ctx.ReadValue<float>();
-
-            if (ActivePlayer == null || 
-                !ActivePlayer.PlayerController.IsPhysicsEnabled) {
+            var pressed = ctx.ReadValue<float>() > .5f;
+            if (!pressed) StopPursuit();
+            if (pressed && CanDefend()) {
+                CancelShotCharge();
+                var pursuit = ActivePlayer.Behaviours.OfType<InputTackleBehaviour>().FirstOrDefault();
+                if (pursuit != null) {
+                    pursuit.SprintHeld = IsSprintHeld;
+                    ActivatePlayerBehaviour<InputTackleBehaviour>();
+                }
                 return true;
             }
-
-            if (value == 1) {
-                ActivatePlayerBehaviour<InputShortPassBehaviour>();
-            }
-
-            return true;
+            return ChargedInput(ChargedBallAction.ShortPass, pressed);
         }
 
-        private bool ShootInput (InputAction.CallbackContext ctx) {
+        private bool ShootInput(InputAction.CallbackContext ctx) => ChargedInput(ChargedBallAction.Shot, ctx.ReadValue<float>() > .5f);
+        private bool ThroughtPass(InputAction.CallbackContext ctx) => ChargedInput(ChargedBallAction.ThroughPass, ctx.ReadValue<float>() > .5f);
+
+        private bool CrossInput(InputAction.CallbackContext ctx) {
+            var pressed = ctx.ReadValue<float>() > .5f;
+            if (pressed && CanDefend()) {
+                CancelShotCharge();
+                ActivatePlayerBehaviour<InputSlideTackleBehaviour>();
+                return true;
+            }
+            return ChargedInput(ChargedBallAction.Cross, pressed);
+        }
+
+        // Legacy action name is retained for old bindings; the authored bindings
+        // now route defence contextually through Pass and Cross only.
+        private bool TackleInput(InputAction.CallbackContext ctx) => PassInput(ctx);
+
+        private bool ChargedInput(ChargedBallAction action, bool pressed) {
             if (MatchPause.IsPaused || !Application.isFocused) {
-                CancelShotCharge();
-                return false;
+                CancelShotCharge(); return false;
             }
-
-            // Shoot is a PassThrough action: performed is sent for both press and release.
-            if (ctx.ReadValue<float>() > 0.5f) {
-                if (chargingPlayer == null && CanChargeShot(ActivePlayer)) {
-                    chargingPlayer = ActivePlayer;
-                    shotChargeStartedAt = Time.unscaledTime;
-                    shotPowerBar.Show(chargingPlayer.Position + shotBarWorldOffset, 0);
+            if (pressed) {
+                if (CanChargeBallAction(ActivePlayer, action) && actionCharge.TryBegin(action, ActivePlayer, Time.unscaledTime,
+                    action == ChargedBallAction.Shot && Ball.Current.HolderPlayer == null)) {
+                    chargingBall = Ball.Current;
+                    ShowActionCharge();
                 }
                 return true;
             }
-
-            if (chargingPlayer == null) {
-                return true;
+            var valid = chargingBall == Ball.Current && actionCharge.MatchesPossession(Ball.Current?.HolderPlayer) && CanChargeBallAction(ActivePlayer, action);
+            if (!actionCharge.TryRelease(action, ActivePlayer, Time.unscaledTime, MatchControlSettings.Current.ChargeDuration, out var charge)) return true;
+            shotPowerBar.Hide();
+            chargingBall = null;
+            if (!valid) return true;
+            switch (action) {
+                case ChargedBallAction.Shot:
+                    if (ActivePlayer.IsGK) { TryActivateGoalkeeperClearance(charge); break; }
+                    if (TryActivateAerialShot(charge)) break;
+                    var shoot = ActivePlayer.Behaviours.OfType<InputShootBehaviour>().FirstOrDefault();
+                    if (shoot != null) { shoot.SetCharge(charge); ActivatePlayerBehaviour<InputShootBehaviour>(); }
+                    break;
+                case ChargedBallAction.ShortPass: ReleasePass<InputShortPassBehaviour>(charge); break;
+                case ChargedBallAction.ThroughPass: ReleasePass<InputThroughtPassBehaviour>(charge); break;
+                case ChargedBallAction.Cross: ReleasePass<InputCrossBehaviour>(charge); break;
             }
-
-            var player = chargingPlayer;
-            var charge = ShotCharge;
-            CancelShotCharge();
-            if (player == ActivePlayer && CanChargeShot(player)) {
-                var behaviour = player.Behaviours.OfType<InputShootBehaviour>().FirstOrDefault();
-                if (behaviour != null) {
-                    behaviour.SetCharge(charge);
-                    ActivatePlayerBehaviour<InputShootBehaviour>();
-                }
-            }
-
             return true;
         }
 
-        private float ShotCharge => Mathf.Clamp01((Time.unscaledTime - shotChargeStartedAt) / SHOT_CHARGE_SECONDS);
-
-        private bool CanChargeShot(PlayerBase player) {
-            if (player == null || player != ActivePlayer || MatchPause.IsPaused ||
-                shootAction == null || !shootAction.enabled || MatchManager.Current == null) {
-                return false;
-            }
-
-            var status = MatchManager.Current.MatchFlags;
-            return (status == MatchStatus.Playing || status == MatchStatus.WaitingForKickOff) &&
-                player.PlayerController.IsPhysicsEnabled &&
-                Ball.Current != null && Ball.Current.HolderPlayer == player &&
-                !player.IsThrowHolder && !player.IsCornerHolder &&
-                player.ActiveBehaviour is not IInputBehaviour;
+        private void ReleasePass<T>(float charge) where T : AbstractInputPassBehaviour {
+            var behaviour = ActivePlayer.Behaviours.OfType<T>().FirstOrDefault();
+            if (behaviour == null) return;
+            behaviour.SetCharge(charge);
+            ActivatePlayerBehaviour<T>();
         }
 
-        // Called every rendered frame, including pauses and match cutscenes.
+        private InputAction ActionFor(ChargedBallAction action) {
+            switch (action) {
+                case ChargedBallAction.ShortPass: return passAction;
+                case ChargedBallAction.ThroughPass: return throughAction;
+                case ChargedBallAction.Cross: return crossAction;
+                case ChargedBallAction.Shot: return shootAction;
+                default: return null;
+            }
+        }
+
+        private bool CanChargeBallAction(PlayerBase player, ChargedBallAction action) {
+            if (player == null || player != ActivePlayer || MatchPause.IsPaused || !Application.isFocused ||
+                ActionFor(action)?.enabled != true || MatchManager.Current == null ||
+                !player.PlayerController.IsPhysicsEnabled || player.ActiveBehaviour is IInputBehaviour) return false;
+            var status = MatchManager.Current.MatchFlags;
+            if (status != MatchStatus.Playing && status != MatchStatus.WaitingForKickOff) return false;
+            if (action == ChargedBallAction.Shot && player.IsGK) return CanChargeGoalkeeperClearance(player);
+            if (action == ChargedBallAction.Shot && CanChargeAerialShot(player)) return true;
+            return Ball.Current != null && Ball.Current.HolderPlayer == player &&
+                (action != ChargedBallAction.Shot || (!player.IsThrowHolder && !player.IsCornerHolder));
+        }
+
+        private bool CanDefend() => ActivePlayer != null && !ActivePlayer.IsGK && !MatchPause.IsPaused && Application.isFocused &&
+            MatchManager.Current?.MatchFlags == MatchStatus.Playing && ActivePlayer.PlayerController.IsPhysicsEnabled &&
+            Ball.Current != null && Ball.Current.HolderTeam != gameTeam;
+
+        private bool IsSprintHeld => Application.isFocused && !MatchPause.IsPaused && sprintAction?.enabled == true && sprintAction.IsPressed();
+
+        public static MovementType MovementForInput(float intensity, bool sprintHeld)
+            => intensity < .5f ? MovementType.Relax : sprintHeld && intensity >= .75f ? MovementType.BestHeCanDo : MovementType.Normal;
+
+        private void StopPursuit() {
+            var pursuit = ActivePlayer?.Behaviours.OfType<InputTackleBehaviour>().FirstOrDefault();
+            if (pursuit == null) return;
+            pursuit.IsTriggered = false;
+            if (ActivePlayer.ActiveBehaviour == pursuit) ActivePlayer.ResetBehaviours();
+        }
+
+        private void ShowActionCharge() {
+            if (actionCharge.Owner is PlayerBase player)
+                shotPowerBar.Show(player.Position + MatchControlSettings.Current.PowerBarWorldOffset,
+                    actionCharge.Power(Time.unscaledTime, MatchControlSettings.Current.ChargeDuration));
+        }
+
+        // The historical method name is retained by GameTeam's per-frame hook.
         public void UpdateShotCharge() {
-            if (chargingPlayer == null) {
-                return;
-            }
-            if (!CanChargeShot(chargingPlayer)) {
-                CancelShotCharge();
-                return;
-            }
-            shotPowerBar.Show(chargingPlayer.Position + shotBarWorldOffset, ShotCharge);
+            UpdateAerialShotBuffer();
+            var pursuit = ActivePlayer?.Behaviours.OfType<InputTackleBehaviour>().FirstOrDefault();
+            if (pursuit != null) pursuit.SprintHeld = IsSprintHeld;
+            if (!actionCharge.IsActive) return;
+            if (chargingBall != Ball.Current || !actionCharge.MatchesPossession(Ball.Current?.HolderPlayer) ||
+                !CanChargeBallAction(actionCharge.Owner as PlayerBase, actionCharge.Action)) { CancelShotCharge(); return; }
+            ShowActionCharge();
         }
 
         private void CancelShotCharge() {
-            chargingPlayer = null;
+            actionCharge.Cancel();
+            chargingBall = null;
+            StopPursuit();
+            CancelAerialShotInput();
             shotPowerBar?.Hide();
         }
-
         private void OnShootCanceled(InputAction.CallbackContext _) => CancelShotCharge();
-
         private void OnMatchPause(MatchPauseEvent _) => CancelShotCharge();
-
-        private void OnFocusChanged(bool hasFocus) {
-            if (!hasFocus) {
-                CancelShotCharge();
-            }
-        }
-
-        private bool ThroughtPass (InputAction.CallbackContext ctx) {
-            if (MatchPause.IsPaused) {
-                return false;
-            }
-
-            if (ActivePlayer == null ||
-                !ActivePlayer.PlayerController.IsPhysicsEnabled) {
-                return true;
-            }
-
-            if (!ActivePlayer.IsHoldingBall) {
-                return false;
-            }
-
-            ActivatePlayerBehaviour<InputThroughtPassBehaviour>();
-            return true;
-        }
-
-        private bool CrossInput (InputAction.CallbackContext ctx) {
-            if (MatchPause.IsPaused) {
-                return false;
-            }
-
-            var value = ctx.ReadValue<float>();
-
-            if (ActivePlayer == null ||
-                !ActivePlayer.PlayerController.IsPhysicsEnabled) {
-                return true;
-            }
-
-            if (!ActivePlayer.IsHoldingBall) {
-                return false;
-            }
-
-            if (value == 1) {
-                ActivatePlayerBehaviour<InputCrossBehaviour>();
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool TackleInput(InputAction.CallbackContext ctx) {
-            if (MatchPause.IsPaused) {
-                return false;
-            }
-
-            if (ActivePlayer == null || !ActivePlayer.PlayerController.IsPhysicsEnabled) {
-                return true;
-            }
-
-            if (ActivePlayer.IsHoldingBall) {
-                return false;
-            }
-
-            if (ctx.control.IsPressed()) {
-                Debug.Log("[TackleInput] Tackle on");
-                ActivatePlayerBehaviour<InputTackleBehaviour>();
-            } else {
-                Debug.Log("[TackleInput] Tackle off");
-                DectivatePlayerBehaviour<InputTackleBehaviour>();
-            }
-
-            return true;
-        }
+        private void OnFocusChanged(bool hasFocus) { if (!hasFocus) CancelShotCharge(); }
 
         private bool ChangePlayerInput(InputAction.CallbackContext ctx) {
             if (MatchPause.IsPaused) {
@@ -355,15 +331,16 @@ namespace FStudio.MatchEngine.Input {
         }
 
         private void AssignPlayer () {
+            receiverControl.Cancel();
             var currentBallHolder = Ball.Current.HolderPlayer;
 
             if (currentBallHolder != null && ActivePlayer == currentBallHolder) {
                 return;// cannot select another player.
             }
 
-            var possibleTargets = gameTeam.GamePlayers.Where(x => !x.IsGK && x != ActivePlayer);
+            var possibleTargets = gameTeam.GamePlayers.Where(x => !x.IsGK && x != ActivePlayer && EligibleControlledPlayer(x));
 
-            if (currentBallHolder != null && currentBallHolder.GameTeam == gameTeam && !currentBallHolder.IsGK) {
+            if (currentBallHolder != null && currentBallHolder.GameTeam == gameTeam) {
                 ActivePlayer = currentBallHolder;
                 return;
             }
@@ -381,6 +358,8 @@ namespace FStudio.MatchEngine.Input {
                     return;
                 }
                 #endregion
+
+                ActivePlayer = possibleTargets.OrderBy(player => BallChasingBehaviour.BallChasingDistance(player)).FirstOrDefault() ?? ActivePlayer;
             }
             else {
                 // ball is free, select one of chasers.
@@ -412,6 +391,8 @@ namespace FStudio.MatchEngine.Input {
         }
 
         public void Update (in float deltaTime) {
+            ReadMovementDirection();
+            UpdateAutomaticControl();
             if (ActivePlayer == null) {
                 Debug.Log("[TeamInputListener] Input listener doesnt have a player. Looking for a player to control.");
 
@@ -420,7 +401,7 @@ namespace FStudio.MatchEngine.Input {
 
             var holderPlayer = Ball.Current.HolderPlayer;
 
-            if (ActivePlayer != holderPlayer && holderPlayer != null && !holderPlayer.IsGK && holderPlayer.GameTeam == gameTeam) {
+            if (ActivePlayer != holderPlayer && holderPlayer != null && holderPlayer.GameTeam == gameTeam) {
                 ActivePlayer = holderPlayer;
             }
 
@@ -453,7 +434,8 @@ namespace FStudio.MatchEngine.Input {
             }
 
 
-            if (ActivePlayer.ActiveBehaviour is not IInputBehaviour) {
+            if (ActivePlayer.PlayerController.IsPhysicsEnabled && MatchManager.Current.MatchFlags == MatchStatus.Playing &&
+                ActivePlayer.ActiveBehaviour is not IInputBehaviour && !IsAssistingReceiver(ActivePlayer)) {
                 var length = direction.magnitude;
 
                 var activePosition = ActivePlayer.Position;
@@ -462,14 +444,7 @@ namespace FStudio.MatchEngine.Input {
                 if (length < MOVE_DEADZONE) {
                     ActivePlayer.Stop(in deltaTime);
                 } else {
-                    MovementType movementType = MovementType.BestHeCanDo;
-
-                    if (length < 0.5f) {
-                        movementType = MovementType.Relax;
-                    } else if (length < 0.75f) {
-                        movementType = MovementType.Normal;
-                    }
-
+                    var movementType = MovementForInput(length, IsSprintHeld);
                     ActivePlayer.MoveTo(in deltaTime, activePosition, true, movementType);
                 }
             }

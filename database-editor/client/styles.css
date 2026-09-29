@@ -233,6 +233,18 @@ textarea { resize: none; }
 .source-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .source-heading h4 { margin: 0; font: 600 15px var(--font-heading); }
 .source-heading .button { min-height: 36px; }
+.format-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-block: 8px; }
+.format-actions .button { min-height: 36px; }
+.format-stage-card { margin-top: 18px; }
+.format-stage-card .fixture-card-heading { align-items: flex-start; }
+.format-stage-card .fixture-card-heading > .format-actions { justify-content: flex-end; }
+.format-tiebreakers .fixture-toolbar { align-items: end; flex-wrap: wrap; }
+.format-tiebreakers .field { min-width: 180px; flex: 1; }
+.group-assignment-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 18px; max-height: 480px; overflow: auto; padding: 4px 8px 4px 2px; scrollbar-gutter: stable; }
+.group-assignment-grid .field { min-width: 0; }
+.format-stage-card code, .fixture-card code { overflow-wrap: anywhere; }
+@media (max-width: 700px) { .format-stage-card .fixture-card-heading { flex-wrap: wrap; } .format-stage-card .fixture-card-heading > .format-actions { justify-content: flex-start; } .format-actions .button { font-size: 11px; padding-inline: 10px; } }
+@media (max-width: 430px) { .group-assignment-grid { grid-template-columns: 1fr; } }
 #navigation { min-width: 0; }
 @media (min-width: 1500px) { .appearance-fields { grid-template-columns: 1fr 1fr; align-content: start; } .appearance-layout { grid-template-columns: minmax(190px,.8fr) minmax(300px,1.5fr); } }
 @media (max-width: 1200px) { .app-shell { grid-template-columns: 180px minmax(0,1fr); } .sidebar { padding-inline: 15px; } .brand { gap: 8px; font-size: 15px; } .main { padding: 28px 23px 20px; } .workspace-ready { grid-template-columns: 250px minmax(0,1fr); gap: 17px; } .page-header { align-items: flex-start; } .header-actions { max-width: 310px; justify-content: flex-end; } .detail-heading, #record-form { padding-inline: 22px; } .detail-tabs { padding-inline: 22px; } .detail-footer { margin-inline: 22px; } .attributes-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .appearance-layout { gap: 15px; grid-template-columns: minmax(130px,.7fr) minmax(150px,1fr); } .position-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .roster-summary { gap: 15px; flex-wrap: wrap; } .roster-summary .button { margin-left: 0; } }

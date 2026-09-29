@@ -16,6 +16,7 @@ namespace FStudio.FootballWorld.Application
 
         public CareerFormation Formation { get; private set; } = CareerFormation.FourFourTwo;
         public CareerMentality Mentality { get; private set; } = CareerMentality.Balanced;
+        public CareerTacticPlan TacticPlan { get; private set; } = CareerTacticPlan.CreateDefault(CareerFormation.FourFourTwo);
         public DatabaseCatalog EffectiveCatalog => effectiveCatalog ?? Competition.Catalog;
         public IReadOnlyList<CareerTransferOffer> Offers { get; private set; }
         public long ReservedTransferBudget => offers.Where(value => value.Status == CareerTransferStatus.Pending).Sum(value => value.Amount);
@@ -41,12 +42,15 @@ namespace FStudio.FootballWorld.Application
             return Math.Max(10000L, (long)average * average * 100);
         }
 
-        public void SetTactics(CareerFormation formation, CareerMentality mentality)
+        public void SetTactics(CareerFormation formation, CareerMentality mentality, CareerTacticPlan plan = null)
         {
             EnsureManagementAvailable();
             ValidateTactics(formation, mentality);
+            var selectedPlan = plan ?? (formation == Formation ? TacticPlan : CareerTacticPlan.CreateDefault(formation));
+            if (selectedPlan.Formation != formation) throw new ArgumentException("The tactical plan must match its selected formation.", nameof(plan));
             Formation = formation;
             Mentality = mentality;
+            TacticPlan = selectedPlan;
         }
 
         public CareerTransferOffer SubmitOffer(string playerId, long amount)
@@ -125,7 +129,7 @@ namespace FStudio.FootballWorld.Application
                     var memberships = source.Memberships.Where(value => value.PlayerId != offer.PlayerId).ToList();
                     memberships.Add(new RosterMembership(Competition.ControlledClubId, offer.PlayerId));
                     effectiveCatalog = new DatabaseCatalog(source.DatabaseId, source.DatabaseRevision, source.Clubs, source.Players,
-                        memberships, source.Competitions, source.CompetitionEditions, source.Countries, source.Stadiums, source.Snapshot);
+                        memberships, source.Competitions, source.CompetitionEditions, source.Countries, source.Stadiums, source.Snapshot, source.CompetitionFormats);
                 }
                 news.Add(new CareerNewsItem("transfer-" + offer.Id, date, "gazeta-da-bola",
                     status == CareerTransferStatus.Accepted ? "transfer-accepted" : "transfer-rejected",

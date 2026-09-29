@@ -8,6 +8,10 @@ import { clubForm } from './clubs.js';
 import { hasHistory, identity, countryName, countryOptions, setRecordField, deletionBlock, playerDisplayName, playerSearchText, validDate } from './history-model.js';
 import { countryField, referenceStrip, stadiumForm, countryForm, snapshotForm } from './history-ui.js';
 import { views, availableViews, validFilters, creationError, addRecord, removeHistoricalRecord, addSource, removeSource } from './records.js';
+import { formatForm } from './competition-format-ui.js';
+import { declarativeEditionForm } from './edition-declarative-ui.js';
+import { setPortableValue, declarativeDeletionBlock } from './format-model.js';
+import { wireDeclarative } from './declarative-controller.js';
 
 const PAGE_SIZE = 10;
 const initial = new URLSearchParams(location.search);
@@ -16,7 +20,8 @@ const state = {
   view: Object.hasOwn(views, initial.get('view')) ? initial.get('view') : 'players', query: initial.get('q') || '', country: initial.get('country') || '',
   club: initial.get('club') || '', page: Math.max(1, Number(initial.get('page')) || 1),
   selectedId: initial.get('id') || '', tab: ['data', 'attributes', 'appearance'].includes(initial.get('tab')) ? initial.get('tab') : 'data',
-  issues: [], feedback: null, fixtureRound: Math.min(8, Math.max(1, Number(initial.get('round')) || 1)),
+  issues: [], feedback: null, fixtureRound: Math.min(128, Math.max(1, Number(initial.get('round')) || 1)),
+  stageId: initial.get('stage') || '',
 };
 
 function writeUrl() {
@@ -28,6 +33,7 @@ function writeUrl() {
   if (state.page > 1) params.set('page', state.page);
   if (state.selectedId) params.set('id', state.selectedId);
   if (state.view === 'competitionEditions' && state.fixtureRound !== 1) params.set('round', state.fixtureRound);
+  if (['competitionEditions', 'competitionFormats'].includes(state.view) && state.stageId) params.set('stage', state.stageId);
   if (state.tab !== 'data' && state.view === 'players') params.set('tab', state.tab);
   history.replaceState(null, '', `${location.pathname}?${params}`);
 }
@@ -91,7 +97,7 @@ function renderFeedback() {
 
 function describeIssue(issue) {
   const path = normalizeIssuePath(issue.path);
-  const match = /^(players|clubs|countries|stadiums|competitions|competitionEditions)\[(\d+)\]/.exec(path);
+  const match = /^(players|clubs|countries|stadiums|competitions|competitionEditions|competitionFormats)\[(\d+)\]/.exec(path);
   const record = match && state.document[match[1]][Number(match[2])];
   return record ? `${record.name || 'Sem nome'}: ${issue.message}` : issue.message;
 }
@@ -137,8 +143,8 @@ function renderList() {
   const offset = (state.page - 1) * PAGE_SIZE;
   $('#list-summary').textContent = filtered.length ? `${offset + 1}–${Math.min(offset + PAGE_SIZE, filtered.length)} de ${filtered.length} ${views[state.view].plural}` : 'Nenhum resultado';
   $('#record-list').innerHTML = filtered.length ? filtered.slice(offset, offset + PAGE_SIZE).map(record => {
-    const subtitle = state.view === 'competitions' ? `${state.document.competitionEditions.filter(edition => edition.competitionId === record.id).length} edições` : state.view === 'competitionEditions' ? `${state.document.competitions.find(item => item.id === record.competitionId)?.name || 'Campeonato sem vínculo'} · ${record.participantClubIds.length} clubes` : state.view === 'players' ? clubFor(state.document, record.id)?.name || 'Sem clube' : state.view === 'clubs' ? `${state.document.memberships.filter(member => member.clubId === record.id).length} jogadores${record.countryCode ? ` · ${countryName(state.document, record.countryCode)}` : ''}` : state.view === 'stadiums' ? `${record.city} · ${countryName(state.document, record.countryCode)}` : `Código ${record.code}`;
-    const position = state.view === 'players' ? record.naturalPositions[0] || '—' : state.view === 'countries' ? record.code : state.view === 'stadiums' ? '◎' : ['competitions', 'competitionEditions'].includes(state.view) ? 'CP' : 'FC';
+    const subtitle = state.view === 'competitionFormats' ? `${record.participantCount} clubes · ${record.stages.length} fases` : state.view === 'competitions' ? `${state.document.competitionEditions.filter(edition => edition.competitionId === record.id).length} edições` : state.view === 'competitionEditions' ? `${state.document.competitions.find(item => item.id === record.competitionId)?.name || 'Campeonato sem vínculo'} · ${record.participantClubIds.length} clubes` : state.view === 'players' ? clubFor(state.document, record.id)?.name || 'Sem clube' : state.view === 'clubs' ? `${state.document.memberships.filter(member => member.clubId === record.id).length} jogadores${record.countryCode ? ` · ${countryName(state.document, record.countryCode)}` : ''}` : state.view === 'stadiums' ? `${record.city} · ${countryName(state.document, record.countryCode)}` : `Código ${record.code}`;
+    const position = state.view === 'players' ? record.naturalPositions[0] || '—' : state.view === 'countries' ? record.code : state.view === 'stadiums' ? '◎' : state.view === 'competitionFormats' ? 'RF' : ['competitions', 'competitionEditions'].includes(state.view) ? 'CP' : 'FC';
     return `<button class="record-row" data-record-id="${e(identity(record))}"${identity(record) === state.selectedId ? ' aria-current="true"' : ''}${state.saving ? ' disabled' : ''}><span class="position-badge${position === 'GK' ? ' position-gk' : ''}">${e(position)}</span><span class="record-info"><strong>${e((state.view === 'players' ? playerDisplayName(record) : record.name) || 'Sem nome')}</strong><small>${e(subtitle)}</small></span><span class="row-arrow" aria-hidden="true">›</span></button>`;
   }).join('') : '<div class="empty-list"><strong>Nenhum cadastro encontrado</strong><p>Adicione um cadastro ou ajuste a busca e os filtros.</p><button class="text-button" id="reset-filters">Limpar filtros</button></div>';
   $('#record-list').scrollTop = scrollTop;
@@ -152,10 +158,11 @@ function renderList() {
 function renderDetail() {
   const record = selectedRecord();
   if (!record) { $('#detail-panel').innerHTML = '<div class="state-panel"><h2>Selecione um cadastro</h2><p>Escolha um item da lista para editar sua ficha.</p></div>'; return; }
-  const forms = { competitions: () => competitionForm(record, state.document), competitionEditions: () => editionForm(record, state.document, state.fixtureRound), players: () => playerForm(record, state.document, state.options, state.tab), clubs: () => clubForm(record, state.document), stadiums: () => stadiumForm(record, state.document), countries: () => countryForm(record, state.document), snapshot: () => snapshotForm(state.document) };
+  const forms = { competitionFormats: () => formatForm(record, state.document, state.stageId), competitions: () => competitionForm(record, state.document), competitionEditions: () => record.formatId ? declarativeEditionForm(record, state.document, state.stageId, state.fixtureRound) : editionForm(record, state.document, state.fixtureRound), players: () => playerForm(record, state.document, state.options, state.tab), clubs: () => clubForm(record, state.document), stadiums: () => stadiumForm(record, state.document), countries: () => countryForm(record, state.document), snapshot: () => snapshotForm(state.document) };
   $('#detail-panel').innerHTML = forms[state.view]();
   $('#record-form').addEventListener('submit', event => { event.preventDefault(); save(); });
   $('#record-fields').disabled = state.saving;
+  $('#detail-panel').querySelectorAll('[data-format-action]').forEach(button => { button.disabled = button.disabled || state.saving; });
   $('#detail-panel').querySelectorAll('[data-player-tab]').forEach(button => {
     button.disabled = state.saving;
     button.addEventListener('click', () => { state.tab = button.dataset.playerTab; renderDetail(); writeUrl(); $(`[data-player-tab="${state.tab}"]`).focus(); });
@@ -173,6 +180,10 @@ function renderDetail() {
     showDialog({ title: 'Remover esta fonte?', description: `A fonte “${source.title || 'Sem título'}” será removida do rascunho. A alteração só será publicada ao salvar.`, action: 'Remover fonte', danger: true, onAccept: () => { removeSource(state.document, source.id); state.issues = []; changed(); renderDetail(); queueMicrotask(() => $('#add-source')?.focus()); } });
   }));
   wireCompetitionActions(record);
+  wireDeclarative(record, { state, refresh: (focus, dirty = true) => {
+    if (dirty) changed(); renderDetail(); renderList(); renderNavigation(); writeUrl();
+    if (focus) queueMicrotask(() => $(focus)?.focus({ preventScroll: true }));
+  }, openRecord: (view, id) => { state.view = view; state.selectedId = id; state.query = ''; state.page = 1; state.stageId = ''; renderWorkspace(); renderNavigation(); writeUrl(); $('#detail-title')?.focus(); }, warn: message => { state.feedback = { tone: 'warning', title: 'Revise esta configuração', message }; renderFeedback(); } });
   $('#record-form').querySelectorAll('textarea').forEach(autoGrow);
   $('#record-form').addEventListener('input', event => {
     const target = event.target;
@@ -189,8 +200,9 @@ function renderDetail() {
     if (target.dataset.editionPath?.endsWith('.round')) {
       state.fixtureRound = Number(target.value); renderDetail(); writeUrl(); $('#fixture-round-filter')?.focus({ preventScroll: true });
     }
+    if (target.dataset.refresh === 'true') { const id = target.id; renderDetail(); document.getElementById(id)?.focus({ preventScroll: true }); }
     renderList();
-    if (target.id === 'player-name' || target.id === 'club-name' || target.dataset.property === 'name' || target.dataset.property === 'nickname') $('#detail-title').textContent = (state.view === 'players' ? record.nickname ?? record.name : record.name) || 'Sem nome';
+    if (target.id === 'player-name' || target.id === 'club-name' || target.dataset.property === 'name' || target.dataset.portablePath === 'name' || target.dataset.property === 'nickname') $('#detail-title').textContent = (state.view === 'players' ? record.nickname ?? record.name : record.name) || 'Sem nome';
   });
   applyFieldErrors(state.issues);
 }
@@ -248,7 +260,15 @@ function wireCompetitionActions(record) {
 function updateField(input, record) {
   if (state.saving) return;
   const numeric = input.value === '' ? null : Number(input.value);
-  if (input.dataset.editionPath) {
+  if (input.dataset.portablePath) {
+    setPortableValue(record, input.dataset.portablePath, input.value, input.dataset.valueMode || 'text', input.dataset.optional === 'true');
+  } else if (input.dataset.portableArray) {
+    const keys = input.dataset.portableArray.split('.'); let owner = record;
+    for (const key of keys.slice(0, -1)) owner = owner[key];
+    const selected = new Set(owner[keys.at(-1)] || []);
+    if (input.checked) selected.add(input.value); else selected.delete(input.value);
+    owner[keys.at(-1)] = [...selected];
+  } else if (input.dataset.editionPath) {
     const property = input.dataset.editionPath;
     if (property.endsWith('.stadiumId') && input.value === '') {
       const index = Number(/authoredFixtures\[(\d+)\]/.exec(property)[1]);
@@ -313,7 +333,7 @@ function removeRecord() {
   const members = state.view === 'clubs' && state.document.memberships.filter(member => member.clubId === record.id);
   if (members?.length) { state.feedback = { tone: 'warning', title: 'Este clube ainda tem jogadores', message: 'Transfira os jogadores para outro clube ou deixe-os sem clube antes de excluir o cadastro.' }; renderFeedback(); return; }
   if (state.view === 'clubs' && state.document.competitionEditions?.some(edition => edition.participantClubIds.includes(record.id))) { state.feedback = { tone: 'warning', title: 'Este clube participa de um campeonato', message: 'Remova a participação na edição do campeonato antes de excluir o clube. Abra Edições para ajustar os participantes e o calendário.' }; renderFeedback(); return; }
-  const blocked = deletionBlock(state.document, state.view, record) || competitionDeletionBlock(state.document, state.view, record);
+  const blocked = deletionBlock(state.document, state.view, record) || competitionDeletionBlock(state.document, state.view, record) || declarativeDeletionBlock(state.document, state.view, record);
   if (blocked) { state.feedback = { tone: 'warning', title: 'Este cadastro precisa ser preservado', message: blocked }; renderFeedback(); return; }
   if (['players', 'clubs'].includes(state.view) && state.document[state.view].length === 1) { state.feedback = { tone: 'warning', title: 'Mantenha ao menos um cadastro', message: `A base precisa de pelo menos um ${views[state.view].singular}.` }; renderFeedback(); return; }
   showDialog({ title: `Excluir ${record.name}?`, description: players ? 'O jogador, seu vínculo com o clube e sua aparência serão removidos do rascunho. A exclusão só será publicada ao salvar as alterações.' : 'O cadastro será removido do rascunho. A exclusão só será publicada ao salvar as alterações.', action: `Excluir ${views[state.view].singular}`, danger: true, onAccept: () => {
@@ -326,12 +346,18 @@ function focusIssue() {
   const issue = state.issues[0];
   if (!issue) return;
   const path = normalizeIssuePath(issue.path);
-  const match = /^(players|clubs|stadiums|countries|visualProfiles|competitions|competitionEditions)\[(\d+)\]/.exec(path);
+  const match = /^(players|clubs|stadiums|countries|visualProfiles|competitions|competitionEditions|competitionFormats)\[(\d+)\]/.exec(path);
   if (match) {
     state.view = match[1] === 'visualProfiles' ? 'players' : match[1];
     const record = state.document[match[1]][Number(match[2])];
     state.selectedId = match[1] === 'visualProfiles' ? record.playerId : identity(record);
     const fixtureIndex = /authoredFixtures\[(\d+)\]/.exec(path);
+    const phaseIndex = /(?:stages|stageSchedules)\[(\d+)\]/.exec(path);
+    if (phaseIndex) {
+      const phase = (record.stages || record.stageSchedules)?.[Number(phaseIndex[1])];
+      state.stageId = phase?.stageId || phase?.id || '';
+      if (fixtureIndex && phase?.authoredFixtures?.[Number(fixtureIndex[1])]) state.fixtureRound = phase.authoredFixtures[Number(fixtureIndex[1])].round;
+    }
     if (fixtureIndex && record.authoredFixtures?.[Number(fixtureIndex[1])]) state.fixtureRound = record.authoredFixtures[Number(fixtureIndex[1])].round;
     state.tab = path.includes('.attributes.') ? 'attributes' : match[1] === 'visualProfiles' ? 'appearance' : 'data';
     state.query = ''; state.club = ''; state.country = ''; state.page = Math.max(1, Math.floor(records().findIndex(item => identity(item) === state.selectedId) / PAGE_SIZE) + 1);

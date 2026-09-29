@@ -19,10 +19,12 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
         private readonly float minBallProgress;
         private readonly float chanceMultiplier;
+        private readonly bool roleOnly;
 
-        public CrossingBehaviour (float minBallProgress = 0, float chanceMultiplier = 1) {
+        public CrossingBehaviour (float minBallProgress = 0, float chanceMultiplier = 1, bool roleOnly = false) {
             this.minBallProgress = minBallProgress;
             this.chanceMultiplier = chanceMultiplier;
+            this.roleOnly = roleOnly;
         }
 
         private static readonly Curve MAX_BACKWARDS_DIFF = new Curve(new Curve.Point[] { 
@@ -49,6 +51,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
         }
 
         public override bool Behave(bool isAlreadyActive) {
+            if (roleOnly && (!Player.MatchPlayer.RoleTactics.EarlyCross || isInputControlled || !IsRoughValidated())) return false;
             if (ball.HolderPlayer != Player) {
                 return false;
             }
@@ -60,7 +63,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
                 var chance = 
                     CROSS_CHANCE_BY_BALL_PROGRESS.Evaluate(Player.PlayerFieldProgress) * 
-                    chanceMultiplier;
+                    chanceMultiplier * Player.MatchPlayer.RoleTactics.CrossingChance;
 
                 var chanceRoll = Random.Range(0, 100) < chance;
 

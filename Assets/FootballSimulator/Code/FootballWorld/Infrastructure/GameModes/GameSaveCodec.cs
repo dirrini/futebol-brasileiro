@@ -32,17 +32,13 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             using (var reader = new JsonTextReader(new StringReader(databaseJson)) { DateParseHandling = DateParseHandling.None })
                 databaseJson = JObject.Load(reader).ToString(Formatting.None);
             var root = new JObject {
-                ["version"] = 2, ["databaseJson"] = databaseJson,
+                ["version"] = session.Edition.IsDeclarative ? 3 : 2, ["databaseJson"] = databaseJson,
                 ["seasonId"] = snapshot.SeasonId, ["databaseId"] = snapshot.DatabaseId,
                 ["databaseRevision"] = snapshot.DatabaseRevision, ["editionId"] = snapshot.EditionId,
                 ["controlledClubId"] = snapshot.ControlledClubId,
                 ["dailyProgress"] = snapshot.DailyProgress,
                 ["currentDate"] = snapshot.CurrentDate?.ToString(),
-                ["fixtures"] = new JArray(snapshot.Fixtures.Select(fixture => new JObject {
-                    ["id"] = fixture.Id, ["round"] = fixture.Round,
-                    ["year"] = fixture.Date.Year, ["month"] = fixture.Date.Month, ["day"] = fixture.Date.Day,
-                    ["homeClubId"] = fixture.HomeClubId, ["awayClubId"] = fixture.AwayClubId,
-                    ["stadiumId"] = fixture.StadiumId })),
+                ["fixtures"] = new JArray(snapshot.Fixtures.Select(fixture => WriteFixture(fixture, session.Edition.IsDeclarative))),
                 ["results"] = new JArray(snapshot.Results.Select(result => new JObject {
                     ["fixtureId"] = result.FixtureId, ["executionId"] = result.ExecutionId,
                     ["homeClubId"] = result.HomeClubId, ["awayClubId"] = result.AwayClubId,
@@ -61,20 +57,26 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         {
             var root = Read(json);
             var version = Number(root, "version");
-            if (version != 1 && version != 2) throw new InvalidOperationException("Unsupported championship save version.");
+            if (version < 1 || version > 3) throw new InvalidOperationException("Unsupported championship save version.");
             var fields = new[] { "version", "databaseJson", "seasonId", "databaseId", "databaseRevision",
                 "editionId", "controlledClubId", "fixtures", "results", "usedExecutionIds" };
             RequireFields(root, version == 1 ? fields : fields.Concat(new[] { "dailyProgress", "currentDate" }).ToArray());
             var databaseJson = Text(root, "databaseJson");
             var imported = new JsonDatabaseImporter().Import(databaseJson);
             if (!imported.Success) throw new InvalidOperationException("The saved database snapshot is not supported.");
+            if (imported.Catalog.GetCompetitionEdition(Text(root, "editionId")).IsDeclarative != (version == 3))
+                throw new InvalidOperationException("The saved competition format requires its matching fixture schema.");
             var fixtures = List(root, "fixtures").Select(token => {
                 var item = Object(token);
                 var fixtureFields = new[] { "id", "round", "year", "month", "day", "homeClubId", "awayClubId" };
-                RequireFields(item, version == 1 ? fixtureFields : fixtureFields.Concat(new[] { "stadiumId" }).ToArray());
+                var additional = version == 1 ? Array.Empty<string>() : version == 2 ? new[] { "stadiumId" }
+                    : new[] { "stadiumId", "stageId", "tieId", "leg", "isNeutral" };
+                RequireFields(item, fixtureFields.Concat(additional).ToArray());
                 return new FixtureDefinition(Text(item, "id"), Number(item, "round"),
                     new GameDate(Number(item, "year"), Number(item, "month"), Number(item, "day")),
-                    Text(item, "homeClubId"), Text(item, "awayClubId"), version == 1 ? null : NullableText(item, "stadiumId"));
+                    Text(item, "homeClubId"), Text(item, "awayClubId"), version == 1 ? null : NullableText(item, "stadiumId"),
+                    version < 3 ? null : NullableText(item, "stageId"), version < 3 ? null : NullableText(item, "tieId"),
+                    version < 3 ? 1 : Number(item, "leg"), version >= 3 && Boolean(item, "isNeutral"));
             }).ToArray();
             var results = List(root, "results").Select(token => {
                 var item = Object(token);
@@ -98,6 +100,22 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                 version != 1 && Boolean(root, "dailyProgress"), version == 1 ? null : NullableDate(root, "currentDate"));
             var session = CompetitionSession.Restore(imported.Catalog, snapshot);
             return new RestoredChampionship(session, databaseJson, imported.VisualProfiles);
+        }
+
+        private static JObject WriteFixture(FixtureDefinition fixture, bool declarative)
+        {
+            var value = new JObject {
+                ["id"] = fixture.Id, ["round"] = fixture.Round,
+                ["year"] = fixture.Date.Year, ["month"] = fixture.Date.Month, ["day"] = fixture.Date.Day,
+                ["homeClubId"] = fixture.HomeClubId, ["awayClubId"] = fixture.AwayClubId,
+                ["stadiumId"] = fixture.StadiumId
+            };
+            if (declarative)
+            {
+                value["stageId"] = fixture.StageId; value["tieId"] = fixture.TieId;
+                value["leg"] = fixture.Leg; value["isNeutral"] = fixture.IsNeutral;
+            }
+            return value;
         }
 
         public static string Career(HubCareerProfile profile) => new JObject {

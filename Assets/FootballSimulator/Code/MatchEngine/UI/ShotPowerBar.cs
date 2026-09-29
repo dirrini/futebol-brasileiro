@@ -1,25 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
+using FStudio.MatchEngine.Input;
 
 namespace FStudio.MatchEngine.UI {
     /// <summary>
     /// A screen-space charge indicator owned by the existing input-pointer canvas.
     /// </summary>
     public sealed class ShotPowerBar {
-        private const float WIDTH = 76f;
-        private const float HEIGHT = 10f;
-        private const float MIN_SCREEN_SCALE = 0.8f;
-
-        private static readonly Color LOW_POWER_COLOR = new Color32(0x31, 0xD6, 0x6B, 0xFF);
-        private static readonly Color MID_POWER_COLOR = new Color32(0xFF, 0xD4, 0x47, 0xFF);
-        private static readonly Color FULL_POWER_COLOR = new Color32(0xF4, 0x43, 0x36, 0xFF);
-
+        private readonly MatchControlSettings settings;
         private readonly RectTransform parentRect;
         private readonly Canvas canvas;
         private readonly RectTransform root;
         private readonly Image fill;
 
         public ShotPowerBar(Transform parent) {
+            settings = MatchControlSettings.Current;
             parentRect = parent as RectTransform;
             canvas = parent.GetComponentInParent<Canvas>();
 
@@ -27,7 +22,7 @@ namespace FStudio.MatchEngine.UI {
             root = border.rectTransform;
             root.anchorMin = root.anchorMax = new Vector2(0.5f, 0.5f);
             root.pivot = new Vector2(0.5f, 0.5f);
-            root.sizeDelta = new Vector2(WIDTH, HEIGHT);
+            root.sizeDelta = settings.PowerBarSize;
 
             var background = CreateImage("Background", root, new Color32(0x12, 0x1B, 0x22, 0xF2));
             var backgroundRect = background.rectTransform;
@@ -36,7 +31,7 @@ namespace FStudio.MatchEngine.UI {
             backgroundRect.offsetMin = Vector2.one;
             backgroundRect.offsetMax = -Vector2.one;
 
-            fill = CreateImage("Fill", backgroundRect, LOW_POWER_COLOR);
+            fill = CreateImage("Fill", backgroundRect, settings.PowerColors.Evaluate(0));
             fill.rectTransform.anchorMin = Vector2.zero;
             fill.rectTransform.anchorMax = new Vector2(0f, 1f);
             fill.rectTransform.offsetMin = Vector2.zero;
@@ -55,9 +50,9 @@ namespace FStudio.MatchEngine.UI {
             var screenPosition = camera.WorldToScreenPoint(worldPosition);
             var canvasScale = canvas != null ? Mathf.Max(canvas.scaleFactor, 0.001f) : 1f;
             // Keep the meter readable when the existing 1920px canvas scales down.
-            var sizeScale = Mathf.Max(1f, MIN_SCREEN_SCALE / canvasScale);
-            var halfWidth = WIDTH * sizeScale * canvasScale * 0.5f;
-            var halfHeight = HEIGHT * sizeScale * canvasScale * 0.5f;
+            var sizeScale = Mathf.Max(1f, settings.MinimumScreenScale / canvasScale);
+            var halfWidth = settings.PowerBarSize.x * sizeScale * canvasScale * 0.5f;
+            var halfHeight = settings.PowerBarSize.y * sizeScale * canvasScale * 0.5f;
 
             if (screenPosition.z <= 0f ||
                 screenPosition.x < halfWidth || screenPosition.x > Screen.width - halfWidth ||
@@ -73,9 +68,7 @@ namespace FStudio.MatchEngine.UI {
 
             var power = Mathf.Clamp01(normalizedPower);
             fill.rectTransform.anchorMax = new Vector2(power, 1f);
-            fill.color = power <= 0.5f
-                ? Color.Lerp(LOW_POWER_COLOR, MID_POWER_COLOR, power * 2f)
-                : Color.Lerp(MID_POWER_COLOR, FULL_POWER_COLOR, (power - 0.5f) * 2f);
+            fill.color = settings.PowerColors.Evaluate(power);
 
             root.gameObject.SetActive(true);
         }

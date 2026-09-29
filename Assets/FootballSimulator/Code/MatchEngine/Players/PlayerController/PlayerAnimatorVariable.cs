@@ -38,6 +38,17 @@ namespace FStudio.MatchEngine.Players.PlayerController {
         GKDegage_L,
         // 
 
+        DivingHeader_R,
+        DivingHeader_L,
+        AerialHeader_R,
+        AerialHeader_L,
+        AerialLowHeader_R,
+        AerialLowHeader_L,
+        AerialVolley_R,
+        AerialVolley_L,
+        AerialBicycle_R,
+        AerialBicycle_L,
+
         ParameterCount // Parameter count of the animator.
     }
 }

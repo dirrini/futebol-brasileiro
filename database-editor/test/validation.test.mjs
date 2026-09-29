@@ -23,7 +23,7 @@ test('validator does not coerce, insert defaults, remove fields or mutate its in
 });
 
 test('validator rejects unsupported versions and unknown root properties', () => {
-  for (const value of [null, [], {}, { schemaVersion: 6 }, { schemaVersion: '2' }])
+  for (const value of [null, [], {}, { schemaVersion: 7 }, { schemaVersion: '2' }])
     assert.throws(() => validate(value), isError(422, 'unsupported_schema_version'));
   const document = fixture();
   document.competitions = [];

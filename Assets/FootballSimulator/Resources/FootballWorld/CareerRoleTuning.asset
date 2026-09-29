@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ba548ceca0623274b126d0698f7a7b8, type: 3}
+  m_Name: CareerRoleTuning
+  m_EditorClassIdentifier:
+  Profiles:
+  - Role: 1
+    AttackDepthOffset: 0.065
+    DefenceDepthOffset: 0
+    CentrePull: 0
+    WidthExpansion: 0
+    SupportToBall: 0.035
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 1.7
+    CrossingChance: 0.5
+    ShortPassPriority: 0
+    LongPassPriority: 0
+    ForwardPassPriority: 0.25
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 0
+    EarlyCross: 0
+    PreferLayoff: 0
+  - Role: 2
+    AttackDepthOffset: 0.055
+    DefenceDepthOffset: 0
+    CentrePull: 0
+    WidthExpansion: 0.2
+    SupportToBall: 0
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 1.35
+    CrossingChance: 2.4
+    ShortPassPriority: 0
+    LongPassPriority: 22
+    ForwardPassPriority: 0
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 0
+    EarlyCross: 1
+    PreferLayoff: 0
+  - Role: 3
+    AttackDepthOffset: 0.035
+    DefenceDepthOffset: 0
+    CentrePull: 0.55
+    WidthExpansion: 0
+    SupportToBall: 0.05
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 0.55
+    CrossingChance: 0.25
+    ShortPassPriority: 25
+    LongPassPriority: 0
+    ForwardPassPriority: 0.15
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 1
+    EarlyCross: 0
+    PreferLayoff: 0
+  - Role: 4
+    AttackDepthOffset: -0.045
+    DefenceDepthOffset: -0.025
+    CentrePull: 0
+    WidthExpansion: 0
+    SupportToBall: 0
+    MarkingWeight: 1.45
+    MarkingDistance: 0.7
+    JoinAttack: 0.2
+    CrossingChance: 0.4
+    ShortPassPriority: 15
+    LongPassPriority: 0
+    ForwardPassPriority: 0
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 0
+    EarlyCross: 0
+    PreferLayoff: 0
+  - Role: 5
+    AttackDepthOffset: -0.035
+    DefenceDepthOffset: 0
+    CentrePull: 0
+    WidthExpansion: 0
+    SupportToBall: 0.08
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 0.35
+    CrossingChance: 0.5
+    ShortPassPriority: 25
+    LongPassPriority: 0
+    ForwardPassPriority: 0.75
+    ReceivePassPriority: 18
+    LayoffPriority: 0
+    EarlyPass: 1
+    EarlyCross: 0
+    PreferLayoff: 0
+  - Role: 6
+    AttackDepthOffset: 0.015
+    DefenceDepthOffset: 0
+    CentrePull: 0
+    WidthExpansion: 0
+    SupportToBall: 0.1
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 0.6
+    CrossingChance: 0.6
+    ShortPassPriority: 25
+    LongPassPriority: 0
+    ForwardPassPriority: 1.1
+    ReceivePassPriority: 20
+    LayoffPriority: 0
+    EarlyPass: 1
+    EarlyCross: 0
+    PreferLayoff: 0
+  - Role: 7
+    AttackDepthOffset: -0.055
+    DefenceDepthOffset: 0
+    CentrePull: 0.25
+    WidthExpansion: 0
+    SupportToBall: 0.06
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 0.25
+    CrossingChance: 0.3
+    ShortPassPriority: 30
+    LongPassPriority: 0
+    ForwardPassPriority: -0.5
+    ReceivePassPriority: 35
+    LayoffPriority: 1.5
+    EarlyPass: 1
+    EarlyCross: 0
+    PreferLayoff: 1
+  - Role: 8
+    AttackDepthOffset: 0.035
+    DefenceDepthOffset: 0
+    CentrePull: 0
+    WidthExpansion: 0
+    SupportToBall: 0.12
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 1.4
+    CrossingChance: 0.4
+    ShortPassPriority: 0
+    LongPassPriority: 0
+    ForwardPassPriority: 0.4
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 0
+    EarlyCross: 0
+    PreferLayoff: 0
+  - Role: 9
+    AttackDepthOffset: 0.02
+    DefenceDepthOffset: 0
+    CentrePull: 0
+    WidthExpansion: 0.3
+    SupportToBall: 0
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 1.1
+    CrossingChance: 1.6
+    ShortPassPriority: 0
+    LongPassPriority: 15
+    ForwardPassPriority: 0
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 0
+    EarlyCross: 1
+    PreferLayoff: 0
+  - Role: 10
+    AttackDepthOffset: 0.055
+    DefenceDepthOffset: 0
+    CentrePull: 0.45
+    WidthExpansion: 0
+    SupportToBall: 0
+    MarkingWeight: 1
+    MarkingDistance: 1
+    JoinAttack: 1.35
+    CrossingChance: 0.25
+    ShortPassPriority: 15
+    LongPassPriority: 0
+    ForwardPassPriority: 0.6
+    ReceivePassPriority: 0
+    LayoffPriority: 0
+    EarlyPass: 0
+    EarlyCross: 0
+    PreferLayoff: 0

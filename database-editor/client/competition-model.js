@@ -22,7 +22,7 @@ export function changeFormat(document, edition, type) {
   edition.rules.type = type;
   edition.rules.version = 1;
   if (type === 'paulista-2026') {
-    document.schemaVersion = 5;
+    document.schemaVersion = Math.max(5, document.schemaVersion);
     edition.rules.legs = 1;
     edition.rules.points = { win: 3, draw: 1, loss: 0 };
     edition.rules.tieBreakers = [...paulistaTieBreakers];

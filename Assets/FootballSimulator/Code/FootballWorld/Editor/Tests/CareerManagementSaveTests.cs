@@ -103,7 +103,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             career.SimulateNextFixture();
             var old = JObject.Parse(GameSaveCodec.DailyCareer(fixture.Profile, career, fixture.Source));
             old["version"] = 2;
-            old.Remove("formation"); old.Remove("mentality"); old.Remove("offers");
+            old.Remove("formation"); old.Remove("mentality"); old.Remove("offers"); old.Remove("tactics");
             foreach (var item in old["news"].OfType<JObject>()) item.Remove("playerId");
             var restored = GameSaveCodec.RestoreDailyCareer(old.ToString(Formatting.None));
             Assert.That(restored.Session.Formation, Is.EqualTo(CareerFormation.FourFourTwo));
@@ -118,7 +118,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             Assert.That(restored.Session.Competition.Results.Count, Is.EqualTo(career.Competition.Results.Count));
             Assert.That(JToken.DeepEquals(JToken.Parse(restored.DatabaseJson), JToken.Parse(fixture.Source)), Is.True);
             var upgraded = JObject.Parse(GameSaveCodec.DailyCareer(restored.Profile, restored.Session, restored.DatabaseJson));
-            Assert.That((int)upgraded["version"], Is.EqualTo(3));
+            Assert.That((int)upgraded["version"], Is.EqualTo(4));
             Assert.That(GameSaveCodec.RestoreDailyCareer(upgraded.ToString(Formatting.None)).Session.Offers, Is.Empty);
         }
 
@@ -182,7 +182,7 @@ namespace FStudio.FootballWorld.Editor.Tests
                 "FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json"));
             var imported = new JsonDatabaseImporter().Import(source);
             Assert.That(imported.Success, Is.True, string.Join("; ", imported.Errors.Select(value => value.Message)));
-            var edition = imported.Catalog.CompetitionEditions.First(value => value.Rules.IsPaulista2026);
+            var edition = imported.Catalog.CompetitionEditions.First();
             var club = imported.Catalog.GetClub(edition.ParticipantClubIds[0]);
             var career = CareerSession.Create(imported.Catalog, edition.Id, "career-management-codec", club.Id, new GameDate(2026, 1, 1));
             Assert.That(career.FinanceBalance, Is.EqualTo(5000000));

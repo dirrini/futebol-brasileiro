@@ -8,7 +8,7 @@ import { DatabaseStore } from '../server/database-store.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const legacyPath = join(root, 'Assets/FootballSimulator/Code/FootballWorld/Tests/Fixtures/legacy-four-clubs.database.json');
-export const schemas = await Promise.all([1, 2, 3, 4, 5].map(async version => JSON.parse(await readFile(
+export const schemas = await Promise.all([1, 2, 3, 4, 5, 6].map(async version => JSON.parse(await readFile(
   join(root, `Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v${version}.schema.json`), 'utf8'))));
 const legacy = JSON.parse(await readFile(legacyPath, 'utf8'));
 export const validate = createValidator(schemas);

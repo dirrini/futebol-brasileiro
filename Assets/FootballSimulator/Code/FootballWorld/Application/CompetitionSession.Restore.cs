@@ -18,9 +18,9 @@ namespace FStudio.FootballWorld.Application
                 throw new ArgumentException("The save requires its exact authored database snapshot.", nameof(snapshot));
             var edition = catalog.GetCompetitionEdition(snapshot.EditionId);
             var session = new CompetitionSession(catalog, snapshot.EditionId, snapshot.SeasonId,
-                snapshot.ControlledClubId, edition.Rules.IsPaulista2026 ? edition.ScheduledFixtures : snapshot.Fixtures,
+                snapshot.ControlledClubId, edition.IsDeclarative ? Array.Empty<FixtureDefinition>() : edition.Rules.IsPaulista2026 ? edition.ScheduledFixtures : snapshot.Fixtures,
                 snapshot.DailyProgress, snapshot.CurrentDate);
-            if (!edition.Rules.IsPaulista2026)
+            if (!edition.IsDeclarative && !edition.Rules.IsPaulista2026)
                 ValidateLegacySchedule(session, snapshot);
             foreach (var executionId in snapshot.UsedExecutionIds)
                 if (!session.usedExecutionIds.Add(CompetitionIdentity.Validate(executionId)))
@@ -49,7 +49,7 @@ namespace FStudio.FootballWorld.Application
                 session.resultsById.Add(result.FixtureId, result);
                 session.EnsurePlayoffs();
             }
-            if (edition.Rules.IsPaulista2026)
+            if (edition.IsDeclarative || edition.Rules.IsPaulista2026)
                 ValidatePaulistaSnapshotFixtures(session, snapshot);
             session.ValidateRestoredProgress();
             // An interrupted match returns to pending; its execution stays used
@@ -69,7 +69,8 @@ namespace FStudio.FootballWorld.Application
                 remaining.Add(key, fixture);
             }
             foreach (var fixture in expected)
-                if (!remaining.TryGetValue(FixtureKey(fixture), out var saved) || !saved.Date.Equals(fixture.Date) || saved.StadiumId != null)
+                if (!remaining.TryGetValue(FixtureKey(fixture), out var saved) || !saved.Date.Equals(fixture.Date) || saved.StadiumId != null ||
+                    saved.StageId != null || saved.TieId != null || saved.Leg != 1 || saved.IsNeutral)
                     throw new ArgumentException("Saved fixtures do not match the edition's dates and pairings.");
         }
 
@@ -80,7 +81,8 @@ namespace FStudio.FootballWorld.Application
             var seen = new HashSet<string>(StringComparer.Ordinal);
             foreach (var saved in snapshot.Fixtures)
                 if (saved == null || !seen.Add(saved.Id) || !session.fixturesById.TryGetValue(saved.Id, out var expected) ||
-                    FixtureKey(saved) != FixtureKey(expected) || !saved.Date.Equals(expected.Date) || saved.StadiumId != expected.StadiumId)
+                    FixtureKey(saved) != FixtureKey(expected) || !saved.Date.Equals(expected.Date) || saved.StadiumId != expected.StadiumId ||
+                    saved.StageId != expected.StageId || saved.TieId != expected.TieId || saved.Leg != expected.Leg || saved.IsNeutral != expected.IsNeutral)
                     throw new ArgumentException("Saved fixtures do not match the authored calendar or qualified knockout bracket.");
         }
 
@@ -94,9 +96,21 @@ namespace FStudio.FootballWorld.Application
             }
             if (DailyProgress)
             {
+                if (Edition.IsDeclarative && CurrentDate.Value.CompareTo(Edition.EndDate) > 0) throw new ArgumentException("The saved calendar exceeds this edition.");
                 foreach (var fixture in fixtures)
                     if (fixture.Date.CompareTo(CurrentDate.Value) < 0 && !resultsById.ContainsKey(fixture.Id))
                         throw new ArgumentException("The daily calendar cannot skip pending fixtures.");
+            }
+            else if (Edition.IsDeclarative)
+            {
+                var missingDate = false;
+                foreach (var day in fixtures.GroupBy(value => value.Date).OrderBy(value => value.Key))
+                {
+                    var completed = day.Count(value => resultsById.ContainsKey(value.Id));
+                    if (completed != 0 && (missingDate || completed != day.Count()))
+                        throw new ArgumentException("A declarative championship snapshot must finish calendar days in order.");
+                    if (completed == 0) missingDate = true;
+                }
             }
             else if (!Edition.Rules.IsPaulista2026)
             {

@@ -2,6 +2,8 @@
 
 Abra [localhost:8080](http://localhost:8080) após `./scripts/webgl.ps1`.
 O hub UGUI/TextMeshPro oferece Quick match, Championship, Career e Options.
+Os comandos de passe, corrida, marcação, goleiro e finalização estão em
+[Controles da partida 3D](README-MATCH-CONTROLS.md).
 
 ## Quick match
 
@@ -70,11 +72,11 @@ A competição e a carreira fixam o JSON completo da revisão ao nascer. Editar 
 [editor da base](http://localhost:8080/editor/) e dar refresh oferece o conteúdo
 para novas sessões, sem mudar uma temporada em andamento.
 
-Campeonatos usam formato 2; carreiras diárias usam formato 3, acrescentando tática
+Campeonatos declarativos usam formato 3 (legados continuam no 2); carreiras diárias usam formato 4, acrescentando posições e funções individuais à tática
 e propostas aos dias, resultados, treino, finanças e notícias. Carreiras diárias
-v2 e saves anteriores de formato 1 continuam aceitos. O armazenamento usa
+v2/v3 e saves anteriores de formato 1 continuam aceitos. O armazenamento usa
 dois slots por modo e compressão GZip; só troca o slot ativo depois de gravar.
-Há limites de **2 MiB descomprimidos** e **112 KiB por slot armazenado**. A quota
+Há limites de **8 MiB descomprimidos** e **112 KiB por slot armazenado**. A quota
 real do navegador ainda pode rejeitar uma escrita: o jogo avisa e preserva o
 último save confirmado. Não há recuperação automática de um slot corrompido.
 Limpar dados do site apaga o progresso; localhost e 127.0.0.1 são origens distintas.
@@ -84,3 +86,9 @@ adapta a partida; Presentation apenas exibe consultas e envia comandos. Layout,
 fontes, cores, tema, retratos e textos ficam nos prefabs/assets autorados. O comando
 **Create game hub assets** acrescenta os controles novos preservando os existentes.
 Escudos, uniformes e modelos pertencem ao build; o save não arquiva suas versões.
+
+## Regulamentos e inspeção da equipe
+
+Novas competições usam as fases declarativas configuradas no editor, incluindo grupos por posições da fase anterior e playoffs dos derrotados. A fase que concede o título é explícita; vagas e prêmios são processados separadamente. Saves existentes conservam seu regulamento original.
+
+Na carreira, **Tática** mostra a formação em campo e a prévia dos onze escolhidos pelo planejador. Mudar a formação mostra um rascunho; o botão de aplicar confirma. **Elenco** e **Mercado** usam uma ficha com identidade, posições naturais e quinze atributos agrupados, na escala real 0–100. O layout foi inspirado nas referências fornecidas, sem inventar retratos, potencial, histórico ou estatísticas ausentes.

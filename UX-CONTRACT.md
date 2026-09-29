@@ -165,9 +165,13 @@ e no XI automático quando escolhidas pelo adaptador. Transferências aceitas e
 recusadas também geram notícias fictícias; a taxa aceita aparece no extrato.
 
 Tática tem rascunho local preservado ao sair e voltar, com indicação de alterações
-pendentes. Salvar é explícito e aplica formação e postura às próximas partidas.
-O XI exibido corresponde ao padrão salvo e identifica as posições naturais dos
-jogadores; não promete escalação manual. No fim do calendário, consultas continuam,
+pendentes. Salvar é explícito e aplica formação, postura, posições e funções às próximas partidas.
+O campo e o XI exibidos mostram a prévia do rascunho tático. A partida só usa
+as escolhas após Salvar. Arrastar ajusta a vaga do XI automático, com limites por
+posição; não troca titulares. Selecionar um marcador ou linha do XI mostra as
+funções compatíveis com aquela posição. Restaurar uma posição ou todas mantém
+o estado como rascunho; trocar formação reinicia posições/funções e trocar postura
+as preserva. No fim do calendário, consultas continuam,
 mas editar tática, enviar e cancelar propostas ficam desabilitados com motivo claro.
 
 Todos os textos dessas telas têm chaves PT/EN. A largura reservada ao rodapé não é

@@ -22,16 +22,18 @@ namespace FStudio.FootballWorld.Application
         public IReadOnlyList<FixtureResult> Results { get; }
         public bool DailyProgress { get; }
         public GameDate? CurrentDate { get; private set; }
-        public IReadOnlyList<StandingRow> Standings => StandingsCalculator.Calculate(Edition.ParticipantClubIds, Edition.Rules, results, SeasonId);
-        public IReadOnlyList<StandingRow> LeagueStandings => StandingsCalculator.Calculate(Edition.ParticipantClubIds, Edition.Rules,
+        public IReadOnlyList<StandingRow> Standings => Edition.IsDeclarative ? GetStageStandings(CurrentStageId) : StandingsCalculator.Calculate(Edition.ParticipantClubIds, Edition.Rules, results, SeasonId);
+        public IReadOnlyList<StandingRow> LeagueStandings => Edition.IsDeclarative ? GetStageStandings(Edition.Format.Stages[0].Id) : StandingsCalculator.Calculate(Edition.ParticipantClubIds, Edition.Rules,
             results.Where(value => fixturesById[value.FixtureId].Round <= Edition.RoundDates.Count), SeasonId);
-        public bool IsComplete => results.Count == fixtures.Count && (!Edition.Rules.IsPaulista2026 || fixtures.Any(value => value.Round == 12));
+        public bool IsComplete => results.Count == fixtures.Count && (Edition.IsDeclarative ? activatedStages.Count == Edition.Format.Stages.Count : !Edition.Rules.IsPaulista2026 || fixtures.Any(value => value.Round == 12));
         public FixtureDefinition NextFixture => GetNextFixture(ControlledClubId);
         public FixtureExecution ActiveExecution { get; private set; }
         public CompetitionPhase Phase => IsComplete ? CompetitionPhase.Complete : GetPhase(fixtures.First(value => !resultsById.ContainsKey(value.Id)));
-        public string ChampionClubId => !IsComplete ? null : Edition.Rules.IsPaulista2026
+        public string ChampionClubId => Edition.IsDeclarative
+            ? Edition.Format.ChampionStageId != null && IsStageComplete(Edition.Format.ChampionStageId) ? GetStageStandings(Edition.Format.ChampionStageId)[0].ClubId : null
+            : !IsComplete ? null : Edition.Rules.IsPaulista2026
             ? FinalWinner() : Standings.Count(value => value.Rank == 1) == 1 ? Standings[0].ClubId : null;
-        public IReadOnlyList<string> RelegatedClubIds => Edition.Rules.IsPaulista2026 && RoundComplete(8)
+        public IReadOnlyList<string> RelegatedClubIds => Edition.IsDeclarative ? QualifiedOutcomes.Where(value => value.Kind == "relegation").Select(value => value.ClubId).Distinct().ToList().AsReadOnly() : Edition.Rules.IsPaulista2026 && RoundComplete(8)
             ? LeagueStandings.Skip(14).Select(value => value.ClubId).ToList().AsReadOnly() : new List<string>().AsReadOnly();
 
         private CompetitionSession(DatabaseCatalog catalog, string editionId, string seasonId, string controlledClubId,
@@ -49,6 +51,7 @@ namespace FStudio.FootballWorld.Application
             foreach (var fixture in initialFixtures) AddFixture(fixture);
             Fixtures = fixtures.AsReadOnly();
             Results = results.AsReadOnly();
+            if (Edition.IsDeclarative) ActivateDeclarativeStage(0, Edition.ParticipantClubIds);
         }
 
         public static CompetitionSession Create(DatabaseCatalog catalog, string editionId, string seasonId,
@@ -57,7 +60,7 @@ namespace FStudio.FootballWorld.Application
             if (catalog == null) throw new ArgumentNullException(nameof(catalog));
             var edition = catalog.GetCompetitionEdition(editionId);
             return new CompetitionSession(catalog, editionId, seasonId, controlledClubId,
-                edition.Rules.IsPaulista2026 ? edition.ScheduledFixtures : RoundRobinScheduler.CreateFixtures(edition, nextFixtureId));
+                edition.IsDeclarative ? Array.Empty<FixtureDefinition>() : edition.Rules.IsPaulista2026 ? edition.ScheduledFixtures : RoundRobinScheduler.CreateFixtures(edition, nextFixtureId));
         }
 
         public static CompetitionSession CreateDaily(DatabaseCatalog catalog, string editionId, string seasonId,
@@ -68,18 +71,33 @@ namespace FStudio.FootballWorld.Application
             if (startDate.CompareTo(edition.StartDate) > 0)
                 throw new ArgumentException("A new daily season must start before its first round.", nameof(startDate));
             return new CompetitionSession(catalog, editionId, seasonId, controlledClubId,
-                edition.Rules.IsPaulista2026 ? edition.ScheduledFixtures : RoundRobinScheduler.CreateFixtures(edition), true, startDate);
+                edition.IsDeclarative ? Array.Empty<FixtureDefinition>() : edition.Rules.IsPaulista2026 ? edition.ScheduledFixtures : RoundRobinScheduler.CreateFixtures(edition), true, startDate);
         }
 
         public CompetitionPhase GetPhase(FixtureDefinition fixture)
         {
             if (fixture == null) throw new ArgumentNullException(nameof(fixture));
+            if (Edition.IsDeclarative)
+            {
+                var stage = Edition.Format.Stages.Single(value => value.Id == fixture.StageId);
+                if (stage.Kind == "league") return CompetitionPhase.League;
+                var count = Edition.Format.GetStageParticipantCount(stage.Id);
+                return count == 2 ? CompetitionPhase.Final : count == 4 ? CompetitionPhase.SemiFinal : CompetitionPhase.QuarterFinal;
+            }
             if (!Edition.Rules.IsPaulista2026 || fixture.Round <= 8) return CompetitionPhase.League;
             return fixture.Round == 9 ? CompetitionPhase.QuarterFinal : fixture.Round == 10 ? CompetitionPhase.SemiFinal : CompetitionPhase.Final;
         }
 
         public FixtureDefinition GetNextFixture(string clubId)
-            => fixtures.FirstOrDefault(fixture => fixture.IncludesClub(clubId) && !resultsById.ContainsKey(fixture.Id));
+        {
+            var next = fixtures.FirstOrDefault(fixture => fixture.IncludesClub(clubId) && !resultsById.ContainsKey(fixture.Id));
+            // An earlier AI game can activate another branch and create a nearer
+            // controlled fixture. Do not let a championship jump over that date.
+            // Daily sessions resolve those games while advancing their calendar.
+            if (Edition.IsDeclarative && !DailyProgress && clubId == ControlledClubId && next != null &&
+                fixtures.Any(value => !resultsById.ContainsKey(value.Id) && value.Date.CompareTo(next.Date) < 0)) return null;
+            return next;
+        }
         public FixtureResult GetResult(string fixtureId) => resultsById.TryGetValue(fixtureId, out var result) ? result : null;
         public FixtureExecution BeginFixture(string fixtureId, string executionId = null)
             => BeginFixtureInternal(fixtureId, executionId, false, false);
@@ -96,7 +114,7 @@ namespace FStudio.FootballWorld.Application
             {
                 if (NextFixture?.Id != fixtureId) throw new InvalidOperationException("Play the controlled club's next fixture first.");
             }
-            else if (!DailyProgress && !allowRound && fixture.Round > SimulatableRound())
+            else if (!DailyProgress && !allowRound && (Edition.IsDeclarative ? !WithinCompletedControlledDate(fixture) : fixture.Round > SimulatableRound()))
                 throw new InvalidOperationException("Other results are applied only after the controlled match finishes.");
             executionId = CompetitionIdentity.Validate(executionId ?? "execution-" + Guid.NewGuid().ToString("N"));
             if (!usedExecutionIds.Add(executionId)) throw new InvalidOperationException("Execution IDs cannot be reused.");
@@ -158,6 +176,7 @@ namespace FStudio.FootballWorld.Application
             if (!DailyProgress) throw new InvalidOperationException("Calendar advancement requires a daily competition.");
             if (ActiveExecution != null) throw new InvalidOperationException("Finish or abandon the active match before advancing.");
             if (targetDate.CompareTo(CurrentDate.Value) < 0) throw new ArgumentException("The calendar cannot move backwards.", nameof(targetDate));
+            if (Edition.IsDeclarative && targetDate.CompareTo(Edition.EndDate) > 0) throw new ArgumentException("The calendar cannot advance beyond this edition.", nameof(targetDate));
             var before = results.Count;
             while (true)
             {
@@ -176,13 +195,21 @@ namespace FStudio.FootballWorld.Application
         {
             if (ActiveExecution != null) throw new InvalidOperationException("Finish or abandon the active match before simulating.");
             if (IsComplete) return 0;
+            if (Edition.IsDeclarative)
+            {
+                var firstPending = fixtures.First(value => !resultsById.ContainsKey(value.Id));
+                var cutoff = fixtures.Where(value => value.StageId == firstPending.StageId && value.Round == firstPending.Round).Max(value => value.Date);
+                if (DailyProgress) return SimulateThrough(cutoff, true);
+                if (NextFixture == null) return SimulateAwaitingDeclarativeFixtures(cutoff);
+                return SimulateDeclarativeThrough(cutoff);
+            }
             var round = fixtures.Where(value => !resultsById.ContainsKey(value.Id)).Min(value => value.Round);
             if (DailyProgress)
                 return SimulateThrough(fixtures.Where(value => value.Round == round).Max(value => value.Date), true);
             // A legacy odd-team league can begin with a bye for the user. Finish
             // through their next game so the existing whole-round save invariant
             // is retained rather than persisting AI results ahead of that club.
-            if (!Edition.Rules.IsPaulista2026) round = NextFixture?.Round ?? Edition.RoundDates.Count;
+            if (!Edition.IsDeclarative && !Edition.Rules.IsPaulista2026) round = NextFixture?.Round ?? Edition.RoundDates.Count;
             var before = results.Count;
             foreach (var fixture in fixtures.Where(value => value.Round <= round).ToArray())
                 if (!resultsById.ContainsKey(fixture.Id)) SimulateFixtureInternal(fixture.Id, true);
@@ -193,14 +220,56 @@ namespace FStudio.FootballWorld.Application
         {
             var completed = results.Where(result => fixturesById[result.FixtureId].IncludesClub(ControlledClubId)).ToArray();
             if (completed.Length == 0) return 0;
-            return !Edition.Rules.IsPaulista2026 && NextFixture == null ? Edition.RoundDates.Count : completed.Max(result => fixturesById[result.FixtureId].Round);
+            return !Edition.IsDeclarative && !Edition.Rules.IsPaulista2026 && NextFixture == null ? Edition.RoundDates.Count : completed.Max(result => fixturesById[result.FixtureId].Round);
         }
 
         private void CompleteOtherFixtures()
         {
+            if (Edition.IsDeclarative)
+            {
+                var completed = results.Where(value => fixturesById[value.FixtureId].IncludesClub(ControlledClubId)).ToArray();
+                if (completed.Length == 0) return;
+                SimulateDeclarativeThrough(completed.Max(value => fixturesById[value.FixtureId].Date), false);
+                return;
+            }
             var throughRound = SimulatableRound();
             foreach (var fixture in fixtures.Where(value => !value.IncludesClub(ControlledClubId) && value.Round <= throughRound).ToArray())
                 if (!resultsById.ContainsKey(fixture.Id)) SimulateFixtureInternal(fixture.Id, true);
+        }
+
+        private bool WithinCompletedControlledDate(FixtureDefinition fixture)
+        {
+            var completed = results.Where(value => fixturesById[value.FixtureId].IncludesClub(ControlledClubId)).ToArray();
+            return completed.Length > 0 && fixture.Date.CompareTo(completed.Max(value => fixturesById[value.FixtureId].Date)) <= 0;
+        }
+
+        private int SimulateDeclarativeThrough(GameDate cutoff, bool includeControlled = true)
+        {
+            var before = results.Count;
+            while (true)
+            {
+                var pending = fixtures.FirstOrDefault(value => !resultsById.ContainsKey(value.Id) && value.Date.CompareTo(cutoff) <= 0 &&
+                    (includeControlled || !value.IncludesClub(ControlledClubId)));
+                if (pending == null) break;
+                SimulateFixtureInternal(pending.Id, true);
+            }
+            return results.Count - before;
+        }
+
+        private int SimulateAwaitingDeclarativeFixtures(GameDate cutoff)
+        {
+            var before = results.Count;
+            while (true)
+            {
+                var pending = fixtures.FirstOrDefault(value => !resultsById.ContainsKey(value.Id));
+                if (pending == null || pending.Date.CompareTo(cutoff) > 0) break;
+                var controlled = fixtures.FirstOrDefault(value => value.IncludesClub(ControlledClubId) && !resultsById.ContainsKey(value.Id));
+                // Stop when a played fixture becomes available, including one
+                // that was generated by the result just simulated in this loop.
+                if (controlled != null && pending.Date.CompareTo(controlled.Date) >= 0) break;
+                SimulateFixtureInternal(pending.Id, true);
+            }
+            return results.Count - before;
         }
 
         private void AddFixture(FixtureDefinition fixture)

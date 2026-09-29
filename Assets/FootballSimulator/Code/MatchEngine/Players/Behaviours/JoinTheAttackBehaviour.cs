@@ -33,6 +33,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
        
 
         public override bool Behave (bool isAlreadyActive) {
+            if (Player.MatchPlayer.RoleTactics.JoinAttack <= 0) return false;
             if (!ShouldIAttackWhenNotHoldingTheBall ()) {
                 return false;
             }
@@ -76,10 +77,15 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
                 // do that by progress of the ball position on X
                 tacticalPosition.x = Mathf.Lerp(tacticalPosition.x, targetX, 
-                    joinPower * 
-                    Player.GameTeam.Team.TeamTactics.JoinAttackPowerByFieldProgressCurve.Evaluate (ballProgress));
+                    Mathf.Clamp01(joinPower *
+                    Player.GameTeam.Team.TeamTactics.JoinAttackPowerByFieldProgressCurve.Evaluate (ballProgress)) *
+                    Player.MatchPlayer.RoleTactics.JoinAttack);
 
                 tacticalPosition = Vector3.Lerp(tacticalPosition, targetGoalNetPosition, lerper);
+                var role = Player.MatchPlayer.RoleTactics;
+                tacticalPosition.z = FStudio.MatchEngine.Tactics.PlayerTacticalInstruction.ApplyWidth(
+                    tacticalPosition.z, fieldEndY, role.CentrePull, role.WidthExpansion);
+                if (role != FStudio.MatchEngine.Tactics.RoleTacticalSettings.Standard) KeepInField(ref tacticalPosition);
 
                 isAlreadyActive = true;
             }

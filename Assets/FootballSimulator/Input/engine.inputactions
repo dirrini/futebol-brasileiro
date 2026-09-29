@@ -88,8 +88,17 @@
                 },
                 {
                     "name": "ThroughtPass",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "d2534aff-72e2-4aa5-a7b1-2189e31cb4aa",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Sprint",
+                    "type": "PassThrough",
+                    "id": "6ca54c25-b855-446c-b632-dbe53c5a3b2c",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -259,39 +268,6 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse;Touch",
                     "action": "Pass",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ed71d1cd-c2a2-42d0-a2da-99835087d553",
-                    "path": "<XInputController>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XBoxController",
-                    "action": "Tackle",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2257f9ba-6d1d-4a6d-9aaf-36f362520053",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Tackle",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "22d9c3b1-58ff-4e40-880b-e19c69f95fdf",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse;Touch",
-                    "action": "Tackle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -490,6 +466,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse;Touch",
                     "action": "ThroughtPass",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9cd3a9c8-2ea4-406c-802e-91b31a9718d6",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad;XBoxController;Touch",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ccb81f91-3329-42e2-84b1-01e7eb6738d3",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

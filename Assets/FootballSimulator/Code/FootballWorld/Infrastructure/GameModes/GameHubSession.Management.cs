@@ -14,9 +14,10 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         private DatabaseCatalog careerAdapterCatalog;
         private CareerFormation careerAdapterFormation;
         private CareerMentality careerAdapterMentality;
+        private CareerTacticPlan careerAdapterTacticPlan;
         private static CatalogMatchAdapter CreateCareerAdapter(CareerSession career, IReadOnlyList<VisualProfileData> profiles)
             => new CatalogMatchAdapter(career.EffectiveCatalog, profiles, LoadBindings(),
-                new CareerMatchOptions(career.Competition.ControlledClubId, career.Formation, career.Mentality));
+                new CareerMatchOptions(career.Competition.ControlledClubId, career.Formation, career.Mentality, career.TacticPlan));
 
         // Rebuild for a lineup preview or match only when career choices change.
         // The effective roster and tactics are
@@ -24,7 +25,8 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         private void RefreshCareerAdapter()
         {
             if (careerAdapter != null && ReferenceEquals(careerAdapterCatalog, careerSession.EffectiveCatalog)
-                && careerAdapterFormation == careerSession.Formation && careerAdapterMentality == careerSession.Mentality) return;
+                && careerAdapterFormation == careerSession.Formation && careerAdapterMentality == careerSession.Mentality
+                && ReferenceEquals(careerAdapterTacticPlan, careerSession.TacticPlan)) return;
             var replacement = CreateCareerAdapter(careerSession, careerVisualProfiles);
             if (replacement.Teams.Any(team => careerSession.Competition.Edition.ParticipantClubIds.Contains(team.ClubId) && !team.CanPlay))
             {
@@ -41,6 +43,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             careerAdapterCatalog = careerSession.EffectiveCatalog;
             careerAdapterFormation = careerSession.Formation;
             careerAdapterMentality = careerSession.Mentality;
+            careerAdapterTacticPlan = careerSession.TacticPlan;
         }
 
         public IReadOnlyList<PlayerDefinition> GetCareerStartingLineup()
@@ -59,6 +62,16 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             }
         }
 
+        public IReadOnlyList<PlayerDefinition> GetCareerLineupPreview(CareerFormation formation)
+        {
+            if (careerSession == null) return Array.Empty<PlayerDefinition>();
+            var options = new CareerMatchOptions(careerSession.Competition.ControlledClubId, formation, careerSession.Mentality);
+            var slots = FStudio.Data.FormationRules.GetTeamFormation(options.LegacyFormation).Positions
+                .Select(CatalogMatchAdapter.ToCatalogPosition).ToArray();
+            var plan = LineupPlanner.Plan(careerSession.EffectiveCatalog, careerSession.Competition.ControlledClubId, slots);
+            return plan.Success ? plan.Players : Array.Empty<PlayerDefinition>();
+        }
+
         public bool SubmitCareerOffer(string playerId, long amount)
         {
             if (careerSession == null || IsBusy) return false;
@@ -72,7 +85,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                 if (!careerSession.CancelOffer(offerId)) throw new InvalidOperationException("Offer is no longer pending.");
             }, "career.offerCancelled", "career.offerUnavailable");
 
-        public bool SetCareerTactics(string formationId, string mentalityId)
+        public bool SetCareerTactics(string formationId, string mentalityId, CareerTacticPlan tacticPlan = null)
         {
             CareerFormation formation;
             CareerMentality mentality;
@@ -90,7 +103,31 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                 case "Attacking": mentality = CareerMentality.Attacking; break;
                 default: return ManagementError("career.actionUnavailable");
             }
-            return ChangeCareerManagement(() => careerSession.SetTactics(formation, mentality), "career.tacticsSaved", "career.actionUnavailable");
+            if (careerSession == null || IsBusy) return false;
+            var previousFormation = careerSession.Formation;
+            var previousMentality = careerSession.Mentality;
+            var previousPlan = careerSession.TacticPlan;
+            statusKey = null; statusDetails = null;
+            try { careerSession.SetTactics(formation, mentality, tacticPlan); }
+            catch (Exception exception)
+            {
+                Debug.LogWarning("[FootballWorld] Tactical change rejected: " + exception.Message);
+                return ManagementError("career.actionUnavailable");
+            }
+            var persisted = false;
+            try { persisted = PersistCareer(); }
+            catch (Exception exception)
+            { Debug.LogWarning("[FootballWorld] Tactical change could not be saved: " + exception.Message); }
+            if (!persisted)
+            {
+                // Keep the same career instance so the tactical page retains its
+                // immutable draft and can retry Save after storage recovers.
+                careerSession.SetTactics(previousFormation, previousMentality, previousPlan);
+                return ManagementError("save.save_failed");
+            }
+            statusKey = "career.tacticsSaved";
+            Changed?.Invoke();
+            return true;
         }
 
         private bool ChangeCareerManagement(Action command, string successKey, string errorKey)

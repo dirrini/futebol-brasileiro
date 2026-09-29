@@ -14,7 +14,7 @@ namespace FStudio.FootballWorld.Presentation
         public void Bind(HubStandingView value, bool isUser)
         {
             rank.text = value.Rank.ToString();
-            club.text = value.ClubName;
+            club.text = value.GroupName == null ? value.ClubName : value.GroupName + " · " + value.ClubName;
             played.text = value.Played.ToString();
             won.text = value.Won.ToString();
             drawn.text = value.Drawn.ToString();

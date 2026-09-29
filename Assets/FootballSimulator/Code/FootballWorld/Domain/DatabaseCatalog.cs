@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FStudio.FootballWorld.Domain
 {
-    public sealed class DatabaseCatalog
+    public sealed partial class DatabaseCatalog
     {
         private readonly Dictionary<string, ClubDefinition> clubsById;
         private readonly Dictionary<string, PlayerDefinition> playersById;
@@ -21,6 +21,7 @@ namespace FStudio.FootballWorld.Domain
         public IReadOnlyList<CountryDefinition> Countries { get; }
         public IReadOnlyList<StadiumDefinition> Stadiums { get; }
         public DatabaseSnapshotDefinition Snapshot { get; }
+        public IReadOnlyList<CompetitionFormatDefinition> CompetitionFormats { get; }
 
         public DatabaseCatalog(
             string databaseId,
@@ -31,7 +32,7 @@ namespace FStudio.FootballWorld.Domain
             IEnumerable<CompetitionDefinition> competitions = null,
             IEnumerable<CompetitionEditionDefinition> competitionEditions = null,
             IEnumerable<CountryDefinition> countries = null, IEnumerable<StadiumDefinition> stadiums = null,
-            DatabaseSnapshotDefinition snapshot = null)
+            DatabaseSnapshotDefinition snapshot = null, IEnumerable<CompetitionFormatDefinition> competitionFormats = null)
         {
             DatabaseId = DomainValidation.Id(databaseId, nameof(databaseId));
             DatabaseRevision = DomainValidation.InRange(databaseRevision, 1, int.MaxValue, nameof(databaseRevision));
@@ -176,6 +177,13 @@ namespace FStudio.FootballWorld.Domain
                     throw new ArgumentException("Birth date cannot be after the observation date.", nameof(players));
             }
             Countries = countrySnapshot.AsReadOnly(); Stadiums = stadiumSnapshot.AsReadOnly(); Snapshot = snapshot;
+            var formats = new List<CompetitionFormatDefinition>(competitionFormats ?? Array.Empty<CompetitionFormatDefinition>());
+            if (formats.Count > 128) throw new ArgumentException("The catalog exceeds the competition format limit.");
+            var formatIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var format in formats)
+                if (format == null || !formatIds.Add(format.Id)) throw new ArgumentException("Format IDs must be distinct and non-null.");
+            CompetitionFormats = formats.AsReadOnly();
+            ValidateCompetitionDefinitions(codes, competitionIds);
         }
 
         public StadiumDefinition GetStadium(string stadiumId)

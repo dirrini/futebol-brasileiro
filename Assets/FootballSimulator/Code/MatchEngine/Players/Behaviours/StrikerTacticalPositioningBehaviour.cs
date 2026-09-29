@@ -29,9 +29,9 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
             var ballX = ball.transform.position.x - goalNet.Direction.x;
             // dont stay behind the ball.
-            if (goalNet.Direction.x > 0 && tacticalPosition.x < ballX) {
+            if (!Player.MatchPlayer.RoleTactics.PreferLayoff && goalNet.Direction.x > 0 && tacticalPosition.x < ballX) {
                 tacticalPosition.x = ballX;
-            } else if (goalNet.Direction.x < 0 && tacticalPosition.x > ballX) {
+            } else if (!Player.MatchPlayer.RoleTactics.PreferLayoff && goalNet.Direction.x < 0 && tacticalPosition.x > ballX) {
                 tacticalPosition.x = ballX;
             }
 

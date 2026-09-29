@@ -31,6 +31,18 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         public string AwayClubId { get; }
         public IReadOnlyList<CatalogPlayerIdentity> Players { get; }
         public bool IsDisposed { get; private set; }
+        // Portable competition context for the match adapter. The legacy engine
+        // currently has no bench/substitution flow or external stadium loader.
+        public FixtureDefinition CompetitionFixture { get; private set; }
+        public CompetitionMatchRules CompetitionRules { get; private set; }
+
+        public void SetCompetitionContext(FixtureDefinition fixture, CompetitionMatchRules rules)
+        {
+            if (IsDisposed || CompetitionFixture != null) throw new InvalidOperationException("Match context is already fixed or released.");
+            if (fixture == null || fixture.HomeClubId != HomeClubId || fixture.AwayClubId != AwayClubId)
+                throw new ArgumentException("Competition fixture must match this lease's clubs.", nameof(fixture));
+            CompetitionFixture = fixture; CompetitionRules = rules;
+        }
 
         internal CatalogMatchLease(MatchCreateRequest request, DatabaseCatalog catalog,
             string homeClubId, string awayClubId, IEnumerable<CatalogPlayerIdentity> players)

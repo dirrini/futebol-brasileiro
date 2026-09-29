@@ -207,8 +207,9 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                 if (viewingCareerCompetition) RefreshCareerAdapter();
                 var adapter = viewingCareerCompetition ? careerAdapter : seasonAdapter;
                 var fixture = target.NextFixture;
-                if (!adapter.TryCreateMatch(fixture.HomeClubId, fixture.AwayClubId, out var lease, out var error))
-                    throw new InvalidOperationException(error);
+                  if (!adapter.TryCreateMatch(fixture.HomeClubId, fixture.AwayClubId, out var lease, out var error))
+                      throw new InvalidOperationException(error);
+                  lease.SetCompetitionContext(fixture, target.Edition.IsDeclarative ? target.Edition.Format.MatchRules : null);
                 ApplyCareerPreparation(lease);
                 try { execution = target.BeginFixture(fixture.Id); }
                 catch { lease.Dispose(); throw; }

@@ -4,7 +4,8 @@ using UnityEngine.UI;
 
 namespace FStudio.FootballWorld.Presentation
 {
-    public enum GameHubColorRole { Background, Surface, White, Ink, Muted, Primary, Accent, Line, Danger }
+    public enum GameHubColorRole { Background, Surface, White, Ink, Muted, Primary, Accent, Line, Danger,
+        InspectionPanel, InspectionRow, InspectionText, InspectionMuted, PitchSurface, PitchMarking }
 
     // Explicit Editor application preserves authored layout/text. No runtime layout/theme reconstruction occurs.
     public sealed class GameHubThemeBinding : MonoBehaviour
@@ -30,6 +31,12 @@ namespace FStudio.FootballWorld.Presentation
                 case GameHubColorRole.Accent: graphic.color = Theme.Accent; break;
                 case GameHubColorRole.Line: graphic.color = Theme.Line; break;
                 case GameHubColorRole.Danger: graphic.color = Theme.Danger; break;
+                case GameHubColorRole.InspectionPanel: graphic.color = Theme.InspectionPanel; break;
+                case GameHubColorRole.InspectionRow: graphic.color = Theme.InspectionRow; break;
+                case GameHubColorRole.InspectionText: graphic.color = Theme.InspectionText; break;
+                case GameHubColorRole.InspectionMuted: graphic.color = Theme.InspectionMuted; break;
+                case GameHubColorRole.PitchSurface: graphic.color = Theme.PitchSurface; break;
+                case GameHubColorRole.PitchMarking: graphic.color = Theme.PitchMarking; break;
             }
             if (UseFont && graphic is TMP_Text text) text.font = Theme.Font;
             var selectable = GetComponent<Selectable>();

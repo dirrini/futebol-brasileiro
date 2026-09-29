@@ -5,6 +5,7 @@ O Docker Compose empacota o resultado em Nginx e o disponibiliza em
 [http://localhost:8080](http://localhost:8080). O jogo roda no navegador.
 O mesmo endereço oferece o [editor da base](http://localhost:8080/editor/), servido
 por uma aplicação Node separada através do Nginx.
+Para testar com teclado ou gamepad, consulte [Controles da partida 3D](README-MATCH-CONTROLS.md).
 
 Este é o fluxo escolhido para o projeto: utiliza a ativação existente do
 Unity Hub e não precisa de Unity, licença ou senha dentro de um container.

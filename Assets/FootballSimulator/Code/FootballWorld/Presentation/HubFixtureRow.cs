@@ -13,7 +13,9 @@ namespace FStudio.FootballWorld.Presentation
 
         public void Bind(HubFixtureView value)
         {
-            date.text = GameText.FormatDate(value.Date) + " · " + (value.Phase == "League" ? GameText.Get("hub.round", value.Round) : GameText.Get("phase." + value.Phase));
+            date.text = GameText.FormatDate(value.Date) + " · " + (value.AuthoredStageName ??
+                (value.Phase == "League" ? GameText.Get("hub.round", value.Round) : GameText.Get("phase." + value.Phase)));
+            if (value.IsNeutral) date.text += " · " + GameText.Get("hub.neutralVenue");
             if (value.IsCompleted) date.text += " · " + GameText.Get(value.IsSimulated ? "hub.simulated" : "hub.played");
             if (value.HomePenalties.HasValue) date.text += " · " + GameText.Get("hub.penalties", value.HomePenalties, value.AwayPenalties);
             home.text = value.HomeName;

@@ -86,3 +86,7 @@ saves; uma carreira ou campeonato existente preserva sua revisão de origem.
   nem implementa reformas, aluguel para eventos ou indisponibilidade por período.
 - O calendário permanece no estado da competição, separado do motor 3D. FixtureId
   e ExecutionId correlacionam a conclusão; repetir um apito final não duplica pontos.
+
+## Migração para formatos editáveis
+
+A base atual v6/revisão 11 representa esse calendário com `format-paulista-2026`, fases declarativas e calendários por fase, preservando os IDs dos 64 confrontos iniciais e as datas cadastradas das eliminatórias. A primeira fase tem confrontos autorais; quartas/semifinais usam a campanha acumulada configurada em `rankingStageIds`. A final concede o título, e a primeira fase declara o rebaixamento. O perfil v5 acima continua suportado para bases e saves antigos. Outros formatos são modelos de autoria, não regulamentos oficiais atribuídos a competições reais.

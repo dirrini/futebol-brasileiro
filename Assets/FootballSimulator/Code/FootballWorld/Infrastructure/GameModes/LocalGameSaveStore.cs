@@ -29,7 +29,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
     // Four bounded slots (championship + career) leave room for preferences in WebGL.
     public sealed class LocalGameSaveStore
     {
-        public const int MaxPayloadBytes = 2 * 1024 * 1024;
+        public const int MaxPayloadBytes = 8 * 1024 * 1024;
         public const int MaxStoredBytes = 112 * 1024;
         private const string CompressedPrefix = "football-save:gzip:1:";
         private readonly IGamePreferenceStore store;

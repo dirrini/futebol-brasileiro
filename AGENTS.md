@@ -12,8 +12,8 @@
 - Keep authored database content, mutable season progress, and temporary match objects separate. Use stable IDs; never use names, array positions, Unity GUIDs, or match-local player IDs as persistent identity.
 - Keep rosters and natural player positions independent of the legacy eleven-player `TeamEntry` and match formation slots.
 - Keep the season session alive across UI unloads. Route match completion through one application operation correlated by fixture and execution IDs; duplicate completion must not award points twice.
-- Consult `README-GAME-MODES.md` for the current menu scope. Keep authored competition editions in database v3 and mutable progress in versioned saves that pin their source database; a catalog refresh must not silently migrate an existing competition.
-- Career currently creates a coach profile, start month/year and club only. Do not present its selected date as historical squad/rule resolution until temporal content and calendar simulation exist.
+- Consult `README-GAME-MODES.md` for the current menu scope. Keep authored competition editions in versioned databases (currently v6) and mutable progress in versioned saves that pin their source database; a catalog refresh must not silently migrate an existing competition.
+- Career simulates daily progress for one authored edition, with training, tactics, transfers, finances and news. Do not present the selected date as automatic historical squad/rule resolution or promise multi-season scheduling.
 - Community player skins are a required capability of the first usable external database editor, including custom model/texture import and assignment to a player. A preset-only selector does not fulfill this requirement.
 - Keep `SkinId` and immutable skin revisions separate from `PlayerId`. Resolve media and skins through visual adapters; the competition core must not load textures, prefabs, or AssetBundles.
 - Separate portable skin source packages from platform-specific prepared content. Use a versioned compatibility profile for rig, materials, kit integration, and resource budgets; retain gameplay controllers and animation-event ownership in game code.
@@ -22,7 +22,7 @@
 - Keep package import transactional, preserve the last valid content, and pin content revisions for active seasons. Reject unsupported rule types or versions. Fallback is allowed only for visual resources when declared by the contract, with a visible diagnostic.
 - Introduce assemblies for new pure C# modules incrementally; do not reorganize the legacy engine as an incidental change. Follow the staged acceptance criteria in `ROADMAP.md`.
 - Keep the local editor in `database-editor`: browser ES modules in `client`, Node services in `server`, and shared portable schemas under `Assets/FootballSimulator/Data/FootballWorld/Schemas`. Do not add Unity or competition-core dependencies to the editor.
-- Treat the current editor as an intermediate clubs/players/preset tool. Competitions, real 3D previews, community model import and skin processing are still separate roadmap work; do not mark the complete external editor delivered from preset controls alone.
+- The editor handles clubs, players, preset appearances, competitions, reusable declarative formats and editions. Real 3D previews, community model import and skin processing remain separate roadmap work; do not mark the complete external editor delivered from preset controls alone.
 - Preserve explicit draft/save behavior, stable IDs, optimistic `If-Match` checks, server-side validation, atomic file replacement and the previous valid database backup. A failed save or conflict must keep the browser draft available.
 
 # Docker

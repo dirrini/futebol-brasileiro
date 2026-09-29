@@ -1,15 +1,15 @@
 # Base externa e modos de jogo
 
 O jogo carrega um catálogo de clubes/jogadores independente do motor Unity.
-A base v5 contém os 16 clubes e 363 jogadores relacionados nas súmulas de abertura
+A base v6 contém os 16 clubes e 363 jogadores relacionados nas súmulas de abertura
 do Paulista de 10 e 11 de janeiro de 2026. É um recorte dos relacionados nesses
 jogos, não dos elencos completos. Veja [fontes e limitações](HISTORICAL-DATA.md).
 A seleção e o amistoso usam esse catálogo para os dados esportivos e os presets
 de aparência. O [editor local](http://localhost:8080/editor/) permite editar a base
 no navegador. Escudos, uniformes, formações, modelos e as próprias paletas/meshes
 dos presets continuam sendo recursos Unity compilados.
-O jogo aceita contratos v1–v5 e saves anteriores. A revisão 10 inclui calendário
-e regulamento do Paulista 2026, editáveis em **Campeonatos** e **Edições**. Consulte
+O jogo aceita contratos v1–v6 e saves anteriores. A revisão 11 inclui formatos declarativos, calendário
+e regulamento do Paulista 2026, editáveis em **Formatos**, **Campeonatos** e **Edições**. Consulte
 [os modos de jogo](README-GAME-MODES.md) para progresso salvo e carreira.
 
 ## Editar no navegador
@@ -97,14 +97,14 @@ largura e profundidade. Esses valores também participam do dimensionamento do
 collider legado. Salvar uma revisão compatível e atualizar o navegador aplica
 os valores na próxima partida, sem recompilar no fluxo local descrito abaixo.
 
-No JSON v2–v5, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
+No JSON v2–v6, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
 estilo e cor do cabelo, estilo e cor da barba, cor das chuteiras e cor da faixa da
 meia. A meia principal continua no uniforme do clube. Esses campos usam IDs de
 presets compilados; não são cores RGB livres ou modelos novos. Veja as opções
 completas em [DATA-FORMAT.md](DATA-FORMAT.md).
 
 A aparência completa no JSON tem prioridade sobre os bindings e dispensa um
-`PlayerEntry` de referência. Quando omitida, v1–v5 preservam a aparência associada
+`PlayerEntry` de referência. Quando omitida, v1–v6 preservam a aparência associada
 por `PlayerId` em `LegacyMatchBindings`, ou seu default declarado. O editor oferece
 **Definir aparência na base** nesses casos; uma skin externa vinculada não é
 sobrescrita por presets. Os presets da amostra são genéricos; não equivalem a
@@ -143,8 +143,8 @@ O JSON e seu schema podem ser inspecionados no servidor local:
 - [database.schema.json](http://localhost:8080/StreamingAssets/FootballWorld/database.schema.json)
 - [Schema do editor](http://localhost:8080/editor/api/schema)
 
-Os endpoints de schema descrevem as cinco versões suportadas. Os schemas de
-autoria v1–v5 continuam separados nos arquivos indicados acima.
+Os endpoints de schema descrevem as seis versões suportadas. Os schemas de
+autoria v1–v6 continuam separados nos arquivos indicados acima.
 
 O Compose monta o diretório de autoria somente para leitura no `soccer-web`, e o Nginx entrega
 o JSON original nesse endereço com `Cache-Control: no-store`. Para testar nomes,
@@ -164,7 +164,7 @@ Campeonatos e carreiras salvos retomam a revisão com que foram criados. Mudanç
 na base são usadas em novos campeonatos, carreiras e amistosos; atualizar a página
 não migra uma competição em andamento. Uma partida interrompida volta a ficar pendente.
 Os saves guardam o JSON completo da revisão. Compressão GZip permite usar a base
-atual; há limites de 2 MiB descomprimidos e 112 KiB por slot, além da quota do
+atual; há limites de 8 MiB descomprimidos e 112 KiB por slot, além da quota do
 navegador. Consulte [persistência](README-GAME-MODES.md#persistência-e-autoria).
 
 Essa atualização direta é o fluxo local do Compose. A exportação ainda inclui
@@ -252,7 +252,7 @@ Validação estrutural opcional, usando PowerShell 7 com `Test-Json` disponível
 ```powershell
 Test-Json `
   -LiteralPath 'Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json' `
-  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v5.schema.json'
+  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v6.schema.json'
 ```
 
 Isso não substitui o importador: IDs duplicados, referências cruzadas e as
@@ -279,3 +279,9 @@ Pop-Location
 Mudanças apenas nessa aplicação, mantendo o contrato do jogo, são publicadas com
 `docker compose up --build -d --wait soccer-web`; confira editor e jogo no navegador.
 Mudanças no contrato, adaptador ou recursos Unity exigem também WebGL novo.
+
+## Editar regulamentos reutilizáveis
+
+A aba **Formatos** define fases e regras; **Campeonatos** associa o formato, a elegibilidade, prêmios e identidade; **Edições** define participantes, grupos e calendário. Há modelos de liga, copa, grupos, liga seguida de grupos semeados e playoffs de derrotados sem título. Consulte [COMPETITION-FORMATS.md](COMPETITION-FORMATS.md) para os exemplos de posições 1/4/5/8 e 2/3/6/7, acesso por grupo e final. A revisão publicada continua separada do rascunho e dos saves.
+
+[JSON Schema v6](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v6.schema.json) descreve o contrato novo. Referências de logo/taça e regras de substituições são configuráveis; carregar modelos 3D e executar substituições permanecem etapas próprias.

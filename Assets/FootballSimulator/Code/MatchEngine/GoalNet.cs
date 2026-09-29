@@ -51,7 +51,7 @@ namespace FStudio.MatchEngine {
             dirErrorApplied *= EngineSettings.Current.ShootPowerByDistanceCurve.Evaluate(dir.magnitude);
 
             dirErrorApplied *= EngineSettings.Current.ShootPowerBySkillCurve.
-                Evaluate(playerBase.MatchPlayer.GetShooting() / 100f);
+                Evaluate(playerBase.MatchPlayer.GetShootPower() / 100f);
 
             Debug.Log($"[Shootpoint found] {dirErrorApplied}");
 

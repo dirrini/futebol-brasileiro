@@ -46,7 +46,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
 
             var ballPos = ball.transform.position;
 
-            if (!noOffsideCheck) {
+            if (!noOffsideCheck && (ball.HolderTeam != Player.GameTeam || Player.MatchPlayer.RoleTactics.AttackDepthOffset <= 0)) {
                 // pick the line holder.
                 var possibleLineHolders = teammates.Where(x => !x.IsGK && x != Player && x.IsFrontOfMe(ballPos, OFFSIDE_LINE_X_DIFF_BETWEEN_BALL));
 

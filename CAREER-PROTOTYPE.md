@@ -18,7 +18,9 @@ no último dia da edição cadastrada, 8 de março. Não há virada automática 
 5. Consulte os resultados, notícias e movimentos do caixa. Alterne o treino e
    observe os indicadores no dia seguinte. Recarregue a página para continuar.
 6. Abra o elenco para consultar a ficha e os quinze atributos. Na tática, escolha
-   formação e mentalidade para a próxima partida; a escalação permanece automática.
+   formação e mentalidade, arraste os marcadores para ajustes finos e atribua uma
+   função a cada posição. Use **Salvar tática** para aplicar à próxima partida;
+   a escolha dos onze jogadores permanece automática.
 7. Busque um jogador de outro clube, confira a estimativa de simulação e envie uma
    proposta. O valor fica reservado até a resposta no próximo dia ou o cancelamento.
 
@@ -114,14 +116,16 @@ encerramento da competição a partir de eventos do save. Textos são localizado
 pela apresentação em português/inglês; o core guarda chaves e dados, sem chamadas
 a serviços de IA ou notícias reais.
 
-Saves diários usam versão 3, separada do schema da base; a versão 2 continua
-legível com tática 4-4-2 equilibrada e sem inventar propostas. A restauração valida
+Saves diários usam versão 4, separada do schema da base, com posições e funções
+por vaga tática. A versão 3 mantém formação, mentalidade e propostas e recebe
+posições padrão; a versão 2 continua legível com tática 4-4-2 equilibrada e sem
+inventar propostas. A restauração valida
 a competição, reprocessa treino e propostas e confere movimentos, notícias e
 resultados contabilizados. Recarregar, receber um callback repetido ou salvar
 novamente não concede outra receita, cobrança ou resultado.
 
 O armazenamento comprime os envelopes e mantém dois slots por modo, preservando
-o snapshot confirmado enquanto grava o substituto. Os limites são 2 MiB de
+o snapshot confirmado enquanto grava o substituto. Os limites são 8 MiB de
 conteúdo expandido e 112 KiB por slot; quatro slots no teto equivalem a 896 KiB
 sob contabilização conservadora UTF-16, com margem para preferências. Dados incompatíveis ou grandes demais
 produzem erro e preservam o save anterior. O conteúdo continua local ao navegador.
@@ -134,3 +138,53 @@ temporadas encadeadas e resolução histórica de vínculos permanecem futuras.
 Também não há editor de modelos comunitários ou novos estádios 3D nesta entrega.
 O regulamento e as aproximações esportivas atuais estão em
 [CALENDAR-2026.md](CALENDAR-2026.md).
+
+## Prêmios e formatos v6
+
+A carreira executa participação, vitória/empate por jogo e intervalos de posição ao completar uma fase. Lançamentos são idempotentes e reconstituídos no carregamento; o Paulista de exemplo mantém prêmios zerados até que valores sejam autorados. Prêmios positivos precisam usar a moeda da carreira, sem conversão inventada. Campo neutro não concede receita de mandante. Vagas são registradas, mas não iniciam outra temporada automaticamente.
+
+O campo tático e a ficha de atributos usam prefabs editáveis no Unity. A prévia acompanha a formação escolhida, e salvar aplica a tática; não há escalação manual de titulares nesta etapa. A ficha mostra os quinze atributos existentes na escala 0–100.
+
+## Ajustes de posição e funções individuais
+
+Os marcadores representam vagas da formação, associadas ao XI automático. Arrastar
+um marcador ajusta sua posição de referência; não troca o jogador escalado. Cada
+vaga tem limites de deslocamento para preservar a estrutura da formação, com
+limites próprios para o goleiro. Trocar a formação restaura suas posições e
+funções padrão; trocar apenas a mentalidade preserva os ajustes. Restaurar uma
+posição ou toda a formação altera o rascunho, que só se aplica após salvar.
+
+| Posição | Funções além do padrão |
+| --- | --- |
+| Zagueiro | Zagueiro que avança |
+| Lateral | Lateral cruzador, lateral invertido |
+| Volante / meio-campista central | Volante de marcação, articulador recuado |
+| Meio-campista central / ofensivo | Armador criativo |
+| Centroavante | Atacante pivô, atacante móvel |
+| Meio-campista aberto / ponta | Ponta aberto, atacante interior |
+
+As instruções modificam referências de posicionamento e preferências da IA na
+partida 3D, conforme o papel: avanço, apoio, marcação, passe ou cruzamento.
+Não são movimentos garantidos a cada lance. O simulador rápido de placares ainda
+não avalia essas instruções. Os ajustes pertencem à carreira, não ao cadastro
+permanente do jogador; outros clubes e partidas rápidas mantêm seus padrões.
+
+## O que os atributos já fazem na partida
+
+A tabela completa de efeitos e limitações está em [Atributos e inteligência da partida](ATTRIBUTE-EFFECTS.md).
+
+O adaptador copia os quinze atributos da base para os jogadores temporários. O
+motor aplica curvas de balanceamento antes de usá-los: valores maiores não
+representam aumentos lineares em metros por segundo ou probabilidade de sucesso.
+Velocidade e aceleração afetam o movimento; finalização afeta precisão e decisão
+de chute; potência controla a força separadamente; passe e lançamento alimentam
+a precisão conforme a distância. Reação reduz a espera para uma nova decisão e
+participa das defesas do goleiro. Posicionamento reduz o desvio da posição ideal.
+
+As funções táticas são preferências de uma IA baseada em regras. Ainda não existe
+um atributo separado de inteligência tática, familiaridade com a função ou um
+planejador que avalie conjuntamente cobertura, espaços e momento do desmarque.
+Por isso, aumentar posicionamento não promete decisões mais sofisticadas. Nesta
+integração foram corrigidas ligações herdadas de potência/finalização,
+reação/posicionamento e pesos de passe curto/longo, além do atraso de reação que
+era zerado por divisão inteira.

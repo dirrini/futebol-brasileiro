@@ -48,9 +48,9 @@ namespace FStudio.FootballWorld.Editor.Tests
         public void FullHistoricalDatabaseFitsBothTwoSlotSavesAndPreservesContentAboveOldPayloadLimit()
         {
             var source = CurrentDatabase();
-            Assert.That((int)JObject.Parse(source)["schemaVersion"], Is.EqualTo(5));
+            Assert.That((int)JObject.Parse(source)["schemaVersion"], Is.EqualTo(6));
             var imported = Import(source);
-            var edition = imported.Catalog.CompetitionEditions.First(value => value.Rules.IsPaulista2026);
+            var edition = imported.Catalog.CompetitionEditions.First();
             var club = edition.ParticipantClubIds[0];
             var career = CareerSession.Create(imported.Catalog, edition.Id, "historical-career", club, new GameDate(2026, 1, 1));
             career.AdvanceToNextFixture();

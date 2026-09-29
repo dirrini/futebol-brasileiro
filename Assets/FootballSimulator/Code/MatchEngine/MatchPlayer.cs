@@ -4,6 +4,7 @@ using Shared.Responses;
 using FStudio.MatchEngine.FieldPositions;
 using FStudio.Data;
 using FStudio.Database;
+using FStudio.MatchEngine.Tactics;
 
 namespace FStudio.MatchEngine {
     public class MatchPlayer {
@@ -12,11 +13,16 @@ namespace FStudio.MatchEngine {
         public Positions Position;
 
         public readonly int Number;
+        public readonly PlayerTacticalInstruction TacticalInstruction;
+        public RoleTacticalSettings RoleTactics => TacticalInstruction?.Role ?? RoleTacticalSettings.Standard;
 
-        public MatchPlayer (int number, PlayerEntry player, Positions position) {
+        public MatchPlayer (int number, PlayerEntry player, Positions position, PlayerTacticalInstruction instruction = null) {
+            if (instruction != null && instruction.Position != position)
+                throw new System.ArgumentException("Tactical instruction does not match its formation slot.", nameof(instruction));
             this.Player = player;
             this.Position = position;
             this.Number = number;
+            TacticalInstruction = instruction;
             Setup();
         }
 
@@ -53,11 +59,11 @@ namespace FStudio.MatchEngine {
             ActualLongBall = Mathf.RoundToInt(ModifySkill(Player.longBall, PlayerSkillCurves.Current.PassingCurve));
             ActualAgility = Mathf.RoundToInt(ModifySkill(Player.agility, PlayerSkillCurves.Current.AgilityCurve));
             ActualShooting = Mathf.RoundToInt(ModifySkill(Player.shooting, PlayerSkillCurves.Current.ShootingCurve));
-            ActualShootPower = ModifySkill(Player.shooting, PlayerSkillCurves.Current.ShootingCurve);
+            ActualShootPower = ModifySkill(Player.shootPower, PlayerSkillCurves.Current.ShootingCurve);
 
             /// chemistry and wrong positioning affects positioning skill.
             ActualPositioning = Mathf.RoundToInt (ModifySkill(Player.positioning, PlayerSkillCurves.Current.PositioningCurve));
-            ActualReaction = Mathf.RoundToInt (ModifySkill(Player.positioning, PlayerSkillCurves.Current.ReactionCurve));
+            ActualReaction = Mathf.RoundToInt (ModifySkill(Player.reaction, PlayerSkillCurves.Current.ReactionCurve));
             ///
 
             ActualBallControl = ModifySkill(Player.ballControl, PlayerSkillCurves.Current.BallControlCurve);
@@ -75,6 +81,10 @@ namespace FStudio.MatchEngine {
         public float GetLongBall() => ActualLongBall * EngineSettings.Current.PassingModifier;
         public float GetAgility() => ActualAgility * EngineSettings.Current.AgilityModifier;
         public float GetShooting() => ActualShooting * EngineSettings.Current.ShootingModifier;
+        public float GetShootPower() => ActualShootPower * EngineSettings.Current.ShootingModifier;
+        public float GetReactionDelay() => (100 - Mathf.Clamp(ActualReaction, 0, 100)) / 1000f;
+        public float GetPassingAccuracy(float distance)
+            => Mathf.Lerp(ActualPassing, ActualLongBall, EngineSettings.Current.LongBallSkillPercentageAtDistance(distance));
         #endregion
 
         public float GetDribbleSpeedModifier () {

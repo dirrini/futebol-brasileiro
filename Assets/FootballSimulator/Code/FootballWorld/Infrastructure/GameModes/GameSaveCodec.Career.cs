@@ -27,7 +27,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             var state = session.CaptureSnapshot();
             var rules = state.Rules;
             return new JObject {
-                ["version"] = 3, ["profile"] = JObject.Parse(Career(profile)),
+                ["version"] = 4, ["profile"] = JObject.Parse(Career(profile)),
                 ["competition"] = JObject.Parse(Championship(session.Competition, databaseJson)),
                 ["startDate"] = state.StartDate.ToString(), ["training"] = (int)state.Training,
                 ["condition"] = state.Condition, ["preparation"] = state.Preparation,
@@ -44,6 +44,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                     ["playerId"] = item.PlayerId })),
                 ["processedFixtureIds"] = new JArray(state.ProcessedFixtureIds),
                 ["formation"] = (int)state.Formation, ["mentality"] = (int)state.Mentality,
+                ["tactics"] = WriteTactics(state.TacticPlan),
                 ["offers"] = new JArray(state.Offers.Select(item => new JObject {
                     ["id"] = item.Id, ["playerId"] = item.PlayerId, ["sellerClubId"] = item.SellerClubId,
                     ["amount"] = item.Amount, ["submittedDate"] = item.SubmittedDate.ToString(),
@@ -58,10 +59,11 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             var root = Read(json);
             var version = Number(root, "version");
             if (version == 1) return new RestoredCareer(RestoreCareer(json));
-            if (version != 2 && version != 3) throw new InvalidOperationException("Unsupported career save version.");
+            if (version < 2 || version > 4) throw new InvalidOperationException("Unsupported career save version.");
             var fields = new[] { "version", "profile", "competition", "startDate", "training", "condition", "preparation",
                 "rules", "trainingChanges", "ledger", "news", "processedFixtureIds" };
-            RequireFields(root, version == 2 ? fields : fields.Concat(new[] { "formation", "mentality", "offers" }).ToArray());
+            var expectedFields = version == 2 ? fields : fields.Concat(new[] { "formation", "mentality", "offers" }).ToArray();
+            RequireFields(root, version == 4 ? expectedFields.Concat(new[] { "tactics" }).ToArray() : expectedFields);
             var profile = RestoreCareer(Object(root["profile"]).ToString(Formatting.None));
             var season = RestoreChampionship(Object(root["competition"]).ToString(Formatting.None));
             var rules = Object(root["rules"]);
@@ -101,7 +103,8 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                     Long(rules, "defaultMonthlyWages"), Long(rules, "monthlyIncome"), Long(rules, "homeMatchIncome")),
                 (CareerTraining)Number(root, "training"), Number(root, "condition"), Number(root, "preparation"), changes, ledger, news, processed,
                 version == 2 ? CareerFormation.FourFourTwo : (CareerFormation)Number(root, "formation"),
-                version == 2 ? CareerMentality.Balanced : (CareerMentality)Number(root, "mentality"), offers);
+                version == 2 ? CareerMentality.Balanced : (CareerMentality)Number(root, "mentality"), offers,
+                version < 4 ? null : ReadTactics(Object(root["tactics"]), (CareerFormation)Number(root, "formation")));
             if (profile.DatabaseId != season.Session.Catalog.DatabaseId || profile.DatabaseRevision != season.Session.Catalog.DatabaseRevision ||
                 profile.ClubId != season.Session.ControlledClubId || profile.StartYear != snapshot.StartDate.Year || profile.StartMonth != snapshot.StartDate.Month ||
                 profile.ClubName != season.Session.Catalog.GetClub(profile.ClubId).Name)

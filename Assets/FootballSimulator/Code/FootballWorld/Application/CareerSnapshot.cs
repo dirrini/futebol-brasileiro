@@ -106,11 +106,12 @@ namespace FStudio.FootballWorld.Application
         public CareerFormation Formation { get; }
         public CareerMentality Mentality { get; }
         public IReadOnlyList<CareerTransferOffer> Offers { get; }
+        public CareerTacticPlan TacticPlan { get; }
         public CareerSnapshot(CompetitionSnapshot competition, GameDate startDate, CareerManagementRules rules,
             CareerTraining training, int condition, int preparation, IEnumerable<CareerTrainingChange> trainingChanges,
             IEnumerable<CareerLedgerEntry> ledger, IEnumerable<CareerNewsItem> news, IEnumerable<string> processedFixtureIds,
             CareerFormation formation = CareerFormation.FourFourTwo, CareerMentality mentality = CareerMentality.Balanced,
-            IEnumerable<CareerTransferOffer> offers = null)
+            IEnumerable<CareerTransferOffer> offers = null, CareerTacticPlan tacticPlan = null)
         {
             Competition = competition ?? throw new ArgumentNullException(nameof(competition));
             StartDate = startDate;
@@ -125,6 +126,8 @@ namespace FStudio.FootballWorld.Application
             Formation = formation;
             Mentality = mentality;
             Offers = Copy(offers ?? Array.Empty<CareerTransferOffer>());
+            TacticPlan = tacticPlan ?? CareerTacticPlan.CreateDefault(formation);
+            if (TacticPlan.Formation != formation) throw new ArgumentException("Snapshot formation and tactical plan disagree.", nameof(tacticPlan));
         }
         private static IReadOnlyList<T> Copy<T>(IEnumerable<T> values)
             => new List<T>(values ?? throw new ArgumentNullException(nameof(values))).AsReadOnly();

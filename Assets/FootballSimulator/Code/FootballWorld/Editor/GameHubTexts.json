@@ -867,8 +867,8 @@
     },
     {
       "Key": "hub.awaitingPhase",
-      "Portuguese": "Nenhum próximo jogo definido. Avance os dias no centro do treinador.",
-      "English": "No next fixture defined. Advance days from the manager office."
+      "Portuguese": "Nenhum próximo jogo definido. Acompanhe os jogos restantes da competição.",
+      "English": "No next fixture defined. Follow the remaining competition matches."
     },
     {
       "Key": "career.squad",
@@ -1404,6 +1404,226 @@
       "Key": "career.clubFilter",
       "Portuguese": "Clube",
       "English": "Club"
+    },
+    {
+      "Key": "hub.neutralVenue",
+      "Portuguese": "Campo neutro",
+      "English": "Neutral venue"
+    },
+    {
+      "Key": "ledger.prize-participation",
+      "Portuguese": "Premiação por participação",
+      "English": "Participation award"
+    },
+    {
+      "Key": "ledger.prize-win",
+      "Portuguese": "Premiação por vitória",
+      "English": "Match win award"
+    },
+    {
+      "Key": "ledger.prize-draw",
+      "Portuguese": "Premiação por empate",
+      "English": "Match draw award"
+    },
+    {
+      "Key": "ledger.prize-ranking",
+      "Portuguese": "Premiação por classificação",
+      "English": "Standings award"
+    },
+    {
+      "Key": "news.competition-prize",
+      "Portuguese": "{0} recebeu {3} de premiação nesta competição. Valor de simulação definido no regulamento.",
+      "English": "{0} received a competition award of {3}. Simulation amount set in the competition rules."
+    },
+    {
+      "Key": "career.lineupPreview",
+      "Portuguese": "Prévia da formação",
+      "English": "Formation preview"
+    },
+    {
+      "Key": "career.previewPlayers",
+      "Portuguese": "XI da prévia",
+      "English": "Preview XI"
+    },
+    {
+      "Key": "career.previewPositions",
+      "Portuguese": "Posição na formação selecionada",
+      "English": "Slot in the selected formation"
+    },
+    {
+      "Key": "career.previewHelp",
+      "Portuguese": "A prévia acompanha o rascunho. Salve para aplicar. O XI é automático; os jogadores ainda não podem ser arrastados ou escolhidos manualmente.",
+      "English": "The preview follows your draft. Save to apply. The XI is automatic; dragging and manual player selection are not available yet."
+    },
+    {
+      "Key": "career.previewUnavailable",
+      "Portuguese": "Não foi possível montar os onze jogadores para esta formação. Verifique o elenco.",
+      "English": "Eleven players could not be selected for this formation. Check your squad."
+    },
+    {
+      "Key": "career.naturalPositionMap",
+      "Portuguese": "Posições naturais",
+      "English": "Natural positions"
+    },
+    {
+      "Key": "career.attributeScale",
+      "Portuguese": "Atributos · escala de 0 a 100",
+      "English": "Attributes · scale from 0 to 100"
+    },
+    {
+      "Key": "career.attributesTechnical",
+      "Portuguese": "Técnica",
+      "English": "Technical"
+    },
+    {
+      "Key": "career.attributesPhysical",
+      "Portuguese": "Físico",
+      "English": "Physical"
+    },
+    {
+      "Key": "career.attributesGame",
+      "Portuguese": "Jogo",
+      "English": "Game"
+    },
+    {
+      "Key": "career.tacticsEffectCompact",
+      "Portuguese": "A formação define as posições. A postura orienta a equipe em campo.",
+      "English": "Formation sets the positions. Mentality guides the team on the pitch."
+    },
+    {
+      "Key": "career.tacticsInteractiveHelp",
+      "Portuguese": "Arraste para ajustar posições e escolha a função. Salve para aplicar. O XI é automático; trocar a formação restaura posições e funções.",
+      "English": "Drag to adjust positions and choose roles. Save to apply. The XI is automatic; changing formation resets positions and roles."
+    },
+    {
+      "Key": "career.selectedTacticSlot",
+      "Portuguese": "Função · {0} {1}",
+      "English": "Role · {0} {1}"
+    },
+    {
+      "Key": "career.resetTacticSlot",
+      "Portuguese": "Restaurar vaga",
+      "English": "Reset slot"
+    },
+    {
+      "Key": "career.resetTacticPlan",
+      "Portuguese": "Restaurar tudo",
+      "English": "Reset all"
+    },
+    {
+      "Key": "career.tacticsKeyboard",
+      "Portuguese": "Setas: mover · Esc: controles",
+      "English": "Arrows: move · Esc: controls"
+    },
+    {
+      "Key": "career.role.Standard",
+      "Portuguese": "Padrão da posição",
+      "English": "Position default"
+    },
+    {
+      "Key": "career.roleEffect.Standard",
+      "Portuguese": "Segue o comportamento padrão da posição.",
+      "English": "Uses the position's default behaviour."
+    },
+    {
+      "Key": "career.role.AdvancingCentreBack",
+      "Portuguese": "Zagueiro de apoio",
+      "English": "Advancing centre-back"
+    },
+    {
+      "Key": "career.roleEffect.AdvancingCentreBack",
+      "Portuguese": "Avança para apoiar quando a equipe tem a bola.",
+      "English": "Moves forward to support the team in possession."
+    },
+    {
+      "Key": "career.role.CrossingFullBack",
+      "Portuguese": "Lateral cruzador",
+      "English": "Crossing full-back"
+    },
+    {
+      "Key": "career.roleEffect.CrossingFullBack",
+      "Portuguese": "Mantém a largura e favorece cruzamentos.",
+      "English": "Stays wide and favours crosses."
+    },
+    {
+      "Key": "career.role.InvertedFullBack",
+      "Portuguese": "Lateral invertido",
+      "English": "Inverted full-back"
+    },
+    {
+      "Key": "career.roleEffect.InvertedFullBack",
+      "Portuguese": "Aproxima-se do centro para apoiar a jogada.",
+      "English": "Moves inside to support the play."
+    },
+    {
+      "Key": "career.role.BallWinningMidfielder",
+      "Portuguese": "Volante marcador",
+      "English": "Ball-winning midfielder"
+    },
+    {
+      "Key": "career.roleEffect.BallWinningMidfielder",
+      "Portuguese": "Fecha a marcação e avança menos.",
+      "English": "Marks tighter and holds position."
+    },
+    {
+      "Key": "career.role.DeepLyingPlaymaker",
+      "Portuguese": "Armador recuado",
+      "English": "Deep-lying playmaker"
+    },
+    {
+      "Key": "career.roleEffect.DeepLyingPlaymaker",
+      "Portuguese": "Apoia a saída de bola e prioriza passes.",
+      "English": "Supports the build-up and prioritizes passing."
+    },
+    {
+      "Key": "career.role.CreativePlaymaker",
+      "Portuguese": "Meia criativo",
+      "English": "Creative playmaker"
+    },
+    {
+      "Key": "career.roleEffect.CreativePlaymaker",
+      "Portuguese": "Busca passes mais progressivos.",
+      "English": "Looks for more progressive passes."
+    },
+    {
+      "Key": "career.role.TargetForward",
+      "Portuguese": "Atacante pivô",
+      "English": "Target forward"
+    },
+    {
+      "Key": "career.roleEffect.TargetForward",
+      "Portuguese": "Oferece apoio central e devoluções curtas.",
+      "English": "Offers central support and short layoffs."
+    },
+    {
+      "Key": "career.role.MobileForward",
+      "Portuguese": "Atacante móvel",
+      "English": "Mobile forward"
+    },
+    {
+      "Key": "career.roleEffect.MobileForward",
+      "Portuguese": "Avança e aproxima-se da jogada.",
+      "English": "Moves forward and supports the play."
+    },
+    {
+      "Key": "career.role.WideWinger",
+      "Portuguese": "Ponta aberto",
+      "English": "Wide winger"
+    },
+    {
+      "Key": "career.roleEffect.WideWinger",
+      "Portuguese": "Mantém amplitude e oferece opção por fora.",
+      "English": "Stays wide to offer an outside passing option."
+    },
+    {
+      "Key": "career.role.InsideForward",
+      "Portuguese": "Ponta por dentro",
+      "English": "Inside forward"
+    },
+    {
+      "Key": "career.roleEffect.InsideForward",
+      "Portuguese": "Sai da faixa lateral para apoiar por dentro.",
+      "English": "Leaves the flank to support through the middle."
     }
   ]
 }

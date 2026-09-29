@@ -53,6 +53,7 @@ namespace FStudio.MatchEngine.Players {
 
         protected readonly IEnumerable<BaseBehaviour> baseBehaviours = new BaseBehaviour[] {
             new InputTackleBehaviour(),
+            new InputSlideTackleBehaviour(),
             new InputCrossBehaviour(),
             new InputShortPassBehaviour(),
             new InputThroughtPassBehaviour(),
@@ -72,6 +73,10 @@ namespace FStudio.MatchEngine.Players {
             new ChipShootingBehaviour (),
 
             new ShootingBehaviour (0.75f, 0.5f),
+
+            // Role preferences run after input/restarts and before generic carrying.
+            new CrossingBehaviour(roleOnly: true),
+            new PassingBehaviour(roleOnly: true),
 
             // Relax if there noone around.
             new RunForwardWithBallBehaviour(0,
@@ -667,7 +672,11 @@ namespace FStudio.MatchEngine.Players {
             }
 
             var orderedOptions = finalOptions.
-                Select (x=>(x, priority (x.Item1, x.position, x.priority))).OrderByDescending (x=>x.Item2).ToArray ();
+                Select (x=>(x, priority (x.Item1, x.position, x.priority) +
+                    (MatchPlayer.TacticalInstruction?.PassPriority(x.Item1 == PassType.LongPass,
+                        (x.position.x - myPos.x) * toGoalXDirection,
+                        x.actualTarget.MatchPlayer.RoleTactics.ReceivePassPriority) ??
+                        x.actualTarget.MatchPlayer.RoleTactics.ReceivePassPriority))).OrderByDescending (x=>x.Item2).ToArray ();
 
             return orderedOptions;
         }
@@ -1077,7 +1086,9 @@ namespace FStudio.MatchEngine.Players {
                 in ballPosition,
                 in markingTarget,
                 goalNet,
-                false);
+                false,
+                MatchPlayer.TacticalInstruction,
+                teammateHasTheBall);
 
             // fix by offside.
             var (isOffside, onSide) = IsPositionOffside(fieldPosition + GoalDirection, targetGoalNet, in offsideLine);
@@ -1146,6 +1157,10 @@ namespace FStudio.MatchEngine.Players {
 
 #region those will be called by anim events
         public virtual void BallHitEvent () {
+            if (HasPendingAerialShot) {
+                CompleteAerialShotContact();
+                return;
+            }
             if (MatchManager.Current.MatchFlags == MatchStatus.NotPlaying) {
                 return; // ignore.
             }
@@ -1247,6 +1262,7 @@ namespace FStudio.MatchEngine.Players {
         }
 
         public void Shoot (Vector3 targetVelocity) {
+            CancelPendingAerialShot();
             if (!IsHoldingBall) {
                 return;
             }

@@ -139,6 +139,11 @@ namespace FStudio.MatchEngine.Players.Behaviours {
             }
 
             var targetPosition = Player.Position + runningDir * 5;
+            var role = Player.MatchPlayer.RoleTactics;
+            if (!isInputControlled && (role.CentrePull > 0 || role.WidthExpansion > 0)) {
+                targetPosition.z = FStudio.MatchEngine.Tactics.PlayerTacticalInstruction.ApplyWidth(
+                    targetPosition.z, fieldEndY, role.CentrePull, role.WidthExpansion);
+            }
 
             var avoided = targetPosition;
             Player.AvoidMarkers(opponents, ref avoided);

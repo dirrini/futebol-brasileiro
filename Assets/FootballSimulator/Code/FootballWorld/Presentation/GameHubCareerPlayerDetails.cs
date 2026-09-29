@@ -9,6 +9,8 @@ namespace FStudio.FootballWorld.Presentation
     {
         [SerializeField] private TMP_Text playerName, club, biography;
         [SerializeField] private TMP_Text[] attributeValues;
+        [SerializeField] private GameHubTheme theme;
+        [SerializeField] private CareerNaturalPositionMap positionMap;
 
         public void Bind(PlayerDefinition player, string clubName)
         {
@@ -22,7 +24,13 @@ namespace FStudio.FootballWorld.Presentation
             var values = a == null ? null : new[] { a.Strength, a.Acceleration, a.TopSpeed, a.DribbleSpeed, a.Jump,
                 a.Tackling, a.BallKeeping, a.Passing, a.LongBall, a.Agility, a.Shooting, a.ShootPower, a.Positioning, a.Reaction, a.BallControl };
             for (var index = 0; index < attributeValues.Length; index++)
-                attributeValues[index].text = values == null ? "—" : values[index].ToString(GameText.Culture);
+            {
+                if (attributeValues[index] == null) continue;
+                attributeValues[index].text = values == null || index >= values.Length ? "—" : values[index].ToString(GameText.Culture);
+                if (theme != null) attributeValues[index].color = values == null || index >= values.Length
+                    ? theme.InspectionMuted : theme.AttributeColor.Evaluate(Mathf.Clamp01(values[index] / 100f));
+            }
+            if (positionMap != null) positionMap.Bind(player);
         }
     }
 }

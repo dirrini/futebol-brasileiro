@@ -13,6 +13,12 @@ namespace FStudio.MatchEngine.Players.Behaviours {
         private readonly float maxBallProgress;
         private readonly float frontXThreshold;
         private readonly bool onlyIfCloserToGoalNet;
+        private readonly bool roleOnly;
+
+        public PassingBehaviour(bool roleOnly) {
+            this.roleOnly = roleOnly;
+            maxBallProgress = 1;
+        }
 
         public PassingBehaviour (float maxBallProgress = 1) {
             this.maxBallProgress = maxBallProgress;
@@ -48,6 +54,7 @@ namespace FStudio.MatchEngine.Players.Behaviours {
         }
 
         public override bool Behave (bool isAlreadyActive) {
+            if (roleOnly && (!Player.MatchPlayer.RoleTactics.EarlyPass || isInputControlled || !IsRoughValidated())) return false;
             if (ball.HolderPlayer != Player) {
                 return false;
             }
@@ -69,7 +76,8 @@ namespace FStudio.MatchEngine.Players.Behaviours {
                     (!onlyIfCloserToGoalNet || Vector3.Distance (x.Position, targetGoalNetPosition) < distanceToTargetGoalNet) &&
                     (!onlyIfFrontOfUs || Player.IsFrontOfMe(x.Position, frontXThreshold))).ToArray();
 
-                target = Player.FindPassTarget(in targets, in targetGoalNetPosition);
+                target = Player.FindPassTarget(in targets, in targetGoalNetPosition,
+                    roleOnly && Player.MatchPlayer.RoleTactics.PreferLayoff);
 
                 if (target.IsValid) {
                     Debug.Log($"[PassingBehaviour] OptionName: {target._OptionName}");

@@ -1,6 +1,7 @@
 // Portable, side-effect-free validation shared by the browser draft and Node adapter.
 // Authored definitions only: results, tables and mutable career state never live here.
 import { validDate } from './history-model.js';
+import { validateDeclarativeCompetitions } from './declarative-rules.js';
 
 export const leagueTieBreakers = ['wins', 'goal-difference', 'goals-for'];
 export const paulistaTieBreakers = [...leagueTieBreakers, 'red-cards', 'yellow-cards', 'drawing-lots'];
@@ -8,6 +9,7 @@ export const playoffLabels = ['Quartas: 1º × 8º', 'Quartas: 2º × 7º', 'Qua
 export const roundCount = edition => edition.rules.type === 'paulista-2026' ? 8 : (edition.participantClubIds.length % 2 ? edition.participantClubIds.length : edition.participantClubIds.length - 1) * edition.rules.legs;
 
 export function validateCompetitions(document) {
+  if (document.schemaVersion >= 6) return validateDeclarativeCompetitions(document, validateCompetitions);
   if (document.schemaVersion < 3) return [];
   const issues = []; const issue = (path, message) => issues.push({ path, message });
   const name = (value, path) => { if (typeof value !== 'string' || !value.trim() || [...value].length > 100) issue(path, 'Informe um nome de até 100 caracteres.'); };

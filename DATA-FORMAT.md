@@ -1,14 +1,15 @@
 # Contratos de base e mídia
 
-Estado: contratos JSON v1 a v5. V2 acrescenta presets de aparência; v3 acrescenta
+Estado: contratos JSON v1 a v6. V2 acrescenta presets de aparência; v3 acrescenta
 campeonatos e edições com regulamento e datas de rodadas. V4 acrescenta países,
 estádios, biografias, metadados dos clubes e um recorte observado com fontes.
 V5 acrescenta confrontos autorais, datas das fases finais e o perfil Paulista 2026.
+V6 acrescenta formatos reutilizáveis, fases, vagas, elegibilidade e prêmios.
 Pacotes ZIP, mídia carregável e skins completas nas seções seguintes
 continuam sendo extensões planejadas. Consulte [README-DATABASE.md](README-DATABASE.md),
 [ROADMAP.md](ROADMAP.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Contratos executáveis atuais: JSON v1 a v5
+## Contratos executáveis atuais: JSON v1 a v6
 
 Schema: [database-v1.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
 Extensão de aparência: [database-v2.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json).
@@ -21,18 +22,18 @@ O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
 
 | Campo obrigatório | Conteúdo |
 | --- | --- |
-| schemaVersion | Inteiro 1, 2, 3, 4 ou 5 |
+| schemaVersion | Inteiro 1, 2, 3, 4, 5 ou 6 |
 | databaseId | ID permanente da base |
 | databaseRevision | Inteiro de 1 a 2147483647 |
-| clubs | Um ou mais objetos com id e name; countryCode e city também obrigatórios em v4/v5 |
+| clubs | Um ou mais objetos com id e name; countryCode e city também obrigatórios em v4–v6 |
 | players | Um ou mais jogadores com id, name, naturalPositions, heightCm, weightKg e attributes |
 | memberships | Zero ou mais vínculos clubId/playerId; um clube inicial por jogador |
 | visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional a partir de v2; no máximo um por jogador |
-| competitions (v3–v5) | Até 128 campeonatos com id e name |
-| competitionEditions (v3–v5) | Até 128 edições com participantes, datas e regras suportadas |
-| countries (v4/v5) | De 1 a 300 países, com code e name |
-| stadiums (v4/v5) | De 0 a 1024 estádios, com id, name, countryCode e city; capacity opcional |
-| snapshot (v4/v5) | Data, descrição do recorte, cobertura de elenco, notas e fontes |
+| competitions (v3–v6) | Até 128 campeonatos com id e name |
+| competitionEditions (v3–v6) | Até 128 edições com participantes, datas e regras suportadas |
+| countries (v4–v6) | De 1 a 300 países, com code e name |
+| stadiums (v4–v6) | De 0 a 1024 estádios, com id, name, countryCode e city; capacity opcional |
+| snapshot (v4–v6) | Data, descrição do recorte, cobertura de elenco, notas e fontes |
 
 `skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
 O importador valida a forma da referência e a existência de PlayerId. A ponte do
@@ -103,7 +104,7 @@ elencos vazios ou maiores que onze são válidos no catálogo. LineupPlanner ver
 se o clube pode fornecer um goleiro natural e dez jogadores de linha ao amistoso.
 
 Objetos não aceitam propriedades desconhecidas. Null, campos obrigatórios ausentes e conversões
-implícitas de strings para números são rejeitados. Competições e regras exigem v3, v4 ou v5.
+implícitas de strings para números são rejeitados. Competições e regras exigem v3 ou posterior; formatos declarativos exigem v6.
 Novos tipos de regra, caminhos de arquivo e recursos binários exigem outra evolução
 explícita de versão e importador; não são campos silenciosamente ignorados.
 
@@ -137,7 +138,7 @@ promove v1 para v2 ao definir uma aparência; bases v3–v5 conservam sua versã
 suas competições. A promoção para v4 exige os novos campos obrigatórios, sem
 inventar data, fontes ou localização. Os schemas de autoria são
 separados; `StreamingAssets/FootballWorld/database.schema.json` e
-`/editor/api/schema` publicam as cinco versões suportadas.
+`/editor/api/schema` publicam as seis versões suportadas.
 
 ### Cadastro e recorte observado v4
 
@@ -292,6 +293,43 @@ promovida explicitamente para v5 ao escolher Paulista; versões antigas continua
 aceitas. Dados de carreira (saldo, treino, tática, propostas, vínculos efetivos,
 notícias e resultados) pertencem ao save, sem editar os vínculos iniciais da base.
 
+## Formatos declarativos v6
+
+Schema: [database-v6.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v6.schema.json).
+A revisão 11 do exemplo acrescenta `competitionFormats` e preserva os clubes,
+jogadores, IDs e confrontos autorais do Paulista. V1–v5 permanecem aceitos.
+
+- `competitionFormats`: até 128 formatos, versão 1, 2–64 participantes,
+  1–16 fases e no máximo 4096 jogos por edição. Fases declaram liga/mata-mata,
+  grupos, adversários, 1/2 turnos ou pernas, pontos, desempates, classificação,
+  cruzamento e mando. `source` escolhe classificados, vencedores ou derrotados
+  de uma fase anterior; `championStageId` identifica a fase que dá título e
+  aceita `null` para competições apenas classificatórias.
+- `competitionEditions[].formatId` e `stageSchedules` substituem os campos
+  legados `rules`, `roundDates`, `authoredFixtures` e `playoffDates` da edição.
+  Cada calendário contém datas, grupos e confrontos autorais quando suportados.
+  A primeira fase agrupa `clubIds`; fases seguintes agrupam `seedRanks`.
+  Exemplo: `1,4,5,8` e `2,3,6,7`. `fixtureDates` distribui jogos eliminatórios.
+- `competitions`: formato padrão, nível, reputação, nível de premiação,
+  elegibilidade geográfica/por clube, rotas para outros campeonatos, prêmios e
+  referências de logo/imagem/modelo da taça. `clubs[].stateCode` habilita filtro
+  estadual. Reputação e nível de premiação são metadados; valores de prêmios
+  configurados geram lançamentos na carreira.
+- `outcomes` define intervalos na classificação geral ou por grupo. Uma rota
+  liga a vaga ao campeonato de destino; a inscrição em outra temporada continua
+  futura. O limite de substituições chega ao contexto da partida, mas o motor
+  legado ainda não tem fluxo de banco/trocas.
+
+Fases formam um grafo acíclico com uma origem por fase. Calendários seguem sua
+origem, permitindo a disputa paralela de vagas pelos derrotados e título pelos
+vencedores. Fases que podem compartilhar participantes não podem jogar na mesma
+data. Só a fase designada concede a taça. Salvamento fixa o catálogo e a revisão;
+alterar o editor não modifica a competição em andamento.
+
+Imagens/modelos são referências HTTPS ou caminhos relativos seguros, não upload
+nem importação de modelos. Regras são dados validados, não scripts. Guia completo
+e exemplos: [COMPETITION-FORMATS.md](COMPETITION-FORMATS.md).
+
 ## Extensões planejadas
 
 As seções abaixo orientam as próximas versões. Elas não descrevem campos extras
@@ -335,7 +373,7 @@ ficam em perfis visuais associados aos IDs, separados dos atributos esportivos.
 Listas de resultados e progresso pertencem ao save versionado separado da base;
 veja [README-GAME-MODES.md](README-GAME-MODES.md).
 
-Regulamentos declaram um tipo suportado e seus parâmetros. Os perfis atuais são
+Regulamentos declaram um tipo suportado e seus parâmetros. V6 usa formatos declarativos compostos; os perfis legados são
 `round-robin` e `paulista-2026`, descritos acima. JSON não contém código, expressões executáveis nem nomes de
 classes a instanciar. Tipos ou versões incompatíveis são rejeitados com uma
 mensagem que identifique a competição e o campo.
@@ -430,7 +468,7 @@ Exemplo parcial de associação em um perfil visual:
 ```
 
 Os valores e campos desse exemplo são ilustrativos da extensão futura; não formam
-um objeto válido dos contratos v1–v5 atuais. O perfil visual não altera velocidade,
+um objeto válido dos contratos v1–v6 atuais. O perfil visual não altera velocidade,
 força, IA, colisão ou regras.
 Referências abreviadas como `portraitAssetId` e `fallbackSkinId` são resolvidas
 pelo manifesto imutável da base para revisões e digests exatos. Isso também vale

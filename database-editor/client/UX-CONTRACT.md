@@ -6,6 +6,76 @@ pt-BR e uso principal em desktop. É um editor de rascunho da base inteira. Cons
 fronteiras de domínio, versão portátil e referência visual. A API do editor valida
 o documento integral e exige ETag; o jogo importa a base por uma fronteira própria.
 
+## Formatos reutilizáveis e competições v6
+
+Formatos é um cadastro separado, com a lista canônica de dez itens, busca, ID e
+seleção na URL. Criar um formato em v4/v5 promove o rascunho a v6 sem converter
+edições legadas ou inventar histórico. O formulário do campeonato oferece ativação
+explícita da v6. Formatos exigem a base histórica v4 ou posterior; v1–3 conservam
+seu escopo. A alteração de contrato só é publicada pelo salvamento global.
+
+`competition-format-ui.js`, `competition-metadata-ui.js` e
+`edition-declarative-ui.js` reutilizam `ui.js` e `portable-fields.js` para labels,
+selects nativos, erros e campos numéricos. `format-model.js` cuida de mutações de
+rascunho e IDs; `declarative-controller.js` emite ações através dos mesmos diálogos,
+feedback e salvamento. Regras esportivas publicáveis continuam validadas pelo
+contrato compartilhado `declarative-rules.js`, não por condições visuais.
+
+Um formato apresenta identificação, título/substituições, uma fase selecionada e
+resultados esportivos. Trocar a fase apenas muda a apresentação; mantém o rascunho
+e registra o ID da fase na URL. Fases podem ser adicionadas, removidas e ordenadas
+com botões de teclado, sem exigir arrastar. Uma origem precisa aparecer antes de
+suas dependentes. A origem pode selecionar classificados, vencedores ou derrotados.
+A fase do título é independente da última fase e pode ser Sem taça. Campanhas
+acumuladas usam checkboxes de ancestrais; desempates usam lista ordenada e mantêm
+sorteio como último critério.
+
+Mudar o modelo de uma fase pede confirmação e explica os ajustes de regras.
+Eliminar fase/resultado/formato verifica vínculos antes de permitir exclusão; a
+mensagem explica onde corrigir as referências. Duplicar cria IDs novos e reescreve
+somente os vínculos internos da cópia, preservando fonte e edições existentes.
+Erros e valores obsoletos permanecem no rascunho, inclusive como opção explícita
+de select, até correção. Valores numéricos inválidos não ampliam loops de render:
+datas são limitadas a 128 rodadas e grupos a 64 participantes na apresentação.
+
+O campeonato pode definir formato padrão, abrangência, reputação, nível de
+premiação e elegibilidade. Países, estados, lista permitida e exclusões se combinam;
+estado exige um país. O estado/região é um código opcional digitado na ficha do
+clube, sem inferência a partir da cidade. Ser elegível não inscreve o clube. Campos
+de logo/imagem/modelo da taça são referências opcionais; sua ajuda esclarece que
+não há upload, preparação 3D ou substituição visual do jogo nesta etapa.
+
+Premiação informa moeda e valores inteiros por participação, vitória, empate e
+intervalos de classificação; a UI distingue os pagamentos executáveis dos níveis
+descritivos de reputação/premiação. Destinos de vagas usam seletores de resultados
+e campeonatos, sem criar temporadas futuras automaticamente. Configuração de
+substituições informa que a execução aguarda o fluxo de substituições do jogo.
+
+Novas edições recebem o formato padrão explicitamente. Trocar esse padrão no
+campeonato não modifica edições existentes. Escolher outro formato na edição ou
+converter uma edição legada exige confirmação e substitui seus calendários,
+preservando ID e participantes. Sincronizar fases também confirma a exclusão de
+calendários cujas fases foram removidas; calendários com IDs iguais são preservados.
+
+Calendário é editado por fase. Grupos iniciais distribuem clubes; grupos posteriores
+distribuem posições de entrada. Há distribuição em sequência ou serpentina, sempre
+confirmada, com ajuste individual por select. Dois grupos de oito classificados
+podem receber A=1,4,5,8 e B=2,3,6,7. Fases têm datas de rodada, estádio neutro quando
+aplicável, confrontos autorados da liga inicial filtrados por rodada e datas
+individuais de mata-mata. Datas continuam texto ISO e não mudam ao abrir o campo.
+
+Os erros de fases e calendários abrem a ficha/fase/rodada correspondente antes de
+focar o controle ou grupo inválido. Toda a base permanece um único rascunho com
+ETag, exportação, conflito, descarte e backup existentes. Nenhuma tela publica
+parcialmente, redefine a revisão local ou altera saves do jogo.
+
+Verificação específica: CRUD/duplicação de formatos, título separado de playoff,
+origens vencedores/derrotados, ordenação bloqueada por dependências, seeding,
+calendário por fase, alteração de formato confirmada/cancelada, referências de
+premiação/vagas, estado do clube, erro em fase não visível e preservação do rascunho.
+Os testes automatizados cobrem mutações, referências, limites e render das seis
+amostras. A revisão visual no navegador deve verificar os eventos e o fluxo inteiro.
+
 ## Proprietários canônicos
 
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |

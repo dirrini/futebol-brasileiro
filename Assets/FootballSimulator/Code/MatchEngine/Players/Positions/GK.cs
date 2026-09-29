@@ -8,6 +8,7 @@ using FStudio.MatchEngine.Players.Behaviours;
 using System.Linq;
 using FStudio.MatchEngine.FieldPositions;
 using FStudio.MatchEngine.Players.PlayerController;
+using FStudio.MatchEngine.Players.InputBehaviours;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -46,6 +47,12 @@ namespace FStudio.MatchEngine.Players.Positions {
 
         private readonly IEnumerable<BaseBehaviour> m_behaviours = new BaseBehaviour[] {
 
+            new InputGoalkeeperClearanceBehaviour(),
+            new InputShortPassBehaviour(),
+            new InputCrossBehaviour(),
+            new InputThroughtPassBehaviour(),
+            new InputBlockRestBehaviour(),
+
             new GKGoalKick (),
             new GKBallHoldStay (),
             new GKGoToPenaltyPoint (),
@@ -81,7 +88,9 @@ namespace FStudio.MatchEngine.Players.Positions {
             in float offsideLine,
             GoalNet goalNet,
             GoalNet targetGoalNet) {
-            return goalNet.Position + goalNet.Direction;
+            var position = goalNet.Position + goalNet.Direction;
+            return MatchPlayer.TacticalInstruction?.ApplyBoundedPosition(position, goalNet.Direction,
+                fieldEndX, fieldEndY, false, ballPosition) ?? position;
         }
 
         public override sealed void Behave(
@@ -156,6 +165,10 @@ namespace FStudio.MatchEngine.Players.Positions {
                     }
                 }
             }
+            // Input now blocks the keeper's AI while holding the ball. Complete
+            // the old dive here, after choosing the save animation, instead of
+            // relying on GKShieldBehaviour to run again before distribution.
+            Behaviours.OfType<GKShieldBehaviour>().FirstOrDefault()?.ResetJump();
         }
 
         public override bool OnBallTouch(float touchHeight, float impulse, Ball ball) {

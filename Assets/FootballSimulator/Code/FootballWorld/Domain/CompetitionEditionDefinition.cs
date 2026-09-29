@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace FStudio.FootballWorld.Domain
 {
-    public sealed class CompetitionEditionDefinition
+    public sealed partial class CompetitionEditionDefinition
     {
         public string Id { get; }
         public string CompetitionId { get; }
@@ -14,8 +14,12 @@ namespace FStudio.FootballWorld.Domain
         public LeagueRules Rules { get; }
         public IReadOnlyList<FixtureDefinition> ScheduledFixtures { get; }
         public IReadOnlyList<GameDate> PlayoffDates { get; }
+        public CompetitionFormatDefinition Format { get; }
+        public bool IsDeclarative => Format != null;
+        public IReadOnlyList<CompetitionStageSchedule> StageSchedules { get; }
+        private GameDate? declarativeEndDate;
         public GameDate StartDate => RoundDates[0];
-        public GameDate EndDate => Rules.IsPaulista2026 ? PlayoffDates[7] : RoundDates[RoundDates.Count - 1];
+        public GameDate EndDate => declarativeEndDate ?? (Rules.IsPaulista2026 ? PlayoffDates[7] : RoundDates[RoundDates.Count - 1]);
 
         public CompetitionEditionDefinition(string id, string competitionId, string name,
             IEnumerable<string> participantClubIds, IEnumerable<GameDate> roundDates, LeagueRules rules,
@@ -46,6 +50,7 @@ namespace FStudio.FootballWorld.Domain
                 throw new ArgumentException("Round-robin editions generate their own fixtures and have no playoffs.");
             ScheduledFixtures = fixtures.AsReadOnly();
             PlayoffDates = playoffs.AsReadOnly();
+            StageSchedules = Array.Empty<CompetitionStageSchedule>();
         }
 
         private static void ValidatePaulistaSchedule(List<string> clubs, List<GameDate> dates,

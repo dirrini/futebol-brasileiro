@@ -8,6 +8,7 @@ namespace FStudio.FootballWorld.Application
     {
         private void EnsurePlayoffs()
         {
+            if (Edition.IsDeclarative) { EnsureDeclarativeProgress(); return; }
             if (!Edition.Rules.IsPaulista2026) return;
             if (RoundComplete(8) && !fixtures.Any(value => value.Round == 9))
             {
@@ -62,6 +63,7 @@ namespace FStudio.FootballWorld.Application
 
         private FixtureResult SupplementResult(FixtureDefinition fixture, FixtureResult result)
         {
+            if (Edition.IsDeclarative) return SupplementDeclarativeResult(fixture, result);
             if (!Edition.Rules.IsPaulista2026)
             {
                 if (result.HomeYellowCards != 0 || result.AwayYellowCards != 0 || result.HomeRedCards != 0 ||

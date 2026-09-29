@@ -1,6 +1,6 @@
 # Entregas incrementais
 
-Revisão: 29/09/2026. O catálogo v5 tem os 16 clubes do Paulistão e 363 relacionados
+Revisão: 29/09/2026. O catálogo v6 tem os 16 clubes do Paulistão e 363 relacionados
 nas súmulas de 10–11/01/2026, com cadastros de países e estádios principais. Ele
 alimenta o amistoso e inclui o calendário publicado do Paulistão 2026, com perfil
 de regras executável e eliminatórias. Saves do campeonato demonstrativo conservam
@@ -85,9 +85,9 @@ restauram o progresso dos 16 possíveis clubes controlados. Não representam
 | C3 | Fluxo misto | Jogar um confronto e simular outros; salvar e retomar sem perder ou duplicar resultados |
 
 Reprodutibilidade de C2 não implica determinismo da física/animação da partida 3D.
-Campeonatos usam envelopes de save v2 e carreiras diárias usam v3, com base fixada.
+Campeonatos declarativos usam envelopes v3 (legados v2) e carreiras diárias usam v3, com base fixada.
 Carreiras v2 continuam legíveis com tática padrão e histórico de propostas vazio.
-O armazenamento suporta até 2 MiB expandidos e 112 KiB por slot codificado,
+O armazenamento suporta até 8 MiB expandidos e 112 KiB por slot codificado,
 com compressão e dois slots por modo. A base real é testada com os quatro slots
 sob contagem conservadora UTF-16 menor que 1 MiB; quatro slots no teto representam
 896 KiB nessa contagem, reservando margem para preferências. Falhas preservam o snapshot confirmado.
@@ -117,8 +117,8 @@ edição e executar D2 com uma única skin de referência compatível. Isso deve
 confirmar rig, materiais, troca de uniforme e animações antes de construir o
 processamento e a interface de upload. Não substituir D2 por mais opções de
 presets. A competição permanece separada do editor e das imagens. D1 possui
-formulários para os perfis suportados, sujeitos ao aceite de edição, validação,
-save e importação por refresh; não equivale a um construtor genérico de regulamentos.
+formulários para formatos reutilizáveis com fases e regras validadas, sujeitos ao
+aceite de edição, save e importação por refresh; não executa regras arbitrárias.
 
 **O primeiro editor utilizável precisa concluir D1 a D6.** Um seletor de presets,
 um retrato PNG ou uma textura sobre o modelo padrão não substituem o suporte a
@@ -204,3 +204,7 @@ motor, troca de UI, material principal substituído pelo uniforme, dependência 
 prefab/Avatar atual e erro preexistente de layout XInputController em um fluxo de
 controle virtual. Corrigir um problema quando bloquear a etapa, com escopo e
 validação explícitos; não assumir que um build comprova ausência de falhas runtime.
+
+### Regulamentos reutilizáveis v6
+
+D1 passa a incluir formatos compostos de fases declarativas, com liga/mata-mata, origem por classificados/vencedores/derrotados, grupos semeados, playoffs paralelos, campeão explícito, elegibilidade, vagas e prêmios. A edição preserva participantes/datas separadamente. Não aceita regras executáveis arbitrárias. O guia [COMPETITION-FORMATS.md](COMPETITION-FORMATS.md) delimita as combinações implementadas. Upload/execução de taças e estádios 3D, substituições no motor legado, inscrição em múltiplas temporadas e resoluções históricas permanecem trabalho futuro.

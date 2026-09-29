@@ -19,12 +19,14 @@ namespace FStudio.FootballWorld.DataContracts
         public IReadOnlyList<CountryData> Countries { get; }
         public IReadOnlyList<StadiumData> Stadiums { get; }
         public DatabaseSnapshotData Snapshot { get; }
+        public IReadOnlyList<CompetitionFormatData> CompetitionFormats { get; }
 
         public DatabaseDocument(int schemaVersion, string databaseId, int databaseRevision,
             IEnumerable<ClubData> clubs, IEnumerable<PlayerData> players,
             IEnumerable<MembershipData> memberships, IEnumerable<VisualProfileData> visualProfiles,
             IEnumerable<CompetitionData> competitions = null, IEnumerable<CompetitionEditionData> competitionEditions = null,
-            IEnumerable<CountryData> countries = null, IEnumerable<StadiumData> stadiums = null, DatabaseSnapshotData snapshot = null)
+            IEnumerable<CountryData> countries = null, IEnumerable<StadiumData> stadiums = null, DatabaseSnapshotData snapshot = null,
+            IEnumerable<CompetitionFormatData> competitionFormats = null)
         {
             SchemaVersion = schemaVersion;
             DatabaseId = databaseId;
@@ -37,6 +39,7 @@ namespace FStudio.FootballWorld.DataContracts
             CompetitionEditions = DataSnapshot.Copy(competitionEditions ?? Array.Empty<CompetitionEditionData>());
             Countries = DataSnapshot.Copy(countries ?? Array.Empty<CountryData>());
             Stadiums = DataSnapshot.Copy(stadiums ?? Array.Empty<StadiumData>()); Snapshot = snapshot;
+            CompetitionFormats = DataSnapshot.Copy(competitionFormats ?? Array.Empty<CompetitionFormatData>());
         }
     }
 
@@ -46,6 +49,7 @@ namespace FStudio.FootballWorld.DataContracts
         public string Name { get; }
         public string CountryCode { get; }
         public string City { get; }
+        public string StateCode { get; }
         public string OfficialName { get; }
         public string ShortName { get; }
         public string StadiumId { get; }
@@ -58,11 +62,12 @@ namespace FStudio.FootballWorld.DataContracts
         public string Notes { get; }
         public ClubData(string id, string name, string countryCode = null, string city = null, string officialName = null,
             string shortName = null, string stadiumId = null, int? reputation = null, int? supporterCount = null,
-            int? transferBudget = null, int? monthlyWageBudget = null, string currency = null, string sponsorship = null, string notes = null)
+            int? transferBudget = null, int? monthlyWageBudget = null, string currency = null, string sponsorship = null, string notes = null,
+            string stateCode = null)
         {
             Id = id; Name = name; CountryCode = countryCode; City = city; OfficialName = officialName; ShortName = shortName;
             StadiumId = stadiumId; Reputation = reputation; SupporterCount = supporterCount; TransferBudget = transferBudget;
-            MonthlyWageBudget = monthlyWageBudget; Currency = currency; Sponsorship = sponsorship; Notes = notes;
+            MonthlyWageBudget = monthlyWageBudget; Currency = currency; Sponsorship = sponsorship; Notes = notes; StateCode = stateCode;
         }
     }
 

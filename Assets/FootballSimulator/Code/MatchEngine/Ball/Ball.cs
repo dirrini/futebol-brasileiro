@@ -372,13 +372,7 @@ namespace FStudio.MatchEngine.Balls {
 
             var distance = Vector3.Distance(transform.position, target);
 
-            var longBallPercentage = 
-                EngineSettings.Current.LongBallSkillPercentageAtDistance(distance);
-
-            var longBallSkill = longBallPercentage * hitter.MatchPlayer.ActualPassing;
-            var passingSkill = (1 - longBallPercentage) * hitter.MatchPlayer.ActualLongBall;
-
-            ApplyError (ref target, longBallSkill + passingSkill);
+            ApplyError(ref target, hitter.MatchPlayer.GetPassingAccuracy(distance));
 
             var pos = transform.position;
             pos.y = 0;
@@ -408,6 +402,8 @@ namespace FStudio.MatchEngine.Balls {
 
         public void Shoot (Vector3 velocity, PlayerBase hitter) {
             Debug.Log("[Ball] Shoot");
+
+            IsOnCrossMode = false;
 
             EventManager.Trigger(new PlayerShootEvent (hitter, velocity.magnitude));
 
@@ -491,6 +487,10 @@ namespace FStudio.MatchEngine.Balls {
 
             // release ball and hit.
             Release();
+
+            // A first-time finish may strike a free ball without ever calling Hold.
+            LastTouchedPlayer = hitter;
+            LastHolder = hitter;
 
             rigidbody.velocity = Vector3.zero;
 

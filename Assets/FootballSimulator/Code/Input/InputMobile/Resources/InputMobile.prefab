@@ -548,7 +548,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/buttonEast
+      value: <Gamepad>/buttonEast
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
@@ -654,7 +654,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/buttonNorth
+      value: <Gamepad>/buttonNorth
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text
@@ -780,7 +780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/start
+      value: <Gamepad>/start
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text
@@ -906,7 +906,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/leftShoulder
+      value: <Gamepad>/leftShoulder
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text
@@ -1040,7 +1040,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/buttonWest
+      value: <Gamepad>/buttonWest
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text
@@ -1166,7 +1166,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/buttonSouth
+      value: <Gamepad>/buttonSouth
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text
@@ -1292,7 +1292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/dpad/right
+      value: <Gamepad>/dpad/right
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text
@@ -1418,7 +1418,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753825336525796210, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_ControlPath
-      value: <XInputController>/dpad/left
+      value: <Gamepad>/dpad/left
       objectReference: {fileID: 0}
     - target: {fileID: 8282328475243303850, guid: 3271a9f79c264f04d9b2be9bac7cfc2f, type: 3}
       propertyPath: m_text

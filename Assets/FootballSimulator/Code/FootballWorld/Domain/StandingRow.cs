@@ -19,14 +19,14 @@ namespace FStudio.FootballWorld.Domain
         {
             ClubId = DomainValidation.Id(clubId, nameof(clubId));
             Rank = DomainValidation.InRange(rank, 1, 64, nameof(rank));
-            Wins = DomainValidation.InRange(wins, 0, 126, nameof(wins));
-            Draws = DomainValidation.InRange(draws, 0, 126, nameof(draws));
-            Losses = DomainValidation.InRange(losses, 0, 126, nameof(losses));
-            GoalsFor = DomainValidation.InRange(goalsFor, 0, 126 * 999, nameof(goalsFor));
-            GoalsAgainst = DomainValidation.InRange(goalsAgainst, 0, 126 * 999, nameof(goalsAgainst));
-            Points = DomainValidation.InRange(points, 0, 12600, nameof(points));
-            YellowCards = DomainValidation.InRange(yellowCards, 0, 126 * 99, nameof(yellowCards));
-            RedCards = DomainValidation.InRange(redCards, 0, 126 * 22, nameof(redCards));
+            Wins = DomainValidation.InRange(wins, 0, 2048, nameof(wins));
+            Draws = DomainValidation.InRange(draws, 0, 2048, nameof(draws));
+            Losses = DomainValidation.InRange(losses, 0, 2048, nameof(losses));
+            GoalsFor = DomainValidation.InRange(goalsFor, 0, 2048 * 999, nameof(goalsFor));
+            GoalsAgainst = DomainValidation.InRange(goalsAgainst, 0, 2048 * 999, nameof(goalsAgainst));
+            Points = DomainValidation.InRange(points, 0, 204800, nameof(points));
+            YellowCards = DomainValidation.InRange(yellowCards, 0, 2048 * 99, nameof(yellowCards));
+            RedCards = DomainValidation.InRange(redCards, 0, 2048 * 22, nameof(redCards));
         }
     }
 }

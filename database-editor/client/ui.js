@@ -12,6 +12,8 @@ export function field({ id, label, value, type = 'text', min, max, maxLength, su
 }
 
 export function select({ id, label, value, options, path, property, optional = false, hint = '' }) {
+  if (value !== undefined && value !== null && value !== '' && !options.some(option => option.value === value))
+    options = [{ value, label: `Valor a corrigir: ${value}` }, ...options];
   return `<div class="field"><label for="${id}">${escapeHtml(label)}</label><select id="${id}" name="${id}"${editAttributes({ path, property, optional })} aria-describedby="${id}-hint ${id}-error">${options.map(option => `<option value="${escapeHtml(option.value)}"${option.value === value ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select><small id="${id}-hint" class="field-hint">${escapeHtml(hint)}</small><small id="${id}-error" class="field-error"></small></div>`;
 }
 

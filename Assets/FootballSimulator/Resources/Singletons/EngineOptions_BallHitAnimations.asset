@@ -34,6 +34,26 @@ MonoBehaviour:
       Val: 1
     - Id: 22
       Val: 1
+    - Id: 31
+      Val: 1
+    - Id: 32
+      Val: 1
+    - Id: 33
+      Val: 1
+    - Id: 34
+      Val: 1
+    - Id: 35
+      Val: 1
+    - Id: 36
+      Val: 1
+    - Id: 37
+      Val: 1
+    - Id: 38
+      Val: 1
+    - Id: 39
+      Val: 1
+    - Id: 40
+      Val: 1
   BlockBehavioursWhenThisClipsAreaPlaying:
   - Spin
   - Struggle
@@ -50,3 +70,82 @@ MonoBehaviour:
   BALL_HEIGHT_VOLLEY_START: 1.6
   BALL_HEIGHT_GROUND_HEADER_UNTIL: 1.15
   SPECIAL_BALL_HIT_TIME_OFFSET: 0.2
+  AerialShots:
+  - Kind: 1
+    Enabled: 1
+    Animation: 31
+    MinimumHeight: 0.6
+    MaximumHeight: 1.25
+    MinimumFacingDot: 0.25
+    MaximumFacingDot: 1
+    ContactRadius: 1.35
+    MinimumContactDistance: 0.6
+    MinimumForwardOffset: 0.5
+    MaximumForwardOffset: 1.3
+    MaximumLateralOffset: 0.5
+    ContactDelay: 0.40666673
+    RecoverySeconds: 2.4266667
+    VelocityMultiplier: 0.75
+  - Kind: 3
+    Enabled: 1
+    Animation: 39
+    MinimumHeight: 1.2
+    MaximumHeight: 1.9
+    MinimumFacingDot: -1
+    MaximumFacingDot: -0.35
+    ContactRadius: 1.05
+    MinimumContactDistance: 0
+    MinimumForwardOffset: -0.9
+    MaximumForwardOffset: 0.55
+    MaximumLateralOffset: 0.7
+    ContactDelay: 0.34
+    RecoverySeconds: 1.5
+    VelocityMultiplier: 0.9
+  - Kind: 0
+    Enabled: 1
+    Animation: 33
+    MinimumHeight: 1.5
+    MaximumHeight: 2.05
+    MinimumFacingDot: -0.2
+    MaximumFacingDot: 1
+    ContactRadius: 0.9
+    MinimumContactDistance: 0
+    MinimumForwardOffset: -0.2
+    MaximumForwardOffset: 0.8
+    MaximumLateralOffset: 0.55
+    ContactDelay: 0.185
+    RecoverySeconds: 0.6
+    VelocityMultiplier: 0.75
+  - Kind: 0
+    Enabled: 1
+    Animation: 35
+    MinimumHeight: 1.15
+    MaximumHeight: 1.65
+    MinimumFacingDot: -0.2
+    MaximumFacingDot: 1
+    ContactRadius: 0.95
+    MinimumContactDistance: 0
+    MinimumForwardOffset: -0.15
+    MaximumForwardOffset: 0.85
+    MaximumLateralOffset: 0.55
+    ContactDelay: 0.18
+    RecoverySeconds: 0.35
+    VelocityMultiplier: 0.75
+  - Kind: 2
+    Enabled: 1
+    Animation: 37
+    MinimumHeight: 0.65
+    MaximumHeight: 1.3
+    MinimumFacingDot: -0.2
+    MaximumFacingDot: 1
+    ContactRadius: 1.15
+    MinimumContactDistance: 0
+    MinimumForwardOffset: 0.35
+    MaximumForwardOffset: 1.4
+    MaximumLateralOffset: 0.55
+    ContactDelay: 0.27
+    RecoverySeconds: 0.6
+    VelocityMultiplier: 1
+  AerialInputBufferSeconds: 0.35
+  AerialInputReach: 6
+  AerialContactGraceSeconds: 0.2

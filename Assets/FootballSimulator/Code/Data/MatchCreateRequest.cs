@@ -2,6 +2,7 @@ using FStudio.Database;
 using FStudio.Data;
 using FStudio.MatchEngine.Enums;
 using FStudio.MatchEngine.Tactics;
+using System.Collections.Generic;
 
 namespace Shared.Responses {
     public struct MatchCreateRequest {
@@ -22,6 +23,8 @@ namespace Shared.Responses {
 
         // Per-match instruction. Null preserves the legacy balanced start.
         public TacticPresetTypes? InitialUserTactic;
+        public IReadOnlyList<PlayerTacticalInstruction> HomePlayerInstructions;
+        public IReadOnlyList<PlayerTacticalInstruction> AwayPlayerInstructions;
 
         public TeamEntry GetTeam(bool homeOrAway) {
             return !homeOrAway ? homeTeam : awayTeam;
@@ -43,6 +46,8 @@ namespace Shared.Responses {
             userTeam = UserTeam.None;
             dayTime = DayTimes.Night;
             InitialUserTactic = null;
+            HomePlayerInstructions = null;
+            AwayPlayerInstructions = null;
         }
     }
 }

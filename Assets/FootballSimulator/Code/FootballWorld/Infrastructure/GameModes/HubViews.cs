@@ -40,6 +40,8 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public int? AwayPenalties { get; }
         public bool HasSimulatedSupplement { get; }
         public string Phase { get; }
+        public string AuthoredStageName { get; }
+        public bool IsNeutral { get; }
         internal HubFixtureView(FixtureDefinition fixture, FixtureResult result, CompetitionSession season)
         {
             Id = fixture.Id; Round = fixture.Round; Date = fixture.Date.ToDateTime();
@@ -51,6 +53,8 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             HomePenalties = result?.HomePenalties; AwayPenalties = result?.AwayPenalties;
             HasSimulatedSupplement = result != null && result.HasSimulatedSupplement;
             Phase = season.GetPhase(fixture).ToString();
+            AuthoredStageName = fixture.StageId == null ? null : season.Edition.Format?.Stages.First(value => value.Id == fixture.StageId).Name;
+            IsNeutral = fixture.IsNeutral;
         }
     }
 
@@ -67,9 +71,11 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public int GoalsAgainst { get; }
         public int GoalDifference { get; }
         public int Points { get; }
-        internal HubStandingView(StandingRow row, DatabaseCatalog catalog)
+        public string GroupName { get; }
+        internal HubStandingView(StandingRow row, DatabaseCatalog catalog, string groupName = null)
         {
             ClubId = row.ClubId; ClubName = catalog.GetClub(row.ClubId).Name; Rank = row.Rank;
+            GroupName = groupName;
             Played = row.Played; Won = row.Wins; Drawn = row.Draws; Lost = row.Losses;
             GoalsFor = row.GoalsFor; GoalsAgainst = row.GoalsAgainst;
             GoalDifference = row.GoalDifference; Points = row.Points;
@@ -92,6 +98,8 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public string Phase { get; }
         public string ChampionName { get; }
         public bool IsPaulista { get; }
+        public string AuthoredStageName { get; }
+        public IReadOnlyList<string> UserOutcomes { get; }
         public IReadOnlyList<string> RelegatedNames { get; }
         internal HubChampionshipView(CompetitionSession season, bool busy)
         {
@@ -105,11 +113,28 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             Fixtures = season.Fixtures.Select(fixture => new HubFixtureView(fixture,
                 results.TryGetValue(fixture.Id, out var result) ? result : null, season)).ToArray();
             NextFixture = season.NextFixture == null ? null : Fixtures.First(fixture => fixture.Id == season.NextFixture.Id);
-            Standings = season.Standings.Select(row => new HubStandingView(row, season.Catalog)).ToArray();
+            AuthoredStageName = season.Edition.IsDeclarative
+                ? season.Edition.Format.Stages.First(value => value.Id == season.CurrentStageId).Name : null;
+            Standings = BuildStandings(season);
             Phase = season.Phase.ToString();
             ChampionName = season.ChampionClubId == null ? null : season.Catalog.GetClub(season.ChampionClubId).Name;
-            IsPaulista = season.Edition.Rules.IsPaulista2026;
+            IsPaulista = !season.Edition.IsDeclarative && season.Edition.Rules.IsPaulista2026;
             RelegatedNames = season.RelegatedClubIds.Select(id => season.Catalog.GetClub(id).Name).ToArray();
+            UserOutcomes = season.Edition.IsDeclarative ? season.QualifiedOutcomes.Where(value => value.ClubId == UserClubId)
+                .Select(value => value.Label).Distinct().ToArray() : Array.Empty<string>();
+        }
+
+        private static IReadOnlyList<HubStandingView> BuildStandings(CompetitionSession season)
+        {
+            if (!season.Edition.IsDeclarative)
+                return season.Standings.Select(row => new HubStandingView(row, season.Catalog)).ToArray();
+            var stageId = season.CurrentStageId;
+            var groups = season.GetStageGroupIds(stageId);
+            if (groups.Count <= 1)
+                return season.GetStageStandings(stageId).Select(row => new HubStandingView(row, season.Catalog)).ToArray();
+            var state = season.StageStates.First(value => value.StageId == stageId);
+            return groups.SelectMany(id => season.GetStageStandings(stageId, id).Select(row =>
+                new HubStandingView(row, season.Catalog, state.Groups.First(group => group.Id == id).Name))).ToArray();
         }
     }
 

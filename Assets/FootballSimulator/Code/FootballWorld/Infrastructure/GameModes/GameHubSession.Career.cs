@@ -128,16 +128,18 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             else PersistSeason();
         }
 
-        private void PersistCareer()
+        private bool PersistCareer()
         {
-            if (careerSession == null) return;
+            if (careerSession == null) return false;
             try
             {
-                if (!saves.Write(CareerSaveKey, GameSaveCodec.DailyCareer(Career, careerSession, careerDatabaseJson), out var error)) AddSaveWarning(error);
-                else HasCareerSave = true;
+                if (!saves.Write(CareerSaveKey, GameSaveCodec.DailyCareer(Career, careerSession, careerDatabaseJson), out var error))
+                { AddSaveWarning(error); return false; }
+                HasCareerSave = true;
+                return true;
             }
             catch (Exception exception)
-            { Debug.LogWarning("[FootballWorld] Career progress could not be saved: " + exception.Message); AddSaveWarning("save_failed"); }
+            { Debug.LogWarning("[FootballWorld] Career progress could not be saved: " + exception.Message); AddSaveWarning("save_failed"); return false; }
         }
 
         public string CareerMoney(long amount)

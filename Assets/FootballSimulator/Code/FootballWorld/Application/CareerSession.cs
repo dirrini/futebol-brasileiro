@@ -57,6 +57,7 @@ namespace FStudio.FootballWorld.Application
             News = news.AsReadOnly();
             Offers = offers.AsReadOnly();
             ledger.Add(new CareerLedgerEntry("opening", startDate, "opening-balance", club.TransferBudget ?? Rules.DefaultInitialBalance));
+            InitializeCompetitionAwards(startDate);
             news.Add(new CareerNewsItem("welcome", startDate, "gazeta-da-bola", "welcome", amount: FinanceBalance));
         }
 
@@ -168,12 +169,14 @@ namespace FStudio.FootballWorld.Application
                 if (!fixture.IncludesClub(Competition.ControlledClubId) || fixture.Date.CompareTo(date) > 0 || !processedFixtureIds.Add(fixture.Id)) continue;
                 Condition = Clamp(Condition - 12);
                 Preparation = Clamp(Preparation - 3);
-                if (fixture.HomeClubId == Competition.ControlledClubId)
+                if (fixture.HomeClubId == Competition.ControlledClubId && !fixture.IsNeutral)
                     ledger.Add(new CareerLedgerEntry(Key("gate", fixture.Id), fixture.Date, "home-match-income", Rules.HomeMatchIncome, fixture.Id));
+                ApplyMatchAward(fixture, result);
                 news.Add(new CareerNewsItem(Key("match", fixture.Id), fixture.Date,
                     fixture.HomeClubId == Competition.ControlledClubId ? "gazeta-da-bola" : "diario-da-arquibancada",
                     "match-result", fixture.Id, condition: Condition, preparation: Preparation));
             }
+            ApplyStageAwardsThrough(date);
             if (Competition.IsComplete && Competition.Results.All(value => fixtures[value.FixtureId].Date.CompareTo(date) <= 0) &&
                 news.All(value => value.Id != "season-complete"))
                 news.Add(new CareerNewsItem("season-complete", date, "gazeta-da-bola", "season-complete"));
@@ -183,7 +186,7 @@ namespace FStudio.FootballWorld.Application
         {
             ReconcileResults();
             return new CareerSnapshot(Competition.CaptureSnapshot(), StartDate, Rules, Training, Condition, Preparation,
-                trainingChanges, ledger, news, processedFixtureIds.OrderBy(value => value, StringComparer.Ordinal), Formation, Mentality, offers);
+                trainingChanges, ledger, news, processedFixtureIds.OrderBy(value => value, StringComparer.Ordinal), Formation, Mentality, offers, TacticPlan);
         }
 
         public static CareerSession Restore(DatabaseCatalog catalog, CareerSnapshot snapshot)
@@ -196,6 +199,9 @@ namespace FStudio.FootballWorld.Application
             ValidateTactics(snapshot.Formation, snapshot.Mentality);
             session.Formation = snapshot.Formation;
             session.Mentality = snapshot.Mentality;
+            if (snapshot.TacticPlan == null || snapshot.TacticPlan.Formation != snapshot.Formation)
+                throw new ArgumentException("Saved tactical plan does not match the career formation.");
+            session.TacticPlan = snapshot.TacticPlan;
             if (snapshot.Offers.Count > MaximumOffers || snapshot.Offers.Any(value => value == null ||
                 value.SubmittedDate.CompareTo(session.StartDate) < 0 || value.SubmittedDate.CompareTo(session.CurrentDate) > 0 ||
                 (value.DecisionDate.HasValue && value.DecisionDate.Value.CompareTo(session.CurrentDate) > 0)))

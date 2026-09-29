@@ -55,7 +55,9 @@ namespace FStudio.FootballWorld.Presentation
                 var progress = session.CareerProgress;
                 var season = progress.Competition;
                 heading.text = GameText.FormatDate(progress.CurrentDate.ToDateTime()) + "  ·  " + session.Career.ClubName
-                    + "\n" + session.Career.CoachName + "  ·  " + GameText.Get("phase." + season.Phase);
+                    + "\n" + session.Career.CoachName + "  ·  " + (season.Edition.IsDeclarative && !season.IsComplete
+                        ? season.Edition.Format.Stages.First(value => value.Id == season.CurrentStageId).Name
+                        : GameText.Get("phase." + season.Phase));
                 var fixture = season.NextFixture;
                 calendar.text = fixture == null ? GameText.Get(season.IsComplete ? "career.calendarEnded" : "career.followFinals")
                     : GameText.FormatDate(fixture.Date.ToDateTime()) + "\n" + season.Catalog.GetClub(fixture.HomeClubId).Name

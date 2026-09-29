@@ -276,6 +276,7 @@ namespace FStudio.MatchEngine {
             ) {
 
             CurrentMatchDetails = matchDetails;
+            var details = matchDetails.matchEvent.details;
 
             var homeFormation = FormationRules.GetTeamFormation(matchDetails.homeTeam.Formation);
 
@@ -284,15 +285,14 @@ namespace FStudio.MatchEngine {
                 homeTeamMatchPlayers[i] = new MatchPlayer(
                     i + 1,
                     matchDetails.homeTeam.Players[i],
-                    11 > i ? homeFormation.Positions[i] : matchDetails.homeTeam.Players[i].Position);
+                    11 > i ? homeFormation.Positions[i] : matchDetails.homeTeam.Players[i].Position,
+                    details.HomePlayerInstructions?[i]);
             }
 
             var homeTactics = await PlayableFormations.
                 Current.
                 Formations.
                 FindAsync(matchDetails.homeTeam.Formation);
-
-            var details = matchDetails.matchEvent.details;
 
             var homeMatchTeam = new MatchTeam() {
                 Players = homeTeamMatchPlayers,
@@ -311,7 +311,8 @@ namespace FStudio.MatchEngine {
                 awayTeamMatchPlayers[i] = new MatchPlayer(
                     i + 1,
                     matchDetails.awayTeam.Players[i],
-                    11 > i ? awayFormation.Positions[i] : matchDetails.awayTeam.Players[i].Position);
+                    11 > i ? awayFormation.Positions[i] : matchDetails.awayTeam.Players[i].Position,
+                    details.AwayPlayerInstructions?[i]);
             }
 
             var awayTactics = await PlayableFormations.Current.Formations.FindAsync(matchDetails.awayTeam.Formation);
@@ -928,8 +929,9 @@ namespace FStudio.MatchEngine {
 
                     if (hasTheBall) {
                         // closest one to the ball.
-                        closest = team.GamePlayers.Where(x => !x.MatchPlayer.Position.HasFlag(excludeKickerPosition)).
-                            OrderBy(x => Vector3.Distance(x.Position, position)).First();
+                        closest = foulType == FoulType.GoalKick ? team.GamePlayers.First(player => player.IsGK) :
+                            team.GamePlayers.Where(x => !x.MatchPlayer.Position.HasFlag(excludeKickerPosition)).
+                                OrderBy(x => Vector3.Distance(x.Position, position)).First();
 
                         keepInField(ref position, 0.25f); // clamp ball pos.
 
@@ -963,13 +965,13 @@ namespace FStudio.MatchEngine {
 
         /// <summary>
         /// Reset all behaviour selection timers for teams.
-        /// If you put a non null ballHitter, the other team will use their positioning skill as reset delayer.
+        /// Higher reaction skill shortens the delay before choosing the next behaviour.
         /// </summary>
         public void DelayBehaviourSelectionByReactionSkill () {
             float time = Time.time;
 
             foreach (var player in AllPlayers) {
-                player.NextBehaviour = time + player.MatchPlayer.ActualReaction / 1000;
+                player.NextBehaviour = time + player.MatchPlayer.GetReactionDelay();
             }
         }
 

@@ -1,7 +1,7 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: catálogo observado v5, competições e carreira diária de uma edição.
-Domain, Application, DTOs v1–v5, importador JSON, bootstrap e ponte com a partida
+Estado: catálogo observado v6, competições e carreira diária de uma edição.
+Domain, Application, DTOs v1–v6, importador JSON, bootstrap e ponte com a partida
 3D estão implementados. O editor local mantém clubes, jogadores, países,
 estádios, proveniência, aparência padrão, campeonatos e edições com regras
 suportadas. O jogo suporta ligas round-robin, o perfil do Paulistão 2026 e gestão
@@ -28,7 +28,7 @@ continuam planejados conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extens�
 - `Bootstrap`: FootballDatabaseBootstrap lê a base externa com UnityWebRequest e
   só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
 - `Editor`: FootballDatabaseBuildProcessor valida a base e a registra com um schema
-  que aceita v1–v5 como StreamingAssets adicionais, sem criar fontes fora de
+  que aceita v1–v6 como StreamingAssets adicionais, sem criar fontes fora de
   FootballSimulator.
 - `Infrastructure/LegacyMatch`: CatalogMatchAdapter converte os onze escalados em
   objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
@@ -45,7 +45,7 @@ continuam planejados conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extens�
 - `Presentation`: GameHubView e componentes UGUI/TMP exibem consultas da fachada;
   prefab, tema e avatares são recursos editáveis no Unity.
 
-O exemplo v5 contém 16 clubes e 363 jogadores relacionados nas súmulas de abertura
+O exemplo v6 contém 16 clubes e 363 jogadores relacionados nas súmulas de abertura
 do Paulista de 10/11 de janeiro de 2026. É um recorte observado, não elencos
 completos. Inclui uma edição com calendário publicado e perfil de regras do
 Paulistão 2026, com as aproximações descritas em [CALENDAR-2026.md](CALENDAR-2026.md).
@@ -58,7 +58,7 @@ visuais e formação via LegacyMatchBindings. Aparência completa em v2 tem prio
 e dispensa binding de jogador; se omitida, preserva o caminho legado e seu default
 declarado. Não há fallback para DatabaseService. Apenas a aparência embutida é
 suportada; skins externas continuam planejadas. Os regulamentos executáveis são
-`round-robin` v1 e `paulista-2026` v1. Dados não executam código recebido do editor.
+formatos declarativos v1 em bases v6, além de `round-robin` v1 e `paulista-2026` v1 para bases antigas. Dados não executam código recebido do editor.
 
 ## Objetivos
 
@@ -168,7 +168,7 @@ condição, preparo e notícias pertencem à carreira. Propostas reservam saldo 
 alteram os vínculos efetivos após aceitação, sem modificar o catálogo importado.
 Contratos vivos, lesões e suspensões individuais continuam futuros.
 
-O importador aceita até 1 MiB. O armazenamento recebe envelopes de até 2 MiB
+O importador aceita até 1 MiB. O armazenamento recebe envelopes de até 8 MiB
 expandidos, compacta conteúdo maior com GZip/Base64 e limita cada slot codificado
 a 112 KiB. São dois slots por modo; o snapshot confirmado é preservado durante
 a gravação do substituto. Saves v1 sem compressão permanecem legíveis.
@@ -272,7 +272,8 @@ no replay. A folha mensal continua o parâmetro inicial, sem novos contratos.
 
 As notícias têm EventKey, OutletId e dados. A UI resolve textos em português e
 inglês; o core não carrega textos localizados, armazenamento, rede ou geradores
-de linguagem. Saves diários usam versão 3. Versão 2 é lida com tática padrão e
+de linguagem. Saves diários usam versão 4. Versão 3 recebe posições/funções padrão,
+preservando sua formação; versão 2 é lida com tática padrão e
 histórico de propostas vazio. Perfis antigos v1 são preservados e
 não recebem silenciosamente uma temporada inventada. Uma nova carreira é uma
 ação explícita. Detalhes e parâmetros em [CAREER-PROTOTYPE.md](CAREER-PROTOTYPE.md).
@@ -305,7 +306,7 @@ compartilham um rascunho em memória; salvar é uma ação explícita da base in
 e exportar JSON pode preservar mudanças ainda não publicadas. A prévia é uma
 ilustração dos presets, não uma renderização do personagem do Unity.
 
-V4/v5 são evoluções explícitas do contrato. Abrir uma base v1–v3 não inventa data,
+V4/v5/v6 são evoluções explícitas do contrato. Abrir uma base v1–v3 não inventa data,
 fontes ou localização para promovê-la silenciosamente. Ambos os importadores
 validam forma, limites, referências e datas; dados opcionais desconhecidos são
 omitidos, enquanto `null` explícito é inválido. O metadado de estádio não muda
@@ -349,8 +350,8 @@ não substitui a base ativa. Não executar scripts ou nomes de tipos recebidos e
 JSON. Regulamentos parametrizam comportamentos implementados no jogo.
 
 O editor atual oferece criar, editar, validar e exportar cadastros e competições.
-Os formulários de edição suportam `round-robin` v1 e `paulista-2026` v1; não são
-um construtor de regras arbitrárias. A rota local ainda não importa pacotes gráficos. Hospedagem
+Os formulários separam formatos reutilizáveis, campeonatos e edições. As fases
+declarativas combinam regras implementadas, sem executar regras arbitrárias. A rota local ainda não importa pacotes gráficos. Hospedagem
 de catálogos públicos pode ser acrescentada como outra origem de conteúdo; a
 aplicação local não define autenticação ou publicação pública de uma galeria.
 
@@ -428,3 +429,22 @@ Os testes de carreira exercitam os 16 clubes até o encerramento e restauração
 entre compromissos, além da contabilidade e compressão com a base completa.
 Essas simulações automatizadas não equivalem a jogar as 72 partidas no navegador;
 a cobertura real de UI/3D deve ser informada separadamente.
+
+## Formatos declarativos e apresentação da carreira
+
+O schema v6 separa `CompetitionFormatDefinition`, `CompetitionDefinition` e `CompetitionEditionDefinition`. O formato contém fases ordenadas com origem explícita, regras de confrontos, critérios, vagas e fase que concede o título. A edição atribui participantes, grupos e datas; `CompetitionSession` calcula as fases e suas ramificações sem depender do Unity. Vencedores e derrotados podem seguir calendários paralelos; fases que podem compartilhar clubes não jogam no mesmo dia.
+
+Os adaptadores de importação e o validador compartilhado do editor rejeitam combinações não suportadas. O motor mantém as invariantes, reconstrói grupos/resultados no replay e publica `QualifiedOutcomes`. A carreira deriva prêmios do regulamento em lançamentos idempotentes e não gera bilheteria de mandante em campo neutro. Não cria automaticamente outra temporada a partir de uma vaga.
+
+Saves de campeonatos declarativos usam envelope v3 com fase, confronto, perna e campo neutro; os antigos v1/v2 continuam legíveis. A carreira usa envelope v4 com a competição interna correspondente e o plano tático. O teto expandido é 8 MiB; o teto por slot codificado continua 112 KiB para respeitar a quota WebGL. Uma edição estruturalmente válida pode exceder esse teto de armazenamento: a gravação deve falhar preservando o último save.
+
+A apresentação consome uma prévia de escalação via `LineupPlanner`, sem mutar o save ao selecionar uma formação. Campo, marcadores, linhas de atributo e cores ficam em prefabs/componentes serializados; o core não constrói UI. Consulte [COMPETITION-FORMATS.md](COMPETITION-FORMATS.md).
+
+`CareerTacticPlan` é um valor imutável da Application, com onze vagas semânticas
+por formação. Guarda coordenadas normalizadas no sentido de ataque e funções
+compatíveis com cada posição. A apresentação mantém um rascunho; o Hub envia
+o comando validado à carreira e invalida o adaptador quando o plano salvo muda.
+`CatalogMatchAdapter` converte os ajustes em instruções temporárias por vaga,
+espelha os eixos na fronteira com o legado e aplica apenas ao clube controlado.
+`CareerRoleTuning.asset` concentra intensidades editáveis no Inspector; o motor
+recebe cópias dos parâmetros e não depende do schema JSON nem altera presets.
