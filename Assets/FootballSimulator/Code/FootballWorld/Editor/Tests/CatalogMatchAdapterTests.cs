@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using FStudio.Data;
 using FStudio.Database;
+using FStudio.FootballWorld.Application;
 using FStudio.FootballWorld.DataContracts;
 using FStudio.FootballWorld.Domain;
 using FStudio.FootballWorld.Infrastructure.Importing;
 using FStudio.FootballWorld.Infrastructure.GameModes;
 using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using FStudio.MatchEngine.Tactics;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -358,6 +360,97 @@ namespace FStudio.FootballWorld.Editor.Tests
             Assert.AreSame(largerCatalog, lease.Catalog);
         }
 
+        [TestCase(CareerFormation.FourFourTwo, CareerMentality.Defensive, Formations._4_4_2, TacticPresetTypes.Defensive, false)]
+        [TestCase(CareerFormation.FourThreeThree, CareerMentality.Attacking, Formations._4_3_3, TacticPresetTypes.Offensive, true)]
+        [TestCase(CareerFormation.FourTwoThreeOne, CareerMentality.Balanced, Formations._4_2_3_1_A, TacticPresetTypes.Balanced, false)]
+        public void CareerTacticsApplyOnlyToControlledMatchClonesAndPreserveOrdinaryPreviews(CareerFormation formation,
+            CareerMentality mentality, Formations expectedFormation, TacticPresetTypes expectedTactic, bool controlledAway)
+        {
+            var catalog = imported.Catalog;
+            var controlledId = catalog.Clubs[0].Id;
+            var opponentId = catalog.Clubs[1].Id;
+            var ordinary = CreateAdapter();
+            var ordinaryFormation = ordinary.Teams.Single(value => value.ClubId == controlledId).Preview.Formation;
+            var career = CreateAdapter(careerOptions: new CareerMatchOptions(controlledId, formation, mentality));
+            var lease = CreateLease(career, controlledAway ? opponentId : controlledId, controlledAway ? controlledId : opponentId);
+            var controlled = controlledAway ? lease.Request.awayTeam : lease.Request.homeTeam;
+            var opponent = controlledAway ? lease.Request.homeTeam : lease.Request.awayTeam;
+            Assert.That(controlled.Formation, Is.EqualTo(expectedFormation));
+            Assert.That(opponent.Formation, Is.EqualTo(ordinary.Teams.Single(value => value.ClubId == opponentId).Preview.Formation));
+            Assert.That(lease.Request.InitialUserTactic, Is.EqualTo(expectedTactic));
+            Assert.That(ordinary.Teams.Single(value => value.ClubId == controlledId).Preview.Formation, Is.EqualTo(ordinaryFormation));
+            Assert.That(controlled.Players[0].Position, Is.EqualTo(Positions.GK));
+            Assert.That(lease.Players.Count, Is.EqualTo(22));
+            foreach (var identity in lease.Players)
+            {
+                var team = identity.LocalId < 11 ? lease.Request.homeTeam : lease.Request.awayTeam;
+                AssertSportingData(catalog.GetPlayer(identity.PlayerId), team.Players[identity.LocalId % 11]);
+            }
+            var unrelated = CreateLease(career, catalog.Clubs[1].Id, catalog.Clubs[2].Id);
+            Assert.That(unrelated.Request.InitialUserTactic, Is.Null);
+            var quick = CreateLease(ordinary, controlledId, opponentId);
+            Assert.That(quick.Request.InitialUserTactic, Is.Null);
+        }
+
+        [Test]
+        public void CareerFourThreeThreeReplansAllRosterMembersIntoItsNaturalWingSlots()
+        {
+            var catalog = imported.Catalog;
+            var club = catalog.Clubs[0];
+            var source = catalog.GetRoster(club.Id)[1];
+            var left = new PlayerDefinition("career-left-wing", "Left winger", new[] { PlayerPosition.LW }, source.HeightCm, source.WeightKg, source.Attributes);
+            var right = new PlayerDefinition("career-right-wing", "Right winger", new[] { PlayerPosition.RW }, source.HeightCm, source.WeightKg, source.Attributes);
+            var expanded = new DatabaseCatalog(catalog.DatabaseId, catalog.DatabaseRevision, catalog.Clubs,
+                catalog.Players.Concat(new[] { left, right }), catalog.Memberships.Concat(new[] {
+                    new RosterMembership(club.Id, left.Id), new RosterMembership(club.Id, right.Id) }));
+            var adapter = CreateAdapter(expanded, careerOptions: new CareerMatchOptions(club.Id,
+                CareerFormation.FourThreeThree, CareerMentality.Attacking));
+            var lease = CreateLease(adapter, club.Id, catalog.Clubs[1].Id);
+            var homeIds = lease.Players.Where(value => value.ClubId == club.Id).OrderBy(value => value.LocalId).ToArray();
+            Assert.That(homeIds[8].PlayerId, Is.EqualTo(left.Id));
+            Assert.That(homeIds[9].PlayerId, Is.EqualTo(right.Id));
+            Assert.That(lease.Request.homeTeam.Players[8].Position, Is.EqualTo(Positions.LW));
+            Assert.That(lease.Request.homeTeam.Players[9].Position, Is.EqualTo(Positions.RW));
+            Assert.That(expanded.GetRoster(club.Id).Count, Is.EqualTo(13));
+            Assert.That(catalog.GetRoster(club.Id).Count, Is.EqualTo(11));
+        }
+
+        [Test]
+        public void EffectiveTransferredMembershipFeedsTheNewClubWhileKeepingPlayerIdentityAndAppearance()
+        {
+            var catalog = imported.Catalog;
+            var buyer = catalog.Clubs[0].Id;
+            var seller = catalog.Clubs[1].Id;
+            var recruit = catalog.GetRoster(seller).First(value => !value.NaturalPositions.Contains(PlayerPosition.GK));
+            var specialist = new PlayerDefinition(recruit.Id, recruit.Name, new[] { PlayerPosition.AM },
+                recruit.HeightCm, recruit.WeightKg, recruit.Attributes);
+            var effective = new DatabaseCatalog(catalog.DatabaseId, catalog.DatabaseRevision, catalog.Clubs,
+                catalog.Players.Select(value => value.Id == recruit.Id ? specialist : value),
+                catalog.Memberships.Select(value => value.PlayerId == recruit.Id ? new RosterMembership(buyer, recruit.Id) : value));
+            var adapter = CreateAdapter(effective, careerOptions: new CareerMatchOptions(buyer,
+                CareerFormation.FourTwoThreeOne, CareerMentality.Balanced));
+            var lease = CreateLease(adapter, buyer, catalog.Clubs[2].Id);
+            var identity = lease.Players.Single(value => value.PlayerId == recruit.Id);
+            Assert.That(identity.ClubId, Is.EqualTo(buyer));
+            Assert.That(identity.LocalId, Is.EqualTo(9));
+            Assert.That(lease.Request.homeTeam.Players[9].Position, Is.EqualTo(Positions.AMF));
+            AssertSportingData(specialist, lease.Request.homeTeam.Players[9]);
+            AssertAppearance(bindings.Players.Single(value => value.PlayerId == recruit.Id).Appearance, lease.Request.homeTeam.Players[9]);
+            Assert.That(lease.Request.homeTeam.HomeKit, Is.SameAs(bindings.Clubs.Single(value => value.ClubId == buyer).VisualTemplate.HomeKit));
+            Assert.That(effective.GetRoster(seller).Any(value => value.Id == recruit.Id), Is.False);
+            Assert.That(catalog.GetRoster(seller).Any(value => value.Id == recruit.Id), Is.True);
+        }
+
+        [Test]
+        public void CareerTacticOptionsRejectUnknownChoicesAndUnknownControlledClubs()
+        {
+            Assert.Throws<ArgumentException>(() => new CareerMatchOptions("club", (CareerFormation)999, CareerMentality.Balanced));
+            Assert.Throws<ArgumentException>(() => new CareerMatchOptions("club", CareerFormation.FourFourTwo, (CareerMentality)999));
+            Assert.Throws<ArgumentException>(() => new CareerMatchOptions(" ", CareerFormation.FourFourTwo, CareerMentality.Balanced));
+            Assert.Throws<KeyNotFoundException>(() => CreateAdapter(careerOptions:
+                new CareerMatchOptions("unknown-club", CareerFormation.FourFourTwo, CareerMentality.Balanced)));
+        }
+
         [Test]
         public void IncompleteRosterHasNoPreviewAndPreservesTheOtherClubs()
         {
@@ -448,9 +541,10 @@ namespace FStudio.FootballWorld.Editor.Tests
         }
 
         private CatalogMatchAdapter CreateAdapter(DatabaseCatalog catalog = null,
-            IReadOnlyList<VisualProfileData> visualProfiles = null, LegacyMatchBindings localBindings = null)
+            IReadOnlyList<VisualProfileData> visualProfiles = null, LegacyMatchBindings localBindings = null,
+            CareerMatchOptions careerOptions = null)
         {
-            var adapter = new CatalogMatchAdapter(catalog ?? imported.Catalog, visualProfiles ?? imported.VisualProfiles, localBindings ?? bindings);
+            var adapter = new CatalogMatchAdapter(catalog ?? imported.Catalog, visualProfiles ?? imported.VisualProfiles, localBindings ?? bindings, careerOptions);
             ownedSessions.Add(adapter);
             return adapter;
         }

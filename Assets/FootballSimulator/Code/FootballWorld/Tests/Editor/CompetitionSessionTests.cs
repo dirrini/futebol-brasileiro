@@ -166,6 +166,31 @@ namespace FStudio.FootballWorld.Tests
             Assert.That(next.ExecutionId, Is.Not.EqualTo(first.ExecutionId));
         }
 
+        [TestCase(3)] [TestCase(4)] [TestCase(5)]
+        public void ExplicitManagementSimulationAlsoSupportsLegacyRoundRobinAndRestoresItsProvenance(int count)
+        {
+            foreach (var club in Catalog(count).Clubs)
+            {
+                var session = Session(count, club: club.Id);
+                var fixture = session.NextFixture;
+                session.SimulateFixture(fixture.Id);
+                Assert.That(session.GetResult(fixture.Id).IsSimulated, Is.True);
+                var restored = CompetitionSession.Restore(session.Catalog, session.CaptureSnapshot());
+                while (!restored.IsComplete)
+                {
+                    restored.SimulateNextRound();
+                    restored = CompetitionSession.Restore(session.Catalog, restored.CaptureSnapshot());
+                }
+                Assert.That(restored.Results.All(value => value.IsSimulated), Is.True);
+                var roundsOnly = Session(count, club: club.Id);
+                while (!roundsOnly.IsComplete)
+                {
+                    roundsOnly.SimulateNextRound();
+                    roundsOnly = CompetitionSession.Restore(roundsOnly.Catalog, roundsOnly.CaptureSnapshot());
+                }
+            }
+        }
+
         [Test]
         public void RestorePinsDatabaseFixturesAndResultsAndAbandonsInterruptedExecution()
         {

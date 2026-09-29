@@ -21,7 +21,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
 {
     // The lifetime owner for game modes, navigation and the selected season.
     // Domain/application rules remain in pure C#; this host owns Unity adapters.
-    public sealed class GameHubSession : MonoBehaviour
+    public sealed partial class GameHubSession : MonoBehaviour
     {
         public const string ChampionshipSaveKey = "FOOTBALL_CHAMPIONSHIP_V1";
         public const string CareerSaveKey = "FOOTBALL_CAREER_V1";
@@ -64,7 +64,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public IReadOnlyList<CatalogCountryOption> Countries => FriendlyMatchSession.Current.Countries;
         public IReadOnlyList<HubEditionOption> Editions { get; private set; } = Array.Empty<HubEditionOption>();
         public DateTime DefaultCareerDate { get; private set; } = DateTime.Today;
-        public HubChampionshipView Championship => season == null ? null : new HubChampionshipView(season, IsBusy);
+        public HubChampionshipView Championship => DisplayedSeason == null ? null : new HubChampionshipView(DisplayedSeason, IsBusy);
         public HubCareerProfile Career { get; private set; }
         public bool HasChampionshipSave { get; private set; }
         public bool HasCareerSave { get; private set; }
@@ -139,7 +139,10 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public void Navigate(HubPage page)
         {
             if (IsBusy) return;
-            if (page == HubPage.Championship && season == null) page = HubPage.Championships;
+            if (page == HubPage.Championships) viewingCareerCompetition = false;
+            if (page == HubPage.Championship && DisplayedSeason == null) page = HubPage.Championships;
+            if ((page == HubPage.CareerOffice || page == HubPage.CareerSquad || page == HubPage.CareerTactics || page == HubPage.CareerMarket)
+                && careerSession == null) page = HubPage.Career;
             statusKey = null;
             statusDetails = null;
             Page = page;
@@ -181,6 +184,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
                 { AddSaveWarning(saveError); return false; }
                 seasonAdapter?.Dispose(); seasonAdapter = replacement; replacement = null;
                 season = next; seasonDatabaseJson = source.ActiveSourceJson; HasChampionshipSave = true;
+                viewingCareerCompetition = false;
                 Navigate(HubPage.Championship);
                 return true;
             }
@@ -194,18 +198,24 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
 
         public async Task PlayNextFixture()
         {
-            if (IsBusy || season == null || season.NextFixture == null) return;
+            var target = DisplayedSeason;
+            if (IsBusy || target == null || target.NextFixture == null ||
+                (viewingCareerCompetition && !CareerCanPlay)) return;
             busy = true; statusKey = null; Changed?.Invoke();
             try
             {
-                var fixture = season.NextFixture;
-                if (!seasonAdapter.TryCreateMatch(fixture.HomeClubId, fixture.AwayClubId, out var lease, out var error))
+                if (viewingCareerCompetition) RefreshCareerAdapter();
+                var adapter = viewingCareerCompetition ? careerAdapter : seasonAdapter;
+                var fixture = target.NextFixture;
+                if (!adapter.TryCreateMatch(fixture.HomeClubId, fixture.AwayClubId, out var lease, out var error))
                     throw new InvalidOperationException(error);
-                try { execution = season.BeginFixture(fixture.Id); }
+                ApplyCareerPreparation(lease);
+                try { execution = target.BeginFixture(fixture.Id); }
                 catch { lease.Dispose(); throw; }
-                executionLease = lease; completedExecution = false; matchOrigin = HubPage.Championship;
-                PersistSeason(); // Saves consumed execution IDs; a refresh restores this fixture as pending.
-                var side = fixture.HomeClubId == season.ControlledClubId ? MatchCreateRequest.UserTeam.Home : MatchCreateRequest.UserTeam.Away;
+                executionLease = lease; completedExecution = false;
+                matchOrigin = viewingCareerCompetition ? HubPage.CareerOffice : HubPage.Championship;
+                PersistActiveSeason(); // Saves consumed execution IDs; a refresh restores this fixture as pending.
+                var side = fixture.HomeClubId == target.ControlledClubId ? MatchCreateRequest.UserTeam.Home : MatchCreateRequest.UserTeam.Away;
                 await FriendlyMatchSession.Current.StartPreparedMatch(lease, side);
             }
             catch (Exception exception)
@@ -222,15 +232,16 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
 
         private void OnFinalWhistle(FinalWhistleEvent result)
         {
-            if (result == null || execution == null || completedExecution || season == null || executionLease == null) return;
+            var target = ActiveSeason;
+            if (result == null || execution == null || completedExecution || target == null || executionLease == null) return;
             if (!ReferenceEquals(result.HomeTeam, executionLease.Request.homeTeam) ||
                 !ReferenceEquals(result.AwayTeam, executionLease.Request.awayTeam)) return;
-            var accepted = season.CompleteFixture(new FixtureResult(execution.FixtureId, execution.ExecutionId,
+            var accepted = target.CompleteFixture(new FixtureResult(execution.FixtureId, execution.ExecutionId,
                 executionLease.HomeClubId, executionLease.AwayClubId, result.HomeGoals, result.AwayGoals));
             if (accepted == FixtureCompletion.Applied || accepted == FixtureCompletion.AlreadyApplied)
             {
                 completedExecution = true;
-                PersistSeason();
+                PersistActiveSeason();
                 Changed?.Invoke();
             }
         }
@@ -245,10 +256,11 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         // the lease. Both abandonment and failures leave the fixture replayable.
         public void NotifyMatchUnloaded()
         {
-            if (execution != null && season != null && !completedExecution)
+            var target = ActiveSeason;
+            if (execution != null && target != null && !completedExecution)
             {
-                season.AbortFixture(execution.FixtureId, execution.ExecutionId);
-                PersistSeason();
+                target.AbortFixture(execution.FixtureId, execution.ExecutionId);
+                PersistActiveSeason();
             }
             execution = null; executionLease = null; completedExecution = false;
             busy = false;
@@ -266,18 +278,12 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             if (!DatabaseReady || IsBusy) return false;
             try
             {
-                var catalog = FootballDatabaseBootstrap.Current.Session.ActiveCatalog;
-                var club = catalog.GetClub(clubId);
-                var profile = new HubCareerProfile(name, avatarId, month, year, clubId, club.Name, catalog.DatabaseId, catalog.DatabaseRevision);
-                if (!saves.Write(CareerSaveKey, GameSaveCodec.Career(profile), out var error))
-                { AddSaveWarning(error); return false; }
-                Career = profile; HasCareerSave = true; statusKey = "career.created";
-                Changed?.Invoke(); return true;
+                return CreateDailyCareer(name, avatarId, month, year, clubId);
             }
             catch (Exception exception)
             {
                 Debug.LogWarning("[FootballWorld] Career profile rejected: " + exception.Message);
-                statusKey = "career.invalid"; Changed?.Invoke(); return false;
+                statusKey = "career.unavailableDate"; Changed?.Invoke(); return false;
             }
         }
 
@@ -308,7 +314,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             try
             {
                 var json = saves.Read(CareerSaveKey);
-                if (json != null) Career = GameSaveCodec.RestoreCareer(json);
+                if (json != null) RestoreDailyCareer(json);
             }
             catch (Exception exception)
             { Debug.LogWarning("[FootballWorld] Career save retained but unavailable: " + exception.Message); AddSaveWarning("career_restore_failed"); }
@@ -343,6 +349,7 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             GameText.Changed -= OnPreferencesChanged;
             if (friendly != null) friendly.Changed -= OnFriendlyChanged;
             seasonAdapter?.Dispose();
+            careerAdapter?.Dispose();
             if (current == this) current = null;
         }
     }

@@ -348,7 +348,7 @@ namespace FStudio.MatchEngine {
 
             // set default tactic.
             if (Current.UserTeam != null) {
-                var defaultUserTactic = TacticPresetTypes.Balanced;
+                var defaultUserTactic = details.InitialUserTactic ?? TacticPresetTypes.Balanced;
                 Current.UserTeam.Team.TacticPresetType = defaultUserTactic;
                 EventManager.Trigger(new TeamChangedTactic(Current.UserTeam, defaultUserTactic));
             }

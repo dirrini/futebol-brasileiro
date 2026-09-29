@@ -1,10 +1,30 @@
 {
   "Entries": [
-    { "Key": "country.label", "Portuguese": "País", "English": "Country" },
-    { "Key": "country.unspecified", "Portuguese": "Sem país informado", "English": "Country unspecified" },
-    { "Key": "country.none", "Portuguese": "Nenhum país disponível", "English": "No countries available" },
-    { "Key": "country.BR", "Portuguese": "Brasil", "English": "Brazil" },
-    { "Key": "adapter.genericClub", "Portuguese": "Escudo e uniformes genéricos, não oficiais.", "English": "Generic badge and kits, not official." },
+    {
+      "Key": "country.label",
+      "Portuguese": "País",
+      "English": "Country"
+    },
+    {
+      "Key": "country.unspecified",
+      "Portuguese": "Sem país informado",
+      "English": "Country unspecified"
+    },
+    {
+      "Key": "country.none",
+      "Portuguese": "Nenhum país disponível",
+      "English": "No countries available"
+    },
+    {
+      "Key": "country.BR",
+      "Portuguese": "Brasil",
+      "English": "Brazil"
+    },
+    {
+      "Key": "adapter.genericClub",
+      "Portuguese": "Escudo e uniformes genéricos, não oficiais.",
+      "English": "Generic badge and kits, not official."
+    },
     {
       "Key": "hub.brand",
       "Portuguese": "FUTEBOL BRASILEIRO",
@@ -604,6 +624,786 @@
       "Key": "match.backChampionship",
       "Portuguese": "Voltar ao campeonato",
       "English": "Back to championship"
+    },
+    {
+      "Key": "career.office",
+      "Portuguese": "Centro do treinador",
+      "English": "Manager office"
+    },
+    {
+      "Key": "career.startDaily",
+      "Portuguese": "Iniciar carreira",
+      "English": "Start career"
+    },
+    {
+      "Key": "career.continue",
+      "Portuguese": "Continuar carreira",
+      "English": "Continue career"
+    },
+    {
+      "Key": "career.new",
+      "Portuguese": "Nova carreira",
+      "English": "New career"
+    },
+    {
+      "Key": "career.dailyScope",
+      "Portuguese": "Avance os dias, gerencie o treino e dispute a edição disponível no mês escolhido.",
+      "English": "Advance days, manage training and play the edition available in your chosen month."
+    },
+    {
+      "Key": "career.dailyHint",
+      "Portuguese": "Assuma um clube e viva cada dia da temporada.",
+      "English": "Take charge of a club and live each day of the season."
+    },
+    {
+      "Key": "career.unavailableDate",
+      "Portuguese": "Não foi possível iniciar. Informe nome, clube e mês de abertura de uma edição cadastrada (exemplo: janeiro de 2026).",
+      "English": "Could not start. Enter a name, club and the opening month of an available edition (for example January 2026)."
+    },
+    {
+      "Key": "career.actionUnavailable",
+      "Portuguese": "Ação indisponível. Confira o calendário e conclua o jogo pendente.",
+      "English": "Action unavailable. Check the calendar and complete the pending match."
+    },
+    {
+      "Key": "career.calendarEnded",
+      "Portuguese": "Calendário concluído. Consulte a classificação final.",
+      "English": "Calendar completed. View the final standings."
+    },
+    {
+      "Key": "career.followFinals",
+      "Portuguese": "Sem próximo jogo do clube. Avance para acompanhar as fases finais.",
+      "English": "No next club fixture. Advance to follow the final stages."
+    },
+    {
+      "Key": "career.balance",
+      "Portuguese": "Caixa: {0}",
+      "English": "Balance: {0}"
+    },
+    {
+      "Key": "career.monthly",
+      "Portuguese": "Mensal: +{0} receitas / −{1} folha",
+      "English": "Monthly: +{0} income / −{1} wages"
+    },
+    {
+      "Key": "career.fitness",
+      "Portuguese": "Condição {0}/100 · Preparo {1}/100\nRendimento 3D: {2}%",
+      "English": "Condition {0}/100 · Preparation {1}/100\n3D performance: {2}%"
+    },
+    {
+      "Key": "career.training",
+      "Portuguese": "Plano de treino diário",
+      "English": "Daily training plan"
+    },
+    {
+      "Key": "career.advanceDay",
+      "Portuguese": "Avançar 1 dia",
+      "English": "Advance 1 day"
+    },
+    {
+      "Key": "career.advanceNext",
+      "Portuguese": "Até o próximo jogo",
+      "English": "To next fixture"
+    },
+    {
+      "Key": "career.news",
+      "Portuguese": "Imprensa fictícia",
+      "English": "Fictional press"
+    },
+    {
+      "Key": "career.ledger",
+      "Portuguese": "Movimentações do caixa",
+      "English": "Cash ledger"
+    },
+    {
+      "Key": "career.calendar",
+      "Portuguese": "Calendário e classificação",
+      "English": "Calendar and standings"
+    },
+    {
+      "Key": "career.simulationHint",
+      "Portuguese": "Valores financeiros de simulação. Treino aplicado ao avançar o dia.",
+      "English": "Simulation finances. Training takes effect when advancing the day."
+    },
+    {
+      "Key": "training.Balanced",
+      "Portuguese": "Equilibrado · +1 condição / +1 preparo",
+      "English": "Balanced · +1 condition / +1 preparation"
+    },
+    {
+      "Key": "training.Recovery",
+      "Portuguese": "Recuperação · +4 condição / −2 preparo",
+      "English": "Recovery · +4 condition / −2 preparation"
+    },
+    {
+      "Key": "training.Intensive",
+      "Portuguese": "Intenso · −3 condição / +3 preparo",
+      "English": "Intensive · −3 condition / +3 preparation"
+    },
+    {
+      "Key": "phase.League",
+      "Portuguese": "Primeira fase",
+      "English": "League phase"
+    },
+    {
+      "Key": "phase.QuarterFinal",
+      "Portuguese": "Quartas de final",
+      "English": "Quarter-finals"
+    },
+    {
+      "Key": "phase.SemiFinal",
+      "Portuguese": "Semifinais",
+      "English": "Semi-finals"
+    },
+    {
+      "Key": "phase.Final",
+      "Portuguese": "Final",
+      "English": "Final"
+    },
+    {
+      "Key": "phase.Complete",
+      "Portuguese": "Concluído",
+      "English": "Completed"
+    },
+    {
+      "Key": "hub.simulateMatch",
+      "Portuguese": "Simular jogo",
+      "English": "Simulate match"
+    },
+    {
+      "Key": "hub.simulateRound",
+      "Portuguese": "Simular rodada",
+      "English": "Simulate round"
+    },
+    {
+      "Key": "hub.champion",
+      "Portuguese": "Campeão: {0}",
+      "English": "Champion: {0}"
+    },
+    {
+      "Key": "hub.relegated",
+      "Portuguese": "Rebaixados: {0}",
+      "English": "Relegated: {0}"
+    },
+    {
+      "Key": "hub.eliminated",
+      "Portuguese": "Seu clube encerrou sua participação. Simule as próximas fases.",
+      "English": "Your club has finished its run. Simulate the remaining stages."
+    },
+    {
+      "Key": "hub.penalties",
+      "Portuguese": "Pênaltis {0}–{1}",
+      "English": "Penalties {0}–{1}"
+    },
+    {
+      "Key": "hub.rulesHint",
+      "Portuguese": "Paulista: oito classificados, dois rebaixados; mata-mata por campanha acumulada. Cartões, sorteio e pênaltis são simulados neste protótipo.",
+      "English": "Paulista: top eight qualify, bottom two relegated; knockout seeding by cumulative record. Cards, drawing of lots and penalties are simulated in this prototype."
+    },
+    {
+      "Key": "dialog.replaceDailyCareerBody",
+      "Portuguese": "Isso substituirá o treinador, o calendário, os resultados e as finanças da carreira salva.",
+      "English": "This replaces the coach, calendar, results and finances of the saved career."
+    },
+    {
+      "Key": "outlet.gazeta-da-bola",
+      "Portuguese": "Gazeta da Bola",
+      "English": "Gazeta da Bola"
+    },
+    {
+      "Key": "outlet.diario-da-arquibancada",
+      "Portuguese": "Diário da Arquibancada",
+      "English": "Diário da Arquibancada"
+    },
+    {
+      "Key": "news.welcome",
+      "Portuguese": "{0} apresenta seu novo treinador. A temporada começa com o planejamento do elenco.",
+      "English": "{0} introduces its new manager. The season starts with squad preparation."
+    },
+    {
+      "Key": "news.monthly-finances",
+      "Portuguese": "Balanço mensal de {0}: movimento líquido de {3}.",
+      "English": "Monthly statement for {0}: net cash flow {3}."
+    },
+    {
+      "Key": "news.training-report",
+      "Portuguese": "Semana de treino de {0}: condição {1}/100 e preparo {2}/100.",
+      "English": "Training week at {0}: condition {1}/100 and preparation {2}/100."
+    },
+    {
+      "Key": "news.match-result",
+      "Portuguese": "Resultado de {0}.",
+      "English": "Match result for {0}."
+    },
+    {
+      "Key": "news.season-complete",
+      "Portuguese": "A edição chegou ao fim. Consulte a classificação e o campeão no calendário.",
+      "English": "The edition has ended. View the final standings and champion in the calendar."
+    },
+    {
+      "Key": "ledger.opening-balance",
+      "Portuguese": "Saldo inicial de simulação",
+      "English": "Opening simulation balance"
+    },
+    {
+      "Key": "ledger.monthly-income",
+      "Portuguese": "Receita mensal",
+      "English": "Monthly income"
+    },
+    {
+      "Key": "ledger.monthly-wages",
+      "Portuguese": "Folha mensal",
+      "English": "Monthly wages"
+    },
+    {
+      "Key": "ledger.home-match-income",
+      "Portuguese": "Bilheteria de simulação",
+      "English": "Simulated gate receipts"
+    },
+    {
+      "Key": "hub.cumulative",
+      "Portuguese": "Campanha acumulada",
+      "English": "Cumulative record"
+    },
+    {
+      "Key": "hub.awaitingPhase",
+      "Portuguese": "Nenhum próximo jogo definido. Avance os dias no centro do treinador.",
+      "English": "No next fixture defined. Advance days from the manager office."
+    },
+    {
+      "Key": "career.squad",
+      "Portuguese": "Elenco",
+      "English": "Squad"
+    },
+    {
+      "Key": "career.tactics",
+      "Portuguese": "Padrão tático",
+      "English": "Tactical setup"
+    },
+    {
+      "Key": "career.tacticsShort",
+      "Portuguese": "Tática",
+      "English": "Tactics"
+    },
+    {
+      "Key": "career.market",
+      "Portuguese": "Mercado",
+      "English": "Transfers"
+    },
+    {
+      "Key": "career.squadScope",
+      "Portuguese": "Todos os jogadores do clube · selecione um nome para consultar a ficha.",
+      "English": "Every player at your club · select a name to inspect their profile."
+    },
+    {
+      "Key": "career.selectPlayer",
+      "Portuguese": "Selecione um jogador",
+      "English": "Select a player"
+    },
+    {
+      "Key": "career.playerBio",
+      "Portuguese": "Nascimento: {0} · Pé: {1}\n{2} cm · {3} kg · Nacionalidade: {4}",
+      "English": "Born: {0} · Foot: {1}\n{2} cm · {3} kg · Nationality: {4}"
+    },
+    {
+      "Key": "foot.right",
+      "Portuguese": "Direito",
+      "English": "Right"
+    },
+    {
+      "Key": "foot.left",
+      "Portuguese": "Esquerdo",
+      "English": "Left"
+    },
+    {
+      "Key": "foot.both",
+      "Portuguese": "Ambidestro",
+      "English": "Both"
+    },
+    {
+      "Key": "foot.unknown",
+      "Portuguese": "Não informado",
+      "English": "Unspecified"
+    },
+    {
+      "Key": "career.allPositions",
+      "Portuguese": "Todas as posições",
+      "English": "All positions"
+    },
+    {
+      "Key": "career.allClubs",
+      "Portuguese": "Todos os clubes",
+      "English": "All clubs"
+    },
+    {
+      "Key": "career.freeAgent",
+      "Portuguese": "Sem clube",
+      "English": "Free agent"
+    },
+    {
+      "Key": "career.playerCount",
+      "Portuguese": "{0} jogadores encontrados",
+      "English": "{0} players found"
+    },
+    {
+      "Key": "career.pageCount",
+      "Portuguese": "Página {0} de {1}",
+      "English": "Page {0} of {1}"
+    },
+    {
+      "Key": "career.searchPlayers",
+      "Portuguese": "Buscar jogadores",
+      "English": "Find players"
+    },
+    {
+      "Key": "career.offers",
+      "Portuguese": "Minhas propostas",
+      "English": "My offers"
+    },
+    {
+      "Key": "career.marketScope",
+      "Portuguese": "Taxas de transferência de simulação. Respostas ao avançar o dia.",
+      "English": "Simulated transfer fees. Advance the day to receive decisions."
+    },
+    {
+      "Key": "career.searchName",
+      "Portuguese": "Nome ou apelido",
+      "English": "Name or nickname"
+    },
+    {
+      "Key": "career.searchPlaceholder",
+      "Portuguese": "Buscar jogador…",
+      "English": "Find a player…"
+    },
+    {
+      "Key": "career.clearFilters",
+      "Portuguese": "Limpar",
+      "English": "Clear"
+    },
+    {
+      "Key": "career.position",
+      "Portuguese": "Posição",
+      "English": "Position"
+    },
+    {
+      "Key": "career.noPlayers",
+      "Portuguese": "Nenhum jogador corresponde aos filtros.\nTente outro nome ou limpe a busca.",
+      "English": "No players match these filters.\nTry another name or clear the search."
+    },
+    {
+      "Key": "career.previous",
+      "Portuguese": "Anterior",
+      "English": "Previous"
+    },
+    {
+      "Key": "career.next",
+      "Portuguese": "Próxima",
+      "English": "Next"
+    },
+    {
+      "Key": "career.attributes",
+      "Portuguese": "Atributos · escala de 0 a 100",
+      "English": "Attributes · scale from 0 to 100"
+    },
+    {
+      "Key": "career.squadDetailsHint",
+      "Portuguese": "As posições são as naturais do jogador. O XI é escolhido automaticamente a partir do elenco e da formação salva em Tática.",
+      "English": "These are the player’s natural positions. The starting XI is selected automatically from your squad and the saved tactical formation."
+    },
+    {
+      "Key": "career.offerAmount",
+      "Portuguese": "Valor total da proposta · números inteiros",
+      "English": "Total offer amount · whole numbers"
+    },
+    {
+      "Key": "career.amountPlaceholder",
+      "Portuguese": "Ex.: 250000",
+      "English": "e.g. 250000"
+    },
+    {
+      "Key": "career.makeOffer",
+      "Portuguese": "Fazer proposta",
+      "English": "Make an offer"
+    },
+    {
+      "Key": "career.submitOffer",
+      "Portuguese": "Enviar proposta",
+      "English": "Submit offer"
+    },
+    {
+      "Key": "career.cancelOffer",
+      "Portuguese": "Cancelar",
+      "English": "Cancel offer"
+    },
+    {
+      "Key": "career.offerConfirmTitle",
+      "Portuguese": "Confirmar proposta",
+      "English": "Confirm offer"
+    },
+    {
+      "Key": "career.offerConfirmBody",
+      "Portuguese": "{0} · {1}\nCusto total: {2}\n\nEsse valor ficará reservado até a resposta no próximo dia. O custo é apenas a taxa de transferência; salários e novos contratos ainda não são negociados.",
+      "English": "{0} · {1}\nTotal cost: {2}\n\nThis amount will be reserved until tomorrow’s decision. The cost covers only the transfer fee; wages and new contracts are not negotiated yet."
+    },
+    {
+      "Key": "career.transferBudget",
+      "Portuguese": "Disponível para propostas: {0}\nReservado em propostas pendentes: {1}",
+      "English": "Available for offers: {0}\nReserved for pending offers: {1}"
+    },
+    {
+      "Key": "career.offerCount",
+      "Portuguese": "{0} propostas · decisões aparecem após avançar o dia na carreira",
+      "English": "{0} offers · advance the career day to receive decisions"
+    },
+    {
+      "Key": "career.noOffers",
+      "Portuguese": "Você ainda não fez propostas.\nUse Buscar jogadores para escolher um reforço.",
+      "English": "You have not made any offers yet.\nUse Find players to choose a new signing."
+    },
+    {
+      "Key": "career.offerDates",
+      "Portuguese": "Enviada em {0} · Resposta: {1}",
+      "English": "Submitted {0} · Decision: {1}"
+    },
+    {
+      "Key": "career.tomorrow",
+      "Portuguese": "próximo dia",
+      "English": "next day"
+    },
+    {
+      "Key": "career.alreadyOwned",
+      "Portuguese": "Esse jogador já pertence ao seu clube.",
+      "English": "This player already belongs to your club."
+    },
+    {
+      "Key": "career.offerPending",
+      "Portuguese": "Já existe uma proposta pendente. Veja Minhas propostas para consultar ou cancelar.",
+      "English": "An offer is already pending. Open My offers to view or cancel it."
+    },
+    {
+      "Key": "career.valuation",
+      "Portuguese": "Estimativa: {0} · Disponível: {1}\nValor de simulação; a aceitação depende também do elenco do vendedor.",
+      "English": "Estimate: {0} · Available: {1}\nSimulated value; acceptance also depends on the selling club’s squad."
+    },
+    {
+      "Key": "career.offerSubmitted",
+      "Portuguese": "Proposta enviada. Avance o dia para receber a resposta.",
+      "English": "Offer submitted. Advance the day to receive a decision."
+    },
+    {
+      "Key": "career.offerCancelled",
+      "Portuguese": "Proposta cancelada; o valor reservado foi liberado.",
+      "English": "Offer cancelled; the reserved amount has been released."
+    },
+    {
+      "Key": "career.offerCompleted",
+      "Portuguese": "Contratação concluída. O jogador já está no seu elenco.",
+      "English": "Transfer completed. The player is now in your squad."
+    },
+    {
+      "Key": "career.offerInvalid",
+      "Portuguese": "Informe um valor inteiro entre 0 e 2.147.483.647. Jogadores com clube exigem taxa positiva; sem clube, a taxa é zero.",
+      "English": "Enter a whole number from 0 to 2,147,483,647. Registered players require a positive fee; free agents require zero."
+    },
+    {
+      "Key": "career.offerInsufficientFunds",
+      "Portuguese": "Saldo disponível insuficiente. Reduza o valor ou cancele outra proposta pendente.",
+      "English": "Insufficient available funds. Reduce the amount or cancel another pending offer."
+    },
+    {
+      "Key": "career.offerUnavailable",
+      "Portuguese": "Não foi possível concluir a proposta. Verifique o jogador, as propostas pendentes e a data da carreira.",
+      "English": "The offer could not be completed. Check the player, pending offers and career date."
+    },
+    {
+      "Key": "career.managementEnded",
+      "Portuguese": "Calendário encerrado. Consultas continuam disponíveis.",
+      "English": "Calendar ended. You can still view this information."
+    },
+    {
+      "Key": "career.tacticsScope",
+      "Portuguese": "Defina a formação e a postura padrão para as próximas partidas da carreira.",
+      "English": "Set the default formation and mentality for upcoming career matches."
+    },
+    {
+      "Key": "career.formation",
+      "Portuguese": "Formação",
+      "English": "Formation"
+    },
+    {
+      "Key": "career.mentality",
+      "Portuguese": "Postura",
+      "English": "Mentality"
+    },
+    {
+      "Key": "career.savedTactics",
+      "Portuguese": "Em uso: {0} · {1}",
+      "English": "In use: {0} · {1}"
+    },
+    {
+      "Key": "career.applyTactics",
+      "Portuguese": "Salvar padrão tático",
+      "English": "Save tactical setup"
+    },
+    {
+      "Key": "career.tacticsSaved",
+      "Portuguese": "Padrão tático salvo para as próximas partidas.",
+      "English": "Tactical setup saved for upcoming matches."
+    },
+    {
+      "Key": "career.tacticsEffect",
+      "Portuguese": "A formação define as posições do XI automático. A postura orienta o comportamento da equipe na partida 3D.",
+      "English": "Formation defines the automatic XI’s positions. Mentality guides the team’s behaviour in the 3D match."
+    },
+    {
+      "Key": "career.automaticXI",
+      "Portuguese": "XI automático · padrão salvo",
+      "English": "Automatic XI · saved setup"
+    },
+    {
+      "Key": "career.lineupHint",
+      "Portuguese": "Posições exibidas são naturais. Escalação manual será uma etapa futura.",
+      "English": "Positions shown are natural positions. Manual team selection is a future step."
+    },
+    {
+      "Key": "career.tacticsDraft",
+      "Portuguese": "Alterações pendentes. Salve para aplicá-las.",
+      "English": "Unsaved changes. Save to apply them."
+    },
+    {
+      "Key": "career.tacticsCurrent",
+      "Portuguese": "O padrão salvo está aplicado.",
+      "English": "Your saved setup is active."
+    },
+    {
+      "Key": "mentality.Defensive",
+      "Portuguese": "Defensiva",
+      "English": "Defensive"
+    },
+    {
+      "Key": "mentality.Balanced",
+      "Portuguese": "Equilibrada",
+      "English": "Balanced"
+    },
+    {
+      "Key": "mentality.Attacking",
+      "Portuguese": "Ofensiva",
+      "English": "Attacking"
+    },
+    {
+      "Key": "offerStatus.Pending",
+      "Portuguese": "Pendente",
+      "English": "Pending"
+    },
+    {
+      "Key": "offerStatus.Accepted",
+      "Portuguese": "Aceita",
+      "English": "Accepted"
+    },
+    {
+      "Key": "offerStatus.Rejected",
+      "Portuguese": "Recusada",
+      "English": "Rejected"
+    },
+    {
+      "Key": "offerStatus.Cancelled",
+      "Portuguese": "Cancelada",
+      "English": "Cancelled"
+    },
+    {
+      "Key": "offerReason.None",
+      "Portuguese": "Aguardando resposta do próximo dia.",
+      "English": "Awaiting the next day’s decision."
+    },
+    {
+      "Key": "offerReason.BelowValuation",
+      "Portuguese": "Valor abaixo da avaliação do jogador.",
+      "English": "The amount is below the player’s valuation."
+    },
+    {
+      "Key": "offerReason.SellerSquadTooSmall",
+      "Portuguese": "O clube vendedor ficaria sem jogadores suficientes.",
+      "English": "The selling club would not have enough players."
+    },
+    {
+      "Key": "offerReason.SellerNeedsGoalkeeper",
+      "Portuguese": "O clube vendedor precisa manter um goleiro.",
+      "English": "The selling club needs to retain a goalkeeper."
+    },
+    {
+      "Key": "offerReason.InsufficientFunds",
+      "Portuguese": "Saldo insuficiente no momento da decisão.",
+      "English": "Insufficient funds when the decision was made."
+    },
+    {
+      "Key": "offerReason.PlayerUnavailable",
+      "Portuguese": "O jogador deixou de estar disponível.",
+      "English": "The player is no longer available."
+    },
+    {
+      "Key": "offerReason.Cancelled",
+      "Portuguese": "Cancelada pelo treinador; valor reservado liberado.",
+      "English": "Cancelled by the manager; reserved funds released."
+    },
+    {
+      "Key": "news.transfer-accepted",
+      "Portuguese": "{0} acertou a chegada de {4} por {3}. O reforço já integra o elenco nesta carreira.",
+      "English": "{0} have signed {4} for {3}. The player has joined the squad in this career."
+    },
+    {
+      "Key": "news.transfer-rejected",
+      "Portuguese": "A proposta de {0} por {4}, no valor de {3}, foi recusada. Consulte o motivo em Minhas propostas.",
+      "English": "{0}’s offer of {3} for {4} was rejected. See My offers for the reason."
+    },
+    {
+      "Key": "ledger.transfer-fee",
+      "Portuguese": "Taxa de transferência",
+      "English": "Transfer fee"
+    },
+    {
+      "Key": "match.backCareer",
+      "Portuguese": "Voltar à carreira",
+      "English": "Back to career"
+    },
+    {
+      "Key": "position.GK",
+      "Portuguese": "GK · Goleiro",
+      "English": "GK · Goalkeeper"
+    },
+    {
+      "Key": "position.RB",
+      "Portuguese": "RB · Lateral direito",
+      "English": "RB · Right back"
+    },
+    {
+      "Key": "position.LB",
+      "Portuguese": "LB · Lateral esquerdo",
+      "English": "LB · Left back"
+    },
+    {
+      "Key": "position.CB",
+      "Portuguese": "CB · Zagueiro",
+      "English": "CB · Centre back"
+    },
+    {
+      "Key": "position.DM",
+      "Portuguese": "DM · Volante",
+      "English": "DM · Defensive midfielder"
+    },
+    {
+      "Key": "position.CM",
+      "Portuguese": "CM · Meio-campista",
+      "English": "CM · Central midfielder"
+    },
+    {
+      "Key": "position.RM",
+      "Portuguese": "RM · Meia direito",
+      "English": "RM · Right midfielder"
+    },
+    {
+      "Key": "position.LM",
+      "Portuguese": "LM · Meia esquerdo",
+      "English": "LM · Left midfielder"
+    },
+    {
+      "Key": "position.AM",
+      "Portuguese": "AM · Meia ofensivo",
+      "English": "AM · Attacking midfielder"
+    },
+    {
+      "Key": "position.LW",
+      "Portuguese": "LW · Ponta esquerda",
+      "English": "LW · Left winger"
+    },
+    {
+      "Key": "position.RW",
+      "Portuguese": "RW · Ponta direita",
+      "English": "RW · Right winger"
+    },
+    {
+      "Key": "position.ST",
+      "Portuguese": "ST · Atacante",
+      "English": "ST · Striker"
+    },
+    {
+      "Key": "attribute.Strength",
+      "Portuguese": "Força",
+      "English": "Strength"
+    },
+    {
+      "Key": "attribute.Acceleration",
+      "Portuguese": "Aceleração",
+      "English": "Acceleration"
+    },
+    {
+      "Key": "attribute.TopSpeed",
+      "Portuguese": "Velocidade",
+      "English": "Top speed"
+    },
+    {
+      "Key": "attribute.DribbleSpeed",
+      "Portuguese": "Veloc. com bola",
+      "English": "Dribble speed"
+    },
+    {
+      "Key": "attribute.Jump",
+      "Portuguese": "Impulsão",
+      "English": "Jump"
+    },
+    {
+      "Key": "attribute.Tackling",
+      "Portuguese": "Desarme",
+      "English": "Tackling"
+    },
+    {
+      "Key": "attribute.BallKeeping",
+      "Portuguese": "Proteção de bola",
+      "English": "Ball keeping"
+    },
+    {
+      "Key": "attribute.Passing",
+      "Portuguese": "Passe",
+      "English": "Passing"
+    },
+    {
+      "Key": "attribute.LongBall",
+      "Portuguese": "Passe longo",
+      "English": "Long ball"
+    },
+    {
+      "Key": "attribute.Agility",
+      "Portuguese": "Agilidade",
+      "English": "Agility"
+    },
+    {
+      "Key": "attribute.Shooting",
+      "Portuguese": "Finalização",
+      "English": "Shooting"
+    },
+    {
+      "Key": "attribute.ShootPower",
+      "Portuguese": "Potência de chute",
+      "English": "Shot power"
+    },
+    {
+      "Key": "attribute.Positioning",
+      "Portuguese": "Posicionamento",
+      "English": "Positioning"
+    },
+    {
+      "Key": "attribute.Reaction",
+      "Portuguese": "Reação",
+      "English": "Reaction"
+    },
+    {
+      "Key": "attribute.BallControl",
+      "Portuguese": "Controle de bola",
+      "English": "Ball control"
+    },
+    {
+      "Key": "career.clubFilter",
+      "Portuguese": "Clube",
+      "English": "Club"
     }
   ]
 }

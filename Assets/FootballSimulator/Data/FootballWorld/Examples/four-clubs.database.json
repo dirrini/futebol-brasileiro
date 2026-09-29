@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "databaseId": "db-2bc0ad3f537e4fadbd99aa1addb41feb",
-  "databaseRevision": 9,
+  "databaseRevision": 10,
   "countries": [
     {
       "code": "BR",
@@ -151,7 +151,7 @@
     "date": "2026-01-11",
     "label": "Paulistão 2026 — relacionados da primeira rodada",
     "rosterScope": "matchday-squads",
-    "notes": "Fotografia dos 363 relacionados dos 16 clubes nas súmulas de 10 e 11/01/2026; não equivale a todos os atletas contratados ou inscritos. Data de observação: 11/01/2026. A presença histórica vem exclusivamente das súmulas. Apelidos e nascimentos complementados por fichas públicas FPF consultadas em 29/09/2026; a vinculação atual dessas fichas não é usada como vínculo de janeiro. Dados desconhecidos são omitidos. Posições são adaptações táticas para o protótipo, não scouting; a autoescalação não reproduz os titulares das súmulas. Altura/peso e atributos dos novos atletas são parâmetros fictícios por posição; os atletas preservados do São Paulo mantêm as alturas da amostra documentada em SAO-PAULO-DATA.md, consultadas em setembro, e os demais parâmetros de simulação. Aparência é genérica, sem inferir traços reais. Não há lesões, cartões, contratos, orçamento ou desempenho histórico importados. Estádios são os principais oficiais dos clubes: Allianz Parque e Nabi Abi Chedid. Disponibilidade e mandos temporários não são simulados. Capacidades são números reportados pelas fontes, não laudos. Campos duvidosos foram omitidos. O estádio 3D continua o genérico. Esta base não contém ainda o regulamento/calendário oficial: competições vazias. A data não resolve automaticamente elencos de outras épocas.",
+    "notes": "Fotografia dos 363 relacionados dos 16 clubes nas súmulas de 10 e 11/01/2026; não equivale a todos os atletas contratados ou inscritos. Data de observação: 11/01/2026. A presença histórica vem exclusivamente das súmulas. Apelidos e nascimentos complementados por fichas públicas FPF consultadas em 29/09/2026; a vinculação atual dessas fichas não é usada como vínculo de janeiro. Dados desconhecidos são omitidos. Posições são adaptações táticas para o protótipo, não scouting; a autoescalação não reproduz os titulares das súmulas. Altura/peso e atributos dos novos atletas são parâmetros fictícios por posição; os atletas preservados do São Paulo mantêm as alturas da amostra documentada em SAO-PAULO-DATA.md, consultadas em setembro, e os demais parâmetros de simulação. Aparência é genérica, sem inferir traços reais. Não há lesões, cartões, contratos, orçamento ou desempenho histórico importados. Estádios são os principais oficiais dos clubes: Allianz Parque e Nabi Abi Chedid. Disponibilidade e mandos temporários não são simulados. Capacidades são números reportados pelas fontes, não laudos. Campos duvidosos foram omitidos. O estádio 3D continua o genérico. Esta base não contém ainda o regulamento/calendário oficial: competições vazias. A data não resolve automaticamente elencos de outras épocas. Calendário esportivo: primeira fase conforme tabela FPF publicada em 22/12/2025; não incorpora remarcações posteriores. Datas das eliminatórias e decisão em ida/volta complementadas por comunicados FPF de fevereiro/março de 2026. Os classificados e os resultados são produzidos pela simulação. Regulamento executável paulista-2026; cartões, pênaltis e sorteio são simulados no protótipo. Estádio principal do clube é preservado; locais temporários não foram agendados nesta etapa.",
     "sources": [
       {
         "id": "fpf-fixtures",
@@ -512,6 +512,36 @@
         "id": "positions-72",
         "title": "Funções e escalação — Red Bull Bragantino",
         "url": "https://www.redbullbragantino.com/br-pt/noticias/empate-em-porto-alegre-1105"
+      },
+      {
+        "id": "source-1b731b98d86a40989de98c14adbb9da1",
+        "title": "Regulamento Específico Paulista 2026",
+        "url": "https://futebolpaulista.com.br/Repositorio/Noticia/30546/30546_1.pdf"
+      },
+      {
+        "id": "source-5f85d6b1d5e44a66b3804da70bf22e2d",
+        "title": "FPF: datas das quartas Paulista 2026",
+        "url": "https://futebolpaulista.com.br/Noticias/Detalhe.aspx?Noticia=31989"
+      },
+      {
+        "id": "source-e8b10cb5374b48b7a09dd4fb5510275c",
+        "title": "FPF: datas das semifinais Paulista 2026",
+        "url": "https://futebolpaulista.com.br/Noticias/Detalhe.aspx?Noticia=32026"
+      },
+      {
+        "id": "source-3d201782b32f49439c3bebd72fb768b7",
+        "title": "FPF: datas da final em dois jogos",
+        "url": "https://www.futebolpaulista.com.br/noticias/Detalhe.aspx?Noticia=32069"
+      },
+      {
+        "id": "source-6c0523365832467b9e65ca96d11fc637",
+        "title": "FPF: final e desempate pelo agregado",
+        "url": "https://futebolpaulista.com.br/Noticias/Detalhe.aspx?Noticia=32067"
+      },
+      {
+        "id": "source-c7d26b37c7d44b799b31ba5281f0e1cf",
+        "title": "FPF: decisão sem gol qualificado",
+        "url": "https://futebolpaulista.com.br/Noticias/Detalhe.aspx?Noticia=32095"
       }
     ]
   },
@@ -19032,6 +19062,523 @@
       }
     }
   ],
-  "competitions": [],
-  "competitionEditions": []
+  "competitions": [
+    {
+      "id": "competition-adafa656851b40e0956aa930ea9d6f2c",
+      "name": "Campeonato Paulista"
+    }
+  ],
+  "competitionEditions": [
+    {
+      "id": "edition-bb5142a05a9843d18e62929523af8aae",
+      "competitionId": "competition-adafa656851b40e0956aa930ea9d6f2c",
+      "name": "Paulista 2026",
+      "participantClubIds": [
+        "club-32184129dfae4075a185324c5cce9b85",
+        "club-375e7a5afbbb47c994364a3708dae03a",
+        "club-bedaba6310004b898ddf3e1013baaf3f",
+        "club-77719d0c6bfb4e39a73d11da55b8d135",
+        "club-1135e1f251fc49c7ad2bce90bc39c565",
+        "club-73bd326a5e944fdab51fc9050badc63c",
+        "club-d5c69ada7ed54ee68cdee59ef345209a",
+        "club-4fb09e7ffdc148a7a74e06c71e3b8f7a",
+        "club-76d07a2443f0488189bf7403fac656b3",
+        "club-aed99f2b026949dcb781cfe09862892a",
+        "club-fb06c7c079cc478eb4722933daaa3604",
+        "club-cf543fbb57ad463bbcc68365f1056df0",
+        "club-5dc6bddc818f429ca388a0a34f483e64",
+        "club-ff8480fa5f4d451b88c04bd04f8f95b7",
+        "club-57c5fe91efa14b2aa0cb51986aff34bc",
+        "club-8515fca92adc4d77a428fb272bb7d160"
+      ],
+      "roundDates": [
+        "2026-01-10",
+        "2026-01-13",
+        "2026-01-17",
+        "2026-01-20",
+        "2026-01-24",
+        "2026-01-31",
+        "2026-02-07",
+        "2026-02-15"
+      ],
+      "rules": {
+        "type": "paulista-2026",
+        "version": 1,
+        "legs": 1,
+        "points": {
+          "win": 3,
+          "draw": 1,
+          "loss": 0
+        },
+        "tieBreakers": [
+          "wins",
+          "goal-difference",
+          "goals-for",
+          "red-cards",
+          "yellow-cards",
+          "drawing-lots"
+        ]
+      },
+      "authoredFixtures": [
+        {
+          "id": "fixture-39f5839529574e53af4be3d7141364a4",
+          "round": 1,
+          "date": "2026-01-10",
+          "homeClubId": "club-32184129dfae4075a185324c5cce9b85",
+          "awayClubId": "club-375e7a5afbbb47c994364a3708dae03a"
+        },
+        {
+          "id": "fixture-1e66b6002a7e4f128402a3ea832941bd",
+          "round": 1,
+          "date": "2026-01-10",
+          "homeClubId": "club-bedaba6310004b898ddf3e1013baaf3f",
+          "awayClubId": "club-77719d0c6bfb4e39a73d11da55b8d135"
+        },
+        {
+          "id": "fixture-cd225389747f4838818be0bc2fde6108",
+          "round": 1,
+          "date": "2026-01-10",
+          "homeClubId": "club-1135e1f251fc49c7ad2bce90bc39c565",
+          "awayClubId": "club-73bd326a5e944fdab51fc9050badc63c"
+        },
+        {
+          "id": "fixture-e241358cd3354b7d8d9fc854c10b264a",
+          "round": 1,
+          "date": "2026-01-10",
+          "homeClubId": "club-d5c69ada7ed54ee68cdee59ef345209a",
+          "awayClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a"
+        },
+        {
+          "id": "fixture-1d571ef71ed844d4b2ff5dea381ceff0",
+          "round": 1,
+          "date": "2026-01-11",
+          "homeClubId": "club-76d07a2443f0488189bf7403fac656b3",
+          "awayClubId": "club-aed99f2b026949dcb781cfe09862892a"
+        },
+        {
+          "id": "fixture-e1e7b0c32aa943da89a169a6dbb0f8ba",
+          "round": 1,
+          "date": "2026-01-11",
+          "homeClubId": "club-fb06c7c079cc478eb4722933daaa3604",
+          "awayClubId": "club-cf543fbb57ad463bbcc68365f1056df0"
+        },
+        {
+          "id": "fixture-dfc9f4648887498f86f0ab52189448c7",
+          "round": 1,
+          "date": "2026-01-11",
+          "homeClubId": "club-5dc6bddc818f429ca388a0a34f483e64",
+          "awayClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7"
+        },
+        {
+          "id": "fixture-2836ea90cc264eb19c9a169f6e5d2b71",
+          "round": 1,
+          "date": "2026-01-11",
+          "homeClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc",
+          "awayClubId": "club-8515fca92adc4d77a428fb272bb7d160"
+        },
+        {
+          "id": "fixture-cb30c53cbc8f4293b81ea8ccec4dfd59",
+          "round": 2,
+          "date": "2026-01-13",
+          "homeClubId": "club-77719d0c6bfb4e39a73d11da55b8d135",
+          "awayClubId": "club-1135e1f251fc49c7ad2bce90bc39c565"
+        },
+        {
+          "id": "fixture-e0a67c09f74a47aaa03af6fe9aa1dc9b",
+          "round": 2,
+          "date": "2026-01-13",
+          "homeClubId": "club-375e7a5afbbb47c994364a3708dae03a",
+          "awayClubId": "club-d5c69ada7ed54ee68cdee59ef345209a"
+        },
+        {
+          "id": "fixture-fde403380be74f51b14e5cc66cc6005b",
+          "round": 2,
+          "date": "2026-01-14",
+          "homeClubId": "club-73bd326a5e944fdab51fc9050badc63c",
+          "awayClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc"
+        },
+        {
+          "id": "fixture-2822e35843f34383a552eb8d4e44f361",
+          "round": 2,
+          "date": "2026-01-14",
+          "homeClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a",
+          "awayClubId": "club-bedaba6310004b898ddf3e1013baaf3f"
+        },
+        {
+          "id": "fixture-31c30d8fbd7b44b59501dfdf1862d694",
+          "round": 2,
+          "date": "2026-01-14",
+          "homeClubId": "club-aed99f2b026949dcb781cfe09862892a",
+          "awayClubId": "club-fb06c7c079cc478eb4722933daaa3604"
+        },
+        {
+          "id": "fixture-2de918abcc504fcc80229010a2fba9e7",
+          "round": 2,
+          "date": "2026-01-15",
+          "homeClubId": "club-cf543fbb57ad463bbcc68365f1056df0",
+          "awayClubId": "club-5dc6bddc818f429ca388a0a34f483e64"
+        },
+        {
+          "id": "fixture-f54fa625755148cf8643f0749611f96e",
+          "round": 2,
+          "date": "2026-01-15",
+          "homeClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7",
+          "awayClubId": "club-76d07a2443f0488189bf7403fac656b3"
+        },
+        {
+          "id": "fixture-3ef6201539ba42f1a86f0d514334562b",
+          "round": 2,
+          "date": "2026-01-15",
+          "homeClubId": "club-8515fca92adc4d77a428fb272bb7d160",
+          "awayClubId": "club-32184129dfae4075a185324c5cce9b85"
+        },
+        {
+          "id": "fixture-d37aab963bbc40e9a23595fa02ba07c2",
+          "round": 3,
+          "date": "2026-01-17",
+          "homeClubId": "club-73bd326a5e944fdab51fc9050badc63c",
+          "awayClubId": "club-77719d0c6bfb4e39a73d11da55b8d135"
+        },
+        {
+          "id": "fixture-5c309dd54bbd4f6a853982d77f89a015",
+          "round": 3,
+          "date": "2026-01-17",
+          "homeClubId": "club-d5c69ada7ed54ee68cdee59ef345209a",
+          "awayClubId": "club-fb06c7c079cc478eb4722933daaa3604"
+        },
+        {
+          "id": "fixture-ec0c9d3096f84281ab11d3e2fdc5121c",
+          "round": 3,
+          "date": "2026-01-17",
+          "homeClubId": "club-375e7a5afbbb47c994364a3708dae03a",
+          "awayClubId": "club-aed99f2b026949dcb781cfe09862892a"
+        },
+        {
+          "id": "fixture-b94b50da391c40b6a785b5e91ca71f27",
+          "round": 3,
+          "date": "2026-01-17",
+          "homeClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a",
+          "awayClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc"
+        },
+        {
+          "id": "fixture-02c8c23380cc48448ced97ccdda5848b",
+          "round": 3,
+          "date": "2026-01-18",
+          "homeClubId": "club-76d07a2443f0488189bf7403fac656b3",
+          "awayClubId": "club-8515fca92adc4d77a428fb272bb7d160"
+        },
+        {
+          "id": "fixture-4a5980cec26545a99509b8ca5e4ac2ea",
+          "round": 3,
+          "date": "2026-01-18",
+          "homeClubId": "club-32184129dfae4075a185324c5cce9b85",
+          "awayClubId": "club-5dc6bddc818f429ca388a0a34f483e64"
+        },
+        {
+          "id": "fixture-fba8fabd0a5047cdb78258f4f2e34366",
+          "round": 3,
+          "date": "2026-01-18",
+          "homeClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7",
+          "awayClubId": "club-cf543fbb57ad463bbcc68365f1056df0"
+        },
+        {
+          "id": "fixture-3e7d2e38486f4e6f81e5f946ef81c657",
+          "round": 3,
+          "date": "2026-01-18",
+          "homeClubId": "club-1135e1f251fc49c7ad2bce90bc39c565",
+          "awayClubId": "club-bedaba6310004b898ddf3e1013baaf3f"
+        },
+        {
+          "id": "fixture-4ad75d3f54d54c6f8321c8b78804f512",
+          "round": 4,
+          "date": "2026-01-20",
+          "homeClubId": "club-77719d0c6bfb4e39a73d11da55b8d135",
+          "awayClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a"
+        },
+        {
+          "id": "fixture-34a73d12ca764cbf8a3df2c61318f0df",
+          "round": 4,
+          "date": "2026-01-21",
+          "homeClubId": "club-5dc6bddc818f429ca388a0a34f483e64",
+          "awayClubId": "club-375e7a5afbbb47c994364a3708dae03a"
+        },
+        {
+          "id": "fixture-ac0517471bad4514a5d45cb9c85d3ecb",
+          "round": 4,
+          "date": "2026-01-21",
+          "homeClubId": "club-8515fca92adc4d77a428fb272bb7d160",
+          "awayClubId": "club-d5c69ada7ed54ee68cdee59ef345209a"
+        },
+        {
+          "id": "fixture-a1d23f32440f4401ac65fa6f5220cb5a",
+          "round": 4,
+          "date": "2026-01-21",
+          "homeClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc",
+          "awayClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7"
+        },
+        {
+          "id": "fixture-c0a3893d994146189dd01dd6b69dc3e1",
+          "round": 4,
+          "date": "2026-01-21",
+          "homeClubId": "club-aed99f2b026949dcb781cfe09862892a",
+          "awayClubId": "club-32184129dfae4075a185324c5cce9b85"
+        },
+        {
+          "id": "fixture-a61f0fc35a774954a54537c142e9e774",
+          "round": 4,
+          "date": "2026-01-22",
+          "homeClubId": "club-bedaba6310004b898ddf3e1013baaf3f",
+          "awayClubId": "club-76d07a2443f0488189bf7403fac656b3"
+        },
+        {
+          "id": "fixture-3d5a9a62c97a4ac1baefd0189ad8f4ec",
+          "round": 4,
+          "date": "2026-01-22",
+          "homeClubId": "club-cf543fbb57ad463bbcc68365f1056df0",
+          "awayClubId": "club-73bd326a5e944fdab51fc9050badc63c"
+        },
+        {
+          "id": "fixture-2f2f90d78c6f4700befe204892f1944b",
+          "round": 4,
+          "date": "2026-01-22",
+          "homeClubId": "club-fb06c7c079cc478eb4722933daaa3604",
+          "awayClubId": "club-1135e1f251fc49c7ad2bce90bc39c565"
+        },
+        {
+          "id": "fixture-24c8d4110e2a41b3bd553065c6a94cfb",
+          "round": 5,
+          "date": "2026-01-24",
+          "homeClubId": "club-32184129dfae4075a185324c5cce9b85",
+          "awayClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc"
+        },
+        {
+          "id": "fixture-3da554a35ed644c3a29aadc6941ef8dc",
+          "round": 5,
+          "date": "2026-01-24",
+          "homeClubId": "club-aed99f2b026949dcb781cfe09862892a",
+          "awayClubId": "club-5dc6bddc818f429ca388a0a34f483e64"
+        },
+        {
+          "id": "fixture-b6858e67a73a44bda8f974c5a2096068",
+          "round": 5,
+          "date": "2026-01-24",
+          "homeClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a",
+          "awayClubId": "club-8515fca92adc4d77a428fb272bb7d160"
+        },
+        {
+          "id": "fixture-b188ee8d16a645138a6d3f28f7d5bf37",
+          "round": 5,
+          "date": "2026-01-25",
+          "homeClubId": "club-bedaba6310004b898ddf3e1013baaf3f",
+          "awayClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7"
+        },
+        {
+          "id": "fixture-ba4b4b3b3eed456bb4c1664776d0c09d",
+          "round": 5,
+          "date": "2026-01-25",
+          "homeClubId": "club-375e7a5afbbb47c994364a3708dae03a",
+          "awayClubId": "club-73bd326a5e944fdab51fc9050badc63c"
+        },
+        {
+          "id": "fixture-e33db32071934bbd830413ff702a346f",
+          "round": 5,
+          "date": "2026-01-25",
+          "homeClubId": "club-77719d0c6bfb4e39a73d11da55b8d135",
+          "awayClubId": "club-cf543fbb57ad463bbcc68365f1056df0"
+        },
+        {
+          "id": "fixture-cbf7b71d04a84989b9078ea15a16cff6",
+          "round": 5,
+          "date": "2026-01-25",
+          "homeClubId": "club-fb06c7c079cc478eb4722933daaa3604",
+          "awayClubId": "club-76d07a2443f0488189bf7403fac656b3"
+        },
+        {
+          "id": "fixture-e4abf6cf99df4731bbe31c3f0cd77834",
+          "round": 5,
+          "date": "2026-01-26",
+          "homeClubId": "club-d5c69ada7ed54ee68cdee59ef345209a",
+          "awayClubId": "club-1135e1f251fc49c7ad2bce90bc39c565"
+        },
+        {
+          "id": "fixture-7721dd8447e240aa826ae736ff7be8c2",
+          "round": 6,
+          "date": "2026-01-31",
+          "homeClubId": "club-1135e1f251fc49c7ad2bce90bc39c565",
+          "awayClubId": "club-aed99f2b026949dcb781cfe09862892a"
+        },
+        {
+          "id": "fixture-1bd313abbc4d41b3a4ad15a7848502f1",
+          "round": 6,
+          "date": "2026-01-31",
+          "homeClubId": "club-73bd326a5e944fdab51fc9050badc63c",
+          "awayClubId": "club-d5c69ada7ed54ee68cdee59ef345209a"
+        },
+        {
+          "id": "fixture-97e3e106ed2d4ba9a8147fe6d2152f38",
+          "round": 6,
+          "date": "2026-01-31",
+          "homeClubId": "club-8515fca92adc4d77a428fb272bb7d160",
+          "awayClubId": "club-bedaba6310004b898ddf3e1013baaf3f"
+        },
+        {
+          "id": "fixture-dd5ad313726a4e43bffc4be30aaf6e2b",
+          "round": 6,
+          "date": "2026-02-01",
+          "homeClubId": "club-76d07a2443f0488189bf7403fac656b3",
+          "awayClubId": "club-375e7a5afbbb47c994364a3708dae03a"
+        },
+        {
+          "id": "fixture-9a820c770bc645eb86e6432ff957a45a",
+          "round": 6,
+          "date": "2026-02-01",
+          "homeClubId": "club-5dc6bddc818f429ca388a0a34f483e64",
+          "awayClubId": "club-fb06c7c079cc478eb4722933daaa3604"
+        },
+        {
+          "id": "fixture-28669e2910d8441f93819accc88883c0",
+          "round": 6,
+          "date": "2026-02-01",
+          "homeClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7",
+          "awayClubId": "club-32184129dfae4075a185324c5cce9b85"
+        },
+        {
+          "id": "fixture-a02c2ca750dc49b587fdc05fb2dceb39",
+          "round": 6,
+          "date": "2026-02-01",
+          "homeClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc",
+          "awayClubId": "club-77719d0c6bfb4e39a73d11da55b8d135"
+        },
+        {
+          "id": "fixture-d5c069791c3b4f2c95f945a3a793ceda",
+          "round": 6,
+          "date": "2026-02-01",
+          "homeClubId": "club-cf543fbb57ad463bbcc68365f1056df0",
+          "awayClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a"
+        },
+        {
+          "id": "fixture-0b2ea0c560594d0a86ca14fa4f508c22",
+          "round": 7,
+          "date": "2026-02-07",
+          "homeClubId": "club-d5c69ada7ed54ee68cdee59ef345209a",
+          "awayClubId": "club-aed99f2b026949dcb781cfe09862892a"
+        },
+        {
+          "id": "fixture-2cc720b7c5394ed4b23a6f222a606d97",
+          "round": 7,
+          "date": "2026-02-07",
+          "homeClubId": "club-1135e1f251fc49c7ad2bce90bc39c565",
+          "awayClubId": "club-cf543fbb57ad463bbcc68365f1056df0"
+        },
+        {
+          "id": "fixture-7ac1dc6c52e444dd88dd3aba9f1156ba",
+          "round": 7,
+          "date": "2026-02-07",
+          "homeClubId": "club-77719d0c6bfb4e39a73d11da55b8d135",
+          "awayClubId": "club-32184129dfae4075a185324c5cce9b85"
+        },
+        {
+          "id": "fixture-653508653be94d48b8b8d92a76128da7",
+          "round": 7,
+          "date": "2026-02-07",
+          "homeClubId": "club-8515fca92adc4d77a428fb272bb7d160",
+          "awayClubId": "club-73bd326a5e944fdab51fc9050badc63c"
+        },
+        {
+          "id": "fixture-b152b7560a6844e0928f13b1f2b125d9",
+          "round": 7,
+          "date": "2026-02-08",
+          "homeClubId": "club-5dc6bddc818f429ca388a0a34f483e64",
+          "awayClubId": "club-bedaba6310004b898ddf3e1013baaf3f"
+        },
+        {
+          "id": "fixture-9e508021fa00449e925a9f1f495536e6",
+          "round": 7,
+          "date": "2026-02-08",
+          "homeClubId": "club-375e7a5afbbb47c994364a3708dae03a",
+          "awayClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc"
+        },
+        {
+          "id": "fixture-6854e64d6be24357885a50423469778d",
+          "round": 7,
+          "date": "2026-02-08",
+          "homeClubId": "club-fb06c7c079cc478eb4722933daaa3604",
+          "awayClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7"
+        },
+        {
+          "id": "fixture-89f62106b07d427a83a3ed4289b06631",
+          "round": 7,
+          "date": "2026-02-08",
+          "homeClubId": "club-76d07a2443f0488189bf7403fac656b3",
+          "awayClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a"
+        },
+        {
+          "id": "fixture-52e1f80a7f0746cdad135dfb98660dcf",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-cf543fbb57ad463bbcc68365f1056df0",
+          "awayClubId": "club-375e7a5afbbb47c994364a3708dae03a"
+        },
+        {
+          "id": "fixture-a2ef15bb887e4981ab634b450fce1bcf",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-73bd326a5e944fdab51fc9050badc63c",
+          "awayClubId": "club-5dc6bddc818f429ca388a0a34f483e64"
+        },
+        {
+          "id": "fixture-e6eb61cc21d849f9a2742faa8f67dbcb",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-57c5fe91efa14b2aa0cb51986aff34bc",
+          "awayClubId": "club-d5c69ada7ed54ee68cdee59ef345209a"
+        },
+        {
+          "id": "fixture-162d8aae931b4def9a75cbc17a3ba4ab",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-4fb09e7ffdc148a7a74e06c71e3b8f7a",
+          "awayClubId": "club-1135e1f251fc49c7ad2bce90bc39c565"
+        },
+        {
+          "id": "fixture-8e9530f5d32f493eacf8199bea828f70",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-aed99f2b026949dcb781cfe09862892a",
+          "awayClubId": "club-8515fca92adc4d77a428fb272bb7d160"
+        },
+        {
+          "id": "fixture-6f09ceceaad44d11bc717578409edf85",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-ff8480fa5f4d451b88c04bd04f8f95b7",
+          "awayClubId": "club-77719d0c6bfb4e39a73d11da55b8d135"
+        },
+        {
+          "id": "fixture-022227cb393f43398e454e4aab666b4f",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-bedaba6310004b898ddf3e1013baaf3f",
+          "awayClubId": "club-fb06c7c079cc478eb4722933daaa3604"
+        },
+        {
+          "id": "fixture-28eb27d03a6c49c4a0d7e60b674a3858",
+          "round": 8,
+          "date": "2026-02-15",
+          "homeClubId": "club-32184129dfae4075a185324c5cce9b85",
+          "awayClubId": "club-76d07a2443f0488189bf7403fac656b3"
+        }
+      ],
+      "playoffDates": [
+        "2026-02-22",
+        "2026-02-21",
+        "2026-02-21",
+        "2026-02-22",
+        "2026-02-28",
+        "2026-03-01",
+        "2026-03-04",
+        "2026-03-08"
+      ]
+    }
+  ]
 }

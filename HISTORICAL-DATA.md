@@ -1,6 +1,7 @@
 # Base histórica — abertura do Paulistão 2026
 
-A revisão 9, schema v4, substitui os clubes fictícios por **16 clubes e 363
+A revisão 9 introduziu o cadastro histórico v4. A revisão 10, schema v5, mantém
+esses elencos e adiciona [calendário e regulamento](CALENDAR-2026.md). O recorte substitui os clubes fictícios por **16 clubes e 363
 jogadores relacionados nos oito jogos de 10 e 11 de janeiro de 2026**. É uma
 fotografia verificável da primeira rodada, não a relação completa de contratos ou
 inscrições do mês. Um atleta ausente dessa rodada pode pertencer ao clube e ainda
@@ -73,10 +74,11 @@ o [guia de dezembro de 2025](https://record.r7.com/esporte-record/fotos/paulista
 e documentação oficial do Palmeiras. Não são laudos de lotação. Capacidades de
 Primavera, Botafogo e Bragantino foram omitidas por divergência, ambiguidade ou obra.
 
-O estádio 3D da partida continua genérico. A futura agenda distinguirá estádio
-principal, períodos de reforma/eventos e estádio efetivo do confronto. Eventos
-poderão gerar receita e exigir mando alternativo conforme as regras da carreira;
-nenhum conflito ou receita é simulado nesta etapa. Veja [ROADMAP.md](ROADMAP.md).
+O estádio 3D da partida continua genérico. O calendário v5 já permite declarar um
+estádio específico por confronto, separado do principal do clube. Períodos de
+reforma/eventos, seus conflitos e a escolha automática de mandos alternativos
+ficam para depois. Receitas de eventos também não são simuladas; a gestão atual
+tem receitas mensais e bilheteria simplificadas. Veja [ROADMAP.md](ROADMAP.md).
 
 ## Uso e limites
 
@@ -84,9 +86,11 @@ Edite em [localhost:8080/editor/](http://localhost:8080/editor/), salve e atuali
 página do jogo. Alterações de dados compatíveis não precisam de novo build; novos
 modelos, assets compilados ou mudanças de contrato exigem o fluxo WebGL.
 
-Quick match pode usar os 16 clubes, agrupados em Brasil. Career cria o perfil e
-começa o formulário em janeiro de 2026; não avança dias nem escolhe outra base pela
-data. As coleções de competições estão vazias até a implementação do formato
-oficial do Paulista. Um campeonato demonstrativo salvo pode continuar com sua
-própria base. O histórico completo, calendário, transferências, imprensa e gestão
-financeira ainda pertencem às próximas etapas.
+Quick match usa os 16 clubes, agrupados em Brasil. A carreira diária começa em
+01/01/2026 quando janeiro é escolhido e usa este recorte dos relacionados como
+aproximação inicial, sem resolver vínculos históricos por dia. O Paulista é
+jogável em Championship e Career; calendário publicado, complementos das finais
+e divergências de remarcação estão em [CALENDAR-2026.md](CALENDAR-2026.md).
+Contratações por proposta já alteram os vínculos somente no save da carreira;
+não representam transferências históricas pesquisadas. Histórico completo,
+contratos e outras temporadas continuam planejados.

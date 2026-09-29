@@ -10,6 +10,8 @@ namespace FStudio.FootballWorld.Application
             Func<string> nextFixtureId = null)
         {
             if (edition == null) throw new ArgumentNullException(nameof(edition));
+            if (edition.Rules.IsPaulista2026)
+                throw new ArgumentException("Use the edition's authored schedule for Paulista 2026.", nameof(edition));
             nextFixtureId = nextFixtureId ?? (() => "fixture-" + Guid.NewGuid().ToString("N"));
             var rotation = new List<string>(edition.ParticipantClubIds);
             rotation.Sort(StringComparer.Ordinal);

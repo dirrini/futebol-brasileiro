@@ -12,8 +12,10 @@ namespace FStudio.FootballWorld.Domain
         public int GoalsAgainst { get; }
         public int GoalDifference => GoalsFor - GoalsAgainst;
         public int Points { get; }
+        public int YellowCards { get; }
+        public int RedCards { get; }
         public StandingRow(string clubId, int rank, int wins, int draws, int losses,
-            int goalsFor, int goalsAgainst, int points)
+            int goalsFor, int goalsAgainst, int points, int yellowCards = 0, int redCards = 0)
         {
             ClubId = DomainValidation.Id(clubId, nameof(clubId));
             Rank = DomainValidation.InRange(rank, 1, 64, nameof(rank));
@@ -23,6 +25,8 @@ namespace FStudio.FootballWorld.Domain
             GoalsFor = DomainValidation.InRange(goalsFor, 0, 126 * 999, nameof(goalsFor));
             GoalsAgainst = DomainValidation.InRange(goalsAgainst, 0, 126 * 999, nameof(goalsAgainst));
             Points = DomainValidation.InRange(points, 0, 12600, nameof(points));
+            YellowCards = DomainValidation.InRange(yellowCards, 0, 126 * 99, nameof(yellowCards));
+            RedCards = DomainValidation.InRange(redCards, 0, 126 * 22, nameof(redCards));
         }
     }
 }

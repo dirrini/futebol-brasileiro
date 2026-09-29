@@ -21,6 +21,8 @@ namespace FStudio.FootballWorld.Presentation
         private int sortingOrder = 30;
         [Header("Authored pages")]
         [SerializeField] private GameObject backdrop, homePage, quickMatchPage, championshipsPage, championshipPage, careerPage, optionsPage;
+        [SerializeField] private GameObject careerOfficePage;
+        [SerializeField] private GameObject careerSquadPage, careerTacticsPage, careerMarketPage;
         [SerializeField] private GameObject sharedHeader, sharedFooter;
         [SerializeField] private TMP_Text pageTitle, statusText, saveWarningText;
         [SerializeField] private Button backButton, retryButton, dismissWarningButton;
@@ -30,7 +32,9 @@ namespace FStudio.FootballWorld.Presentation
         [SerializeField] private Button startChampionshipButton, continueChampionshipButton;
         [Header("Championship dashboard")]
         [SerializeField] private TMP_Text championshipTitle, snapshotText, nextFixtureText;
+        [SerializeField] private TMP_Text standingsTitle, rulesHint;
         [SerializeField] private Button playFixtureButton;
+        [SerializeField] private Button simulateFixtureButton, continueCareerButton;
         [SerializeField] private HubStandingRow standingTemplate;
         [SerializeField] private HubFixtureRow fixtureTemplate;
         [Header("Career draft")]
@@ -64,6 +68,8 @@ namespace FStudio.FootballWorld.Presentation
         private int selectedMonth = DateTime.Now.Month, selectedYear = DateTime.Now.Year;
         private HubPage? lastPage;
         private Action pendingConfirmation;
+        private Func<bool> pendingCareerOffer;
+        private string offerConfirmationMessage;
         private GameObject previousSelection;
 
         private void OnEnable()
@@ -97,6 +103,8 @@ namespace FStudio.FootballWorld.Presentation
             startChampionshipButton.onClick.AddListener(StartChampionship);
             continueChampionshipButton.onClick.AddListener(ContinueChampionship);
             playFixtureButton.onClick.AddListener(PlayNext);
+            simulateFixtureButton.onClick.AddListener(SimulateNext);
+            continueCareerButton.onClick.AddListener(ContinueCareer);
             saveCareerButton.onClick.AddListener(SaveCareer);
             editionDropdown.onValueChanged.AddListener(SelectEdition);
             championshipCountryDropdown.onValueChanged.AddListener(SelectChampionshipCountry);
@@ -120,6 +128,8 @@ namespace FStudio.FootballWorld.Presentation
             startChampionshipButton.onClick.RemoveListener(StartChampionship);
             continueChampionshipButton.onClick.RemoveListener(ContinueChampionship);
             playFixtureButton.onClick.RemoveListener(PlayNext);
+            simulateFixtureButton.onClick.RemoveListener(SimulateNext);
+            continueCareerButton.onClick.RemoveListener(ContinueCareer);
             saveCareerButton.onClick.RemoveListener(SaveCareer);
             editionDropdown.onValueChanged.RemoveListener(SelectEdition);
             championshipCountryDropdown.onValueChanged.RemoveListener(SelectChampionshipCountry);
@@ -137,7 +147,10 @@ namespace FStudio.FootballWorld.Presentation
 
         public void OpenQuickMatch() { session.Navigate(HubPage.QuickMatch); }
         public void OpenChampionships() { session.Navigate(HubPage.Championships); }
-        public void OpenCareer() { session.Navigate(HubPage.Career); }
+        public void OpenCareer() { session.OpenCareer(); }
+        public void OpenCareerSquad() { session.Navigate(HubPage.CareerSquad); }
+        public void OpenCareerTactics() { session.Navigate(HubPage.CareerTactics); }
+        public void OpenCareerMarket() { session.Navigate(HubPage.CareerMarket); }
         public void OpenOptions() { session.Navigate(HubPage.Options); }
         public void GoHome() { session.Navigate(HubPage.Home); }
         public void SelectAvatar(int index)
@@ -147,7 +160,11 @@ namespace FStudio.FootballWorld.Presentation
             RefreshAvatar();
         }
 
-        private void Back() { session.Navigate(session.Page == HubPage.Championship ? HubPage.Championships : HubPage.Home); }
+        private void Back() { session.Navigate(session.Page == HubPage.Championship
+            ? (session.IsCareerCalendar ? HubPage.CareerOffice : HubPage.Championships)
+            : session.Page == HubPage.CareerSquad || session.Page == HubPage.CareerTactics || session.Page == HubPage.CareerMarket ? HubPage.CareerOffice : HubPage.Home); }
+        private void SimulateNext() { session.SimulateChampionship(); }
+        private void ContinueCareer() { session.ContinueCareer(); }
         private void Retry() { session.RetryDatabase(); }
         private void DismissWarning() { session.DismissSaveWarning(); }
         private void ContinueChampionship() { session.Navigate(HubPage.Championship); }
@@ -174,7 +191,7 @@ namespace FStudio.FootballWorld.Presentation
                 return;
             }
             if (session.HasCareerSave)
-                Confirm("dialog.replaceCareerTitle", "dialog.replaceCareerBody", () => session.SaveCareer(coachName.text, selectedAvatarId, selectedMonth, selectedYear, selectedCareerClubId));
+                Confirm("dialog.replaceCareerTitle", "dialog.replaceDailyCareerBody", () => session.SaveCareer(coachName.text, selectedAvatarId, selectedMonth, selectedYear, selectedCareerClubId));
             else session.SaveCareer(coachName.text, selectedAvatarId, selectedMonth, selectedYear, selectedCareerClubId);
         }
         private void SelectEdition(int index) { if (!refreshing && index < editionIds.Count) { selectedEditionId = editionIds[index]; selectedChampionshipClubId = null; Refresh(); } }
@@ -203,8 +220,13 @@ namespace FStudio.FootballWorld.Presentation
                 championshipsPage.SetActive(page == HubPage.Championships);
                 championshipPage.SetActive(page == HubPage.Championship);
                 careerPage.SetActive(page == HubPage.Career);
+                careerOfficePage.SetActive(page == HubPage.CareerOffice);
+                careerSquadPage.SetActive(page == HubPage.CareerSquad);
+                careerTacticsPage.SetActive(page == HubPage.CareerTactics);
+                careerMarketPage.SetActive(page == HubPage.CareerMarket);
                 optionsPage.SetActive(page == HubPage.Options);
-                pageTitle.text = GameText.Get(page == HubPage.Career ? "career.title" : page == HubPage.Options ? "options.title" : "hub.championships");
+                pageTitle.text = GameText.Get(page == HubPage.CareerSquad ? "career.squad" : page == HubPage.CareerTactics ? "career.tactics" : page == HubPage.CareerMarket ? "career.market"
+                    : page == HubPage.CareerOffice ? "career.office" : page == HubPage.Career ? "career.title" : page == HubPage.Options ? "options.title" : "hub.championships");
                 statusText.text = session.IsBusy ? GameText.Get("hub.busy") : session.StatusMessage;
                 saveWarningText.text = session.SaveWarning ?? string.Empty;
                 dismissWarningButton.gameObject.SetActive(!string.IsNullOrEmpty(session.SaveWarning));
@@ -245,7 +267,10 @@ namespace FStudio.FootballWorld.Presentation
             var championship = session.Championship;
             if (championship == null) return;
             championshipTitle.text = championship.Name + " · " + championship.EditionName;
-            snapshotText.text = championship.UserClubName + "  ·  " + GameText.Get("hub.revision", championship.DatabaseRevision);
+            standingsTitle.GetComponent<LocalizedText>().Key = championship.IsPaulista ? "hub.cumulative" : "hub.standings";
+            rulesHint.gameObject.SetActive(championship.IsPaulista && string.IsNullOrEmpty(session.StatusMessage));
+            snapshotText.text = championship.UserClubName + "  ·  " + GameText.Get("hub.revision", championship.DatabaseRevision)
+                + "  ·  " + GameText.Get("phase." + championship.Phase);
             for (var index = 0; index < championship.Standings.Count; index++)
             {
                 if (index == standings.Count) standings.Add(Instantiate(standingTemplate, standingTemplate.transform.parent));
@@ -261,8 +286,13 @@ namespace FStudio.FootballWorld.Presentation
             }
             for (var index = championship.Fixtures.Count; index < fixtures.Count; index++) fixtures[index].gameObject.SetActive(false);
             var next = championship.NextFixture;
-            nextFixtureText.text = championship.IsComplete ? GameText.Get("hub.complete") : next == null ? GameText.Get("hub.pending") : GameText.FormatDate(next.Date) + "\n" + next.HomeName + " × " + next.AwayName;
-            playFixtureButton.interactable = championship.CanPlayNext && !session.IsBusy;
+            nextFixtureText.text = championship.IsComplete ? (championship.ChampionName == null ? GameText.Get("hub.complete") : GameText.Get("hub.champion", championship.ChampionName))
+                : next == null ? GameText.Get(session.IsCareerCalendar ? "hub.awaitingPhase" : "hub.eliminated") : GameText.FormatDate(next.Date) + "\n" + next.HomeName + " × " + next.AwayName;
+            if (championship.RelegatedNames.Count > 0 && championship.IsComplete)
+                nextFixtureText.text += "\n" + GameText.Get("hub.relegated", string.Join(", ", championship.RelegatedNames));
+            playFixtureButton.interactable = championship.CanPlayNext && !session.IsBusy && (!session.IsCareerCalendar || session.CareerCanPlay);
+            simulateFixtureButton.interactable = !championship.IsComplete && !session.IsBusy && (!session.IsCareerCalendar || session.CareerCanPlay);
+            simulateFixtureButton.GetComponentInChildren<LocalizedText>(true).Key = next == null ? "hub.simulateRound" : "hub.simulateMatch";
         }
 
         private void RefreshCareer()
@@ -295,7 +325,8 @@ namespace FStudio.FootballWorld.Presentation
             var culture = CultureInfo.GetCultureInfo(session.Settings.Language == "en" ? "en-US" : "pt-BR");
             SetOptions(careerMonthDropdown, Enumerable.Range(1, 12).Select(month => culture.DateTimeFormat.GetMonthName(month)), selectedMonth - 1, "");
             saveCareerButton.interactable = session.DatabaseReady && selectedCareerClubId != null;
-            saveCareerButton.GetComponentInChildren<LocalizedText>(true).Key = session.Career == null ? "career.save" : "career.update";
+            saveCareerButton.GetComponentInChildren<LocalizedText>(true).Key = "career.startDaily";
+            continueCareerButton.gameObject.SetActive(session.HasDailyCareer);
             careerSummary.text = session.Career == null ? string.Empty : GameText.Get("career.created") + "\n" + session.Career.CoachName + " · " + session.Career.ClubName + "\n" + session.Career.StartMonth.ToString("00") + "/" + session.Career.StartYear;
             RefreshAvatar();
         }
@@ -331,7 +362,10 @@ namespace FStudio.FootballWorld.Presentation
         private void Confirm(string title, string message, Action action)
         {
             previousSelection = EventSystem.current?.currentSelectedGameObject;
+            pendingCareerOffer = null;
             pendingConfirmation = action;
+            confirmButton.GetComponentInChildren<LocalizedText>(true).Key = "dialog.confirm";
+            confirmButton.GetComponent<Image>().color = theme.Danger;
             confirmationTitle.text = GameText.Get(title);
             confirmationMessage.text = GameText.Get(message);
             confirmationPanel.SetActive(true);
@@ -341,6 +375,13 @@ namespace FStudio.FootballWorld.Presentation
 
         private void AcceptConfirmation()
         {
+            if (pendingCareerOffer != null)
+            {
+                if (session.IsBusy) return;
+                if (pendingCareerOffer()) CancelConfirmation();
+                else confirmationMessage.text = offerConfirmationMessage + "\n\n" + session.StatusMessage;
+                return;
+            }
             var action = pendingConfirmation;
             CancelConfirmation();
             action?.Invoke();
@@ -349,15 +390,27 @@ namespace FStudio.FootballWorld.Presentation
         private void CancelConfirmation()
         {
             pendingConfirmation = null;
+            pendingCareerOffer = null;
             confirmationPanel.SetActive(false);
             SetPageInteraction(true);
             if (previousSelection != null && previousSelection.activeInHierarchy)
                 EventSystem.current?.SetSelectedGameObject(previousSelection);
         }
 
+        public void ConfirmCareerOffer(string message, Func<bool> submit)
+        {
+            previousSelection = EventSystem.current?.currentSelectedGameObject;
+            pendingConfirmation = null; pendingCareerOffer = submit; offerConfirmationMessage = message;
+            confirmationTitle.text = GameText.Get("career.offerConfirmTitle"); confirmationMessage.text = message;
+            confirmButton.GetComponentInChildren<LocalizedText>(true).Key = "career.submitOffer";
+            confirmButton.GetComponent<Image>().color = theme.Primary;
+            confirmationPanel.SetActive(true); SetPageInteraction(false);
+            EventSystem.current?.SetSelectedGameObject(cancelButton.gameObject);
+        }
+
         private void SetPageInteraction(bool value)
         {
-            foreach (var page in new[] { homePage, quickMatchPage, championshipsPage, championshipPage, careerPage, optionsPage, sharedHeader, sharedFooter })
+            foreach (var page in new[] { homePage, quickMatchPage, championshipsPage, championshipPage, careerPage, careerOfficePage, careerSquadPage, careerTacticsPage, careerMarketPage, optionsPage, sharedHeader, sharedFooter })
             {
                 var group = page.GetComponent<CanvasGroup>();
                 if (group == null) continue;
@@ -373,6 +426,10 @@ namespace FStudio.FootballWorld.Presentation
             {
                 case HubPage.Home: selected = homePage.GetComponentInChildren<Button>(); break;
                 case HubPage.Career: selected = coachName; break;
+                case HubPage.CareerOffice: selected = careerOfficePage.GetComponentInChildren<Button>(); break;
+                case HubPage.CareerSquad: selected = careerSquadPage.GetComponentInChildren<TMP_InputField>(); break;
+                case HubPage.CareerMarket: selected = careerMarketPage.GetComponentInChildren<Selectable>(); break;
+                case HubPage.CareerTactics: selected = careerTacticsPage.GetComponentInChildren<TMP_Dropdown>(); break;
                 case HubPage.Options: selected = languageDropdown; break;
                 case HubPage.Championships: selected = editionDropdown.interactable ? (Selectable)editionDropdown : backButton; break;
                 case HubPage.Championship: selected = playFixtureButton.interactable ? playFixtureButton : backButton; break;

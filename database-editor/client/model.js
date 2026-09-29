@@ -1,3 +1,4 @@
+import { validateCompetitions } from './competition-rules.js';
 import { validateHistory } from './history-model.js';
 
 export const clone = value => structuredClone(value);
@@ -72,5 +73,5 @@ export function validateDocument(document, options) {
       if (!Number.isInteger(value) || value < 0 || value > 100) issue(`${root}.attributes.${field}`, `${label}: informe um valor inteiro de 0 a 100.`);
     }
   });
-  return [...issues, ...validateHistory(document)];
+  return [...issues, ...validateHistory(document), ...validateCompetitions(document)];
 }

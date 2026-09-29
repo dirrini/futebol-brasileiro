@@ -1,3 +1,4 @@
+import { validateCompetitions } from '../client/competition-rules.js';
 import Ajv from 'ajv';
 import { EditorError } from './errors.mjs';
 
@@ -15,7 +16,7 @@ export function createValidator(schemas) {
   const validators = new Map(schemas.map(schema => [schema.properties.schemaVersion.const, ajv.compile(schema)]));
   return document => {
     const validate = validators.get(document?.schemaVersion);
-    if (!validate) throw new EditorError(422, 'unsupported_schema_version', 'A versão da base deve ser 1, 2, 3 ou 4.');
+    if (!validate) throw new EditorError(422, 'unsupported_schema_version', 'A versão da base deve ser 1, 2, 3, 4 ou 5.');
     if (!validate(document)) {
       const issues = validate.errors.slice(0, 40).map(error => ({
         path: error.instancePath + (error.params.missingProperty ? '/' + error.params.missingProperty : ''),
@@ -45,27 +46,10 @@ export function createValidator(schemas) {
       if (item.appearance && (item.skin.skinId !== 'builtin-player' || item.skin.revision !== 1 || item.skin.compatibilityProfile !== 'football-player-v1'))
         issues.push({ path: `/visualProfiles/${index}/appearance`, message: 'Essas opções exigem o modelo padrão builtin-player@1.' });
     });
-    if (document.schemaVersion >= 3) {
-      const competitions = unique(document.competitions, 'id', 'competitions');
-      unique(document.competitionEditions, 'id', 'competitionEditions');
-      document.competitionEditions.forEach((edition, index) => {
-        const path = `/competitionEditions/${index}`;
-        if (!competitions.has(edition.competitionId)) issues.push({ path: `${path}/competitionId`, message: 'Campeonato não encontrado.' });
-        edition.participantClubIds.forEach((id, clubIndex) => {
-          if (!clubs.has(id)) issues.push({ path: `${path}/participantClubIds/${clubIndex}`, message: 'Clube participante não encontrado.' });
-        });
-        const count = edition.participantClubIds.length;
-        const expectedRounds = (count % 2 === 0 ? count - 1 : count) * edition.rules.legs;
-        if (edition.roundDates.length !== expectedRounds) issues.push({ path: `${path}/roundDates`, message: `Informe ${expectedRounds} datas, uma por rodada.` });
-        edition.roundDates.forEach((date, round) => {
-          if (!isCalendarDate(date)) issues.push({ path: `${path}/roundDates/${round}`, message: 'Informe uma data válida no formato AAAA-MM-DD.' });
-          else if (round > 0 && date <= edition.roundDates[round - 1]) issues.push({ path: `${path}/roundDates/${round}`, message: 'As datas das rodadas devem estar em ordem crescente, sem repetições.' });
-        });
-        const { win, draw, loss } = edition.rules.points;
-        if (win <= draw || draw < loss) issues.push({ path: `${path}/rules/points`, message: 'Vitória deve valer mais que empate, e empate pelo menos o mesmo que derrota.' });
-      });
+    for (const item of validateCompetitions(document)) {
+      issues.push({ path: '/' + item.path.replace(/\[(\d+)\]/g, '.$1').split('.').join('/'), message: item.message });
     }
-    if (document.schemaVersion === 4) {
+    if (document.schemaVersion >= 4) {
       const countries = unique(document.countries, 'code', 'countries');
       const stadiums = unique(document.stadiums, 'id', 'stadiums');
       unique(document.snapshot.sources, 'id', 'snapshot/sources');

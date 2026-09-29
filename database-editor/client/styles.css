@@ -64,6 +64,22 @@ h3 { font-size: 18px; }
 .button-danger:hover:not(:disabled) { background: #852734; }
 .button-ghost-danger { background: transparent; color: var(--danger); font-size: 12px; }
 .button-ghost-danger:hover:not(:disabled) { background: var(--danger-soft); }
+.competition-edition-links { display: flex; flex-wrap: wrap; gap: 10px; margin-block: 18px; }
+.participant-field { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.participant-field legend { padding-inline: 6px; font-weight: 650; }
+.participant-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+.participant-option { display: flex; align-items: center; gap: 9px; min-height: 40px; padding: 6px; border-radius: var(--radius); cursor: pointer; }
+.participant-option:hover { background: var(--brand-soft); }
+.participant-option input { accent-color: var(--brand); width: 18px; height: 18px; flex-shrink: 0; }
+.participant-option span { overflow-wrap: anywhere; }
+.round-dates { margin-top: 18px; }
+.fixture-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.fixture-toolbar .field { flex: 1; min-width: 160px; }
+.fixture-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-block: 14px; }
+.fixture-card-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.fixture-card-heading h4 { margin: 0; font-family: var(--font-heading); font-size: 16px; }
+.fixture-card .form-grid { gap: 12px; }
+.field-error:empty { min-height: 1em; }
 .text-button { border: 0; background: transparent; color: var(--brand); padding: 6px; font-size: 12px; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
 .text-button:hover:not(:disabled) { color: var(--brand-hover); background: var(--brand-soft); border-radius: 4px; }
 .save-status { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-block: 1px solid var(--line); margin-bottom: 24px; font-size: 12px; }

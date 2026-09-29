@@ -58,8 +58,9 @@ namespace FStudio.UI.MatchThemes {
 
             if (difficultyText != null) difficultyText.text = GameText.Get("difficulty." + GameUserSettings.Current.Difficulty);
             foreach (var label in GetComponentsInChildren<LocalizedText>(true))
-                if (label.Key == "match.backTeams" || label.Key == "match.backChampionship")
-                    label.Key = FriendlyMatchSession.Current.LockedUserSide.HasValue ? "match.backChampionship" : "match.backTeams";
+                if (label.Key == "match.backTeams" || label.Key == "match.backChampionship" || label.Key == "match.backCareer")
+                    label.Key = !FriendlyMatchSession.Current.LockedUserSide.HasValue ? "match.backTeams"
+                        : GameHubSession.Current.IsCareerMatch ? "match.backCareer" : "match.backChampionship";
 
             Appear();
 

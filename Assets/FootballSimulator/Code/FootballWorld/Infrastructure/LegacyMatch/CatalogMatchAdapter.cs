@@ -24,16 +24,19 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         private readonly Dictionary<string, VisualProfileData> profiles =
             new Dictionary<string, VisualProfileData>(StringComparer.Ordinal);
         private readonly LegacyMatchBindings bindings;
+        private readonly CareerMatchOptions careerOptions;
         private bool disposed;
 
         public DatabaseCatalog Catalog { get; }
         public IReadOnlyList<CatalogTeamOption> Teams { get; }
 
         public CatalogMatchAdapter(DatabaseCatalog catalog, IReadOnlyList<VisualProfileData> visualProfiles,
-            LegacyMatchBindings bindings)
+            LegacyMatchBindings bindings, CareerMatchOptions careerOptions = null)
         {
             Catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             this.bindings = bindings != null ? bindings : throw new ArgumentNullException(nameof(bindings));
+            this.careerOptions = careerOptions;
+            if (careerOptions != null) catalog.GetClub(careerOptions.ControlledClubId);
             if (visualProfiles == null) throw new ArgumentNullException(nameof(visualProfiles));
 
             foreach (var binding in bindings.Clubs ?? Array.Empty<ClubVisualBinding>())
@@ -100,6 +103,8 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             }
 
             var request = new MatchCreateRequest(home.Preview, away.Preview);
+            if (careerOptions != null && (careerOptions.ControlledClubId == homeId || careerOptions.ControlledClubId == awayId))
+                request.InitialUserTactic = careerOptions.LegacyMentality;
             try
             {
                 PrepareOwnedClones(request.homeTeam);
@@ -132,6 +137,8 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             var hasBinding = clubBindings.TryGetValue(club.Id, out var binding);
             var template = hasBinding ? binding.VisualTemplate : bindings.DefaultVisualTemplate;
             var formation = hasBinding ? binding.Formation : bindings.DefaultFormation;
+            if (careerOptions != null && careerOptions.ControlledClubId == club.Id)
+                formation = careerOptions.LegacyFormation;
             var warnings = new List<string>();
             if (!hasBinding)
                 warnings.Add(GameText.Get("adapter.genericClub"));

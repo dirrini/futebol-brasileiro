@@ -138,7 +138,7 @@ namespace FStudio.FootballWorld.Editor.Tests
                 Is.EqualTo(imported.Catalog.Clubs[0].Name), "A newer source must not mutate the saved catalog.");
         }
 
-        [TestCase("version", "2")]
+        [TestCase("version", "999")]
         [TestCase("databaseRevision", "18")]
         [TestCase("controlledClubId", "\"unknown-club\"")]
         [TestCase("fixtures[0].day", "4")]

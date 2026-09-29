@@ -10,7 +10,7 @@ o documento integral e exige ETag; o jogo importa a base por uma fronteira próp
 
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
 | --- | --- | --- | --- | --- |
-| Form | `ui.js` field/select/textarea + model.js validateDocument + history-model.js validateHistory | DATA-FORMAT.md e este contrato | Fichas de jogador, clube, estádio, país e referência | Erro textual associado e foco no primeiro campo inválido |
+| Form | `ui.js` field/select/textarea + model.js validateDocument + history-model.js validateHistory + competition-rules.js validateCompetitions | DATA-FORMAT.md e este contrato | Fichas de jogador, clube, estádio, país, referência, campeonato e edição | Erro textual associado e foco no primeiro campo inválido |
 | Select/Listbox | `ui.js` select | Este contrato | Nativo; geometria do popup do SO aceita, labels pt-BR | Teclado e popup |
 | Scrollbar | `styles.css` baseline global | DESIGN.md | Gutters na lista | Track/thumb/hover/active e forced-colors |
 | Toast | `app.js` renderFeedback/renderStatus + ui.js announce | Este contrato | Success/warning/error/info persistentes | Região live e mesma linguagem nos dois cadastros |
@@ -76,7 +76,7 @@ estável durante salvamento. Todas as ações têm foco e hover explícitos.
 A prévia de aparência é SVG autorado e **ilustrativa**, rotulada como tal. Cores e
 estilos são aproximados. O uniforme desenhado é neutro; o resultado real é conferido
 no jogo. Faixa/acessório de meia é separado da meia principal controlada pelo kit.
-Importar modelos, texturas e campeonatos ainda não tem controles falsos nesta UI.
+Importar modelos e texturas continua fora deste recorte; os campeonatos e edições têm formulários próprios.
 
 ## Verificação
 
@@ -110,7 +110,7 @@ substitui essas verificações. Evidências da execução ficam em Logs, fora da
   silenciosa de caixa, datas ou conteúdo pesquisado.
 - Orçamentos usam unidades inteiras da moeda ISO de três letras e exigem moeda
   quando presentes. Reputação, torcida, orçamento e patrocínio são identificados
-  como parâmetros editáveis de simulação, ainda sem uma economia executada no jogo.
+  como parâmetros editáveis de simulação. A carreira usa transferBudget como caixa inicial e monthlyWageBudget como custo mensal, preservando zeros explícitos; campos ausentes usam defaults declarados no formulário.
   Capacidade e vínculo de estádio não trocam o cenário 3D compilado.
 - Clubes e estádios compartilham o filtro por país. A referência é um formulário
   único, sem lista lateral nem exclusão. Fontes têm título e URL HTTP(S), sem
@@ -127,3 +127,38 @@ referências de exclusão, rascunho independente, IDs/proveniência na exportaç
 apelidos, HTML escapado e compatibilidade v1–3. O teste real no navegador deve
 cobrir os novos diálogos, país como filtro, formulário longo, confirmação de
 exclusão e gravação/descartar/conflito do rascunho integral.
+
+## Campeonatos, edições e calendário v5
+
+- Campeonatos e Edições reutilizam lista, busca, paginação, formulários e diálogo
+  dos demais cadastros. Campeonato identifica a competição; edição guarda os
+  participantes, regras e calendário. Criar uma edição seleciona seu campeonato,
+  gera um ID estável e abre a ficha para completar antes de salvar.
+- Uma liga pode ser criada em bases v1–2 com promoção explícita ao contrato v3,
+  sem inventar referência histórica. O formato Paulista 2026 requer base com
+  países/estádios e promove a revisão de formato a v5 ao confirmar sua escolha.
+- A escolha dos participantes usa checkboxes nativos. Nomes são literais e IDs
+  preservados. Excluir campeonato com edições ou estádio usado em um confronto
+  é bloqueado com orientação para corrigir a referência. Clubes participantes
+  continuam protegidos contra exclusão.
+- Pontos corridos oferece um ou dois turnos e pontos inteiros para vitória,
+  empate e derrota. Os desempates suportados são informados em texto. O formato
+  Paulista 2026 mantém seus parâmetros esportivos fixos; tipos arbitrários de
+  regulamento não são oferecidos nem aceitos silenciosamente.
+- Datas são texto ISO, como nas fichas históricas. O gerador por intervalo exige
+  data inicial e quantidade de dias; explica que substituirá as datas de rodada.
+  Não altera silenciosamente os dias dos jogos ou das eliminatórias. Alterar
+  formato exige confirmação porque remove os confrontos incompatíveis.
+- Calendário autorado tem um filtro nativo por rodada, persistido em `round` na
+  URL, e exibe somente os jogos daquela rodada. Cada confronto edita clubes,
+  rodada, data e eventual estádio alternativo sem mudar o principal do clube.
+  Datas de eliminatórias seguem as posições das quatro quartas, duas semifinais
+  e duas finais; jogos da mesma fase podem compartilhar data.
+- A validação pura de `competition-rules.js` é compartilhada entre browser e
+  adaptador Node e não depende da UI ou do core C#. O schema valida estrutura;
+  o importador C# repete invariantes antes de ativar a base no jogo.
+- Erros mantêm o rascunho, selecionam a edição/rodada correspondente e focam o
+  campo específico. Oito jogos por clube, quatro mandos, adversários distintos,
+  datas dentro de suas janelas e ordem entre fases são exigidos para publicar.
+- A publicação continua única por base, com ETag e backup. Criar/excluir/editar
+  competições não modifica resultados ou carreiras já salvos no jogo.

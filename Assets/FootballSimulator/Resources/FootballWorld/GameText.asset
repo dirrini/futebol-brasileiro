@@ -407,3 +407,527 @@ MonoBehaviour:
   - Key: adapter.genericClub
     Portuguese: "Escudo e uniformes gen\xE9ricos, n\xE3o oficiais."
     English: Generic badge and kits, not official.
+  - Key: career.office
+    Portuguese: Centro do treinador
+    English: Manager office
+  - Key: career.startDaily
+    Portuguese: Iniciar carreira
+    English: Start career
+  - Key: career.continue
+    Portuguese: Continuar carreira
+    English: Continue career
+  - Key: career.new
+    Portuguese: Nova carreira
+    English: New career
+  - Key: career.dailyScope
+    Portuguese: "Avance os dias, gerencie o treino e dispute a edi\xE7\xE3o dispon\xEDvel
+      no m\xEAs escolhido."
+    English: Advance days, manage training and play the edition available in your
+      chosen month.
+  - Key: career.dailyHint
+    Portuguese: Assuma um clube e viva cada dia da temporada.
+    English: Take charge of a club and live each day of the season.
+  - Key: career.unavailableDate
+    Portuguese: "N\xE3o foi poss\xEDvel iniciar. Informe nome, clube e m\xEAs de
+      abertura de uma edi\xE7\xE3o cadastrada (exemplo: janeiro de 2026)."
+    English: Could not start. Enter a name, club and the opening month of an available
+      edition (for example January 2026).
+  - Key: career.actionUnavailable
+    Portuguese: "A\xE7\xE3o indispon\xEDvel. Confira o calend\xE1rio e conclua o
+      jogo pendente."
+    English: Action unavailable. Check the calendar and complete the pending match.
+  - Key: career.calendarEnded
+    Portuguese: "Calend\xE1rio conclu\xEDdo. Consulte a classifica\xE7\xE3o final."
+    English: Calendar completed. View the final standings.
+  - Key: career.followFinals
+    Portuguese: "Sem pr\xF3ximo jogo do clube. Avance para acompanhar as fases finais."
+    English: No next club fixture. Advance to follow the final stages.
+  - Key: career.balance
+    Portuguese: 'Caixa: {0}'
+    English: 'Balance: {0}'
+  - Key: career.monthly
+    Portuguese: "Mensal: +{0} receitas / \u2212{1} folha"
+    English: "Monthly: +{0} income / \u2212{1} wages"
+  - Key: career.fitness
+    Portuguese: "Condi\xE7\xE3o {0}/100 \xB7 Preparo {1}/100\nRendimento 3D: {2}%"
+    English: "Condition {0}/100 \xB7 Preparation {1}/100\n3D performance: {2}%"
+  - Key: career.training
+    Portuguese: "Plano de treino di\xE1rio"
+    English: Daily training plan
+  - Key: career.advanceDay
+    Portuguese: "Avan\xE7ar 1 dia"
+    English: Advance 1 day
+  - Key: career.advanceNext
+    Portuguese: "At\xE9 o pr\xF3ximo jogo"
+    English: To next fixture
+  - Key: career.news
+    Portuguese: "Imprensa fict\xEDcia"
+    English: Fictional press
+  - Key: career.ledger
+    Portuguese: "Movimenta\xE7\xF5es do caixa"
+    English: Cash ledger
+  - Key: career.calendar
+    Portuguese: "Calend\xE1rio e classifica\xE7\xE3o"
+    English: Calendar and standings
+  - Key: career.simulationHint
+    Portuguese: "Valores financeiros de simula\xE7\xE3o. Treino aplicado ao avan\xE7ar
+      o dia."
+    English: Simulation finances. Training takes effect when advancing the day.
+  - Key: training.Balanced
+    Portuguese: "Equilibrado \xB7 +1 condi\xE7\xE3o / +1 preparo"
+    English: "Balanced \xB7 +1 condition / +1 preparation"
+  - Key: training.Recovery
+    Portuguese: "Recupera\xE7\xE3o \xB7 +4 condi\xE7\xE3o / \u22122 preparo"
+    English: "Recovery \xB7 +4 condition / \u22122 preparation"
+  - Key: training.Intensive
+    Portuguese: "Intenso \xB7 \u22123 condi\xE7\xE3o / +3 preparo"
+    English: "Intensive \xB7 \u22123 condition / +3 preparation"
+  - Key: phase.League
+    Portuguese: Primeira fase
+    English: League phase
+  - Key: phase.QuarterFinal
+    Portuguese: Quartas de final
+    English: Quarter-finals
+  - Key: phase.SemiFinal
+    Portuguese: Semifinais
+    English: Semi-finals
+  - Key: phase.Final
+    Portuguese: Final
+    English: Final
+  - Key: phase.Complete
+    Portuguese: "Conclu\xEDdo"
+    English: Completed
+  - Key: hub.simulateMatch
+    Portuguese: Simular jogo
+    English: Simulate match
+  - Key: hub.simulateRound
+    Portuguese: Simular rodada
+    English: Simulate round
+  - Key: hub.champion
+    Portuguese: "Campe\xE3o: {0}"
+    English: 'Champion: {0}'
+  - Key: hub.relegated
+    Portuguese: 'Rebaixados: {0}'
+    English: 'Relegated: {0}'
+  - Key: hub.eliminated
+    Portuguese: "Seu clube encerrou sua participa\xE7\xE3o. Simule as pr\xF3ximas
+      fases."
+    English: Your club has finished its run. Simulate the remaining stages.
+  - Key: hub.penalties
+    Portuguese: "P\xEAnaltis {0}\u2013{1}"
+    English: "Penalties {0}\u2013{1}"
+  - Key: hub.rulesHint
+    Portuguese: "Paulista: oito classificados, dois rebaixados; mata-mata por campanha
+      acumulada. Cart\xF5es, sorteio e p\xEAnaltis s\xE3o simulados neste prot\xF3tipo."
+    English: 'Paulista: top eight qualify, bottom two relegated; knockout seeding
+      by cumulative record. Cards, drawing of lots and penalties are simulated in
+      this prototype.'
+  - Key: dialog.replaceDailyCareerBody
+    Portuguese: "Isso substituir\xE1 o treinador, o calend\xE1rio, os resultados
+      e as finan\xE7as da carreira salva."
+    English: This replaces the coach, calendar, results and finances of the saved
+      career.
+  - Key: outlet.gazeta-da-bola
+    Portuguese: Gazeta da Bola
+    English: Gazeta da Bola
+  - Key: outlet.diario-da-arquibancada
+    Portuguese: "Di\xE1rio da Arquibancada"
+    English: "Di\xE1rio da Arquibancada"
+  - Key: news.welcome
+    Portuguese: "{0} apresenta seu novo treinador. A temporada come\xE7a com o planejamento
+      do elenco."
+    English: '{0} introduces its new manager. The season starts with squad preparation.'
+  - Key: news.monthly-finances
+    Portuguese: "Balan\xE7o mensal de {0}: movimento l\xEDquido de {3}."
+    English: 'Monthly statement for {0}: net cash flow {3}.'
+  - Key: news.training-report
+    Portuguese: "Semana de treino de {0}: condi\xE7\xE3o {1}/100 e preparo {2}/100."
+    English: 'Training week at {0}: condition {1}/100 and preparation {2}/100.'
+  - Key: news.match-result
+    Portuguese: Resultado de {0}.
+    English: Match result for {0}.
+  - Key: news.season-complete
+    Portuguese: "A edi\xE7\xE3o chegou ao fim. Consulte a classifica\xE7\xE3o e o
+      campe\xE3o no calend\xE1rio."
+    English: The edition has ended. View the final standings and champion in the
+      calendar.
+  - Key: ledger.opening-balance
+    Portuguese: "Saldo inicial de simula\xE7\xE3o"
+    English: Opening simulation balance
+  - Key: ledger.monthly-income
+    Portuguese: Receita mensal
+    English: Monthly income
+  - Key: ledger.monthly-wages
+    Portuguese: Folha mensal
+    English: Monthly wages
+  - Key: ledger.home-match-income
+    Portuguese: "Bilheteria de simula\xE7\xE3o"
+    English: Simulated gate receipts
+  - Key: hub.cumulative
+    Portuguese: Campanha acumulada
+    English: Cumulative record
+  - Key: hub.awaitingPhase
+    Portuguese: "Nenhum pr\xF3ximo jogo definido. Avance os dias no centro do treinador."
+    English: No next fixture defined. Advance days from the manager office.
+  - Key: career.squad
+    Portuguese: Elenco
+    English: Squad
+  - Key: career.tactics
+    Portuguese: "Padr\xE3o t\xE1tico"
+    English: Tactical setup
+  - Key: career.tacticsShort
+    Portuguese: "T\xE1tica"
+    English: Tactics
+  - Key: career.market
+    Portuguese: Mercado
+    English: Transfers
+  - Key: career.squadScope
+    Portuguese: "Todos os jogadores do clube \xB7 selecione um nome para consultar
+      a ficha."
+    English: "Every player at your club \xB7 select a name to inspect their profile."
+  - Key: career.selectPlayer
+    Portuguese: Selecione um jogador
+    English: Select a player
+  - Key: career.playerBio
+    Portuguese: "Nascimento: {0} \xB7 P\xE9: {1}\n{2} cm \xB7 {3} kg \xB7 Nacionalidade:
+      {4}"
+    English: "Born: {0} \xB7 Foot: {1}\n{2} cm \xB7 {3} kg \xB7 Nationality: {4}"
+  - Key: foot.right
+    Portuguese: Direito
+    English: Right
+  - Key: foot.left
+    Portuguese: Esquerdo
+    English: Left
+  - Key: foot.both
+    Portuguese: Ambidestro
+    English: Both
+  - Key: foot.unknown
+    Portuguese: "N\xE3o informado"
+    English: Unspecified
+  - Key: career.allPositions
+    Portuguese: "Todas as posi\xE7\xF5es"
+    English: All positions
+  - Key: career.allClubs
+    Portuguese: Todos os clubes
+    English: All clubs
+  - Key: career.freeAgent
+    Portuguese: Sem clube
+    English: Free agent
+  - Key: career.playerCount
+    Portuguese: '{0} jogadores encontrados'
+    English: '{0} players found'
+  - Key: career.pageCount
+    Portuguese: "P\xE1gina {0} de {1}"
+    English: Page {0} of {1}
+  - Key: career.searchPlayers
+    Portuguese: Buscar jogadores
+    English: Find players
+  - Key: career.offers
+    Portuguese: Minhas propostas
+    English: My offers
+  - Key: career.marketScope
+    Portuguese: "Taxas de transfer\xEAncia de simula\xE7\xE3o. Respostas ao avan\xE7ar
+      o dia."
+    English: Simulated transfer fees. Advance the day to receive decisions.
+  - Key: career.searchName
+    Portuguese: Nome ou apelido
+    English: Name or nickname
+  - Key: career.searchPlaceholder
+    Portuguese: "Buscar jogador\u2026"
+    English: "Find a player\u2026"
+  - Key: career.clearFilters
+    Portuguese: Limpar
+    English: Clear
+  - Key: career.position
+    Portuguese: "Posi\xE7\xE3o"
+    English: Position
+  - Key: career.noPlayers
+    Portuguese: 'Nenhum jogador corresponde aos filtros.
+
+      Tente outro nome
+      ou limpe a busca.'
+    English: 'No players match these filters.
+
+      Try another name or clear the
+      search.'
+  - Key: career.previous
+    Portuguese: Anterior
+    English: Previous
+  - Key: career.next
+    Portuguese: "Pr\xF3xima"
+    English: Next
+  - Key: career.attributes
+    Portuguese: "Atributos \xB7 escala de 0 a 100"
+    English: "Attributes \xB7 scale from 0 to 100"
+  - Key: career.squadDetailsHint
+    Portuguese: "As posi\xE7\xF5es s\xE3o as naturais do jogador. O XI \xE9 escolhido
+      automaticamente a partir do elenco e da forma\xE7\xE3o salva em T\xE1tica."
+    English: "These are the player\u2019s natural positions. The starting XI is selected
+      automatically from your squad and the saved tactical formation."
+  - Key: career.offerAmount
+    Portuguese: "Valor total da proposta \xB7 n\xFAmeros inteiros"
+    English: "Total offer amount \xB7 whole numbers"
+  - Key: career.amountPlaceholder
+    Portuguese: 'Ex.: 250000'
+    English: e.g. 250000
+  - Key: career.makeOffer
+    Portuguese: Fazer proposta
+    English: Make an offer
+  - Key: career.submitOffer
+    Portuguese: Enviar proposta
+    English: Submit offer
+  - Key: career.cancelOffer
+    Portuguese: Cancelar
+    English: Cancel offer
+  - Key: career.offerConfirmTitle
+    Portuguese: Confirmar proposta
+    English: Confirm offer
+  - Key: career.offerConfirmBody
+    Portuguese: "{0} \xB7 {1}\nCusto total: {2}\n\nEsse valor ficar\xE1 reservado
+      at\xE9 a resposta no pr\xF3ximo dia. O custo \xE9 apenas a taxa de transfer\xEAncia;
+      sal\xE1rios e novos contratos ainda n\xE3o s\xE3o negociados."
+    English: "{0} \xB7 {1}\nTotal cost: {2}\n\nThis amount will be reserved until
+      tomorrow\u2019s decision. The cost covers only the transfer fee; wages and
+      new contracts are not negotiated yet."
+  - Key: career.transferBudget
+    Portuguese: "Dispon\xEDvel para propostas: {0}\nReservado em propostas pendentes:
+      {1}"
+    English: 'Available for offers: {0}
+
+      Reserved for pending offers: {1}'
+  - Key: career.offerCount
+    Portuguese: "{0} propostas \xB7 decis\xF5es aparecem ap\xF3s avan\xE7ar o dia
+      na carreira"
+    English: "{0} offers \xB7 advance the career day to receive decisions"
+  - Key: career.noOffers
+    Portuguese: "Voc\xEA ainda n\xE3o fez propostas.\nUse Buscar jogadores para escolher
+      um refor\xE7o."
+    English: 'You have not made any offers yet.
+
+      Use Find players to choose
+      a new signing.'
+  - Key: career.offerDates
+    Portuguese: "Enviada em {0} \xB7 Resposta: {1}"
+    English: "Submitted {0} \xB7 Decision: {1}"
+  - Key: career.tomorrow
+    Portuguese: "pr\xF3ximo dia"
+    English: next day
+  - Key: career.alreadyOwned
+    Portuguese: "Esse jogador j\xE1 pertence ao seu clube."
+    English: This player already belongs to your club.
+  - Key: career.offerPending
+    Portuguese: "J\xE1 existe uma proposta pendente. Veja Minhas propostas para consultar
+      ou cancelar."
+    English: An offer is already pending. Open My offers to view or cancel it.
+  - Key: career.valuation
+    Portuguese: "Estimativa: {0} \xB7 Dispon\xEDvel: {1}\nValor de simula\xE7\xE3o;
+      a aceita\xE7\xE3o depende tamb\xE9m do elenco do vendedor."
+    English: "Estimate: {0} \xB7 Available: {1}\nSimulated value; acceptance also
+      depends on the selling club\u2019s squad."
+  - Key: career.offerSubmitted
+    Portuguese: Proposta enviada. Avance o dia para receber a resposta.
+    English: Offer submitted. Advance the day to receive a decision.
+  - Key: career.offerCancelled
+    Portuguese: Proposta cancelada; o valor reservado foi liberado.
+    English: Offer cancelled; the reserved amount has been released.
+  - Key: career.offerCompleted
+    Portuguese: "Contrata\xE7\xE3o conclu\xEDda. O jogador j\xE1 est\xE1 no seu elenco."
+    English: Transfer completed. The player is now in your squad.
+  - Key: career.offerInvalid
+    Portuguese: "Informe um valor inteiro entre 0 e 2.147.483.647. Jogadores com
+      clube exigem taxa positiva; sem clube, a taxa \xE9 zero."
+    English: Enter a whole number from 0 to 2,147,483,647. Registered players require
+      a positive fee; free agents require zero.
+  - Key: career.offerInsufficientFunds
+    Portuguese: "Saldo dispon\xEDvel insuficiente. Reduza o valor ou cancele outra
+      proposta pendente."
+    English: Insufficient available funds. Reduce the amount or cancel another pending
+      offer.
+  - Key: career.offerUnavailable
+    Portuguese: "N\xE3o foi poss\xEDvel concluir a proposta. Verifique o jogador,
+      as propostas pendentes e a data da carreira."
+    English: The offer could not be completed. Check the player, pending offers and
+      career date.
+  - Key: career.managementEnded
+    Portuguese: "Calend\xE1rio encerrado. Consultas continuam dispon\xEDveis."
+    English: Calendar ended. You can still view this information.
+  - Key: career.tacticsScope
+    Portuguese: "Defina a forma\xE7\xE3o e a postura padr\xE3o para as pr\xF3ximas
+      partidas da carreira."
+    English: Set the default formation and mentality for upcoming career matches.
+  - Key: career.formation
+    Portuguese: "Forma\xE7\xE3o"
+    English: Formation
+  - Key: career.mentality
+    Portuguese: Postura
+    English: Mentality
+  - Key: career.savedTactics
+    Portuguese: "Em uso: {0} \xB7 {1}"
+    English: "In use: {0} \xB7 {1}"
+  - Key: career.applyTactics
+    Portuguese: "Salvar padr\xE3o t\xE1tico"
+    English: Save tactical setup
+  - Key: career.tacticsSaved
+    Portuguese: "Padr\xE3o t\xE1tico salvo para as pr\xF3ximas partidas."
+    English: Tactical setup saved for upcoming matches.
+  - Key: career.tacticsEffect
+    Portuguese: "A forma\xE7\xE3o define as posi\xE7\xF5es do XI autom\xE1tico. A
+      postura orienta o comportamento da equipe na partida 3D."
+    English: "Formation defines the automatic XI\u2019s positions. Mentality guides
+      the team\u2019s behaviour in the 3D match."
+  - Key: career.automaticXI
+    Portuguese: "XI autom\xE1tico \xB7 padr\xE3o salvo"
+    English: "Automatic XI \xB7 saved setup"
+  - Key: career.lineupHint
+    Portuguese: "Posi\xE7\xF5es exibidas s\xE3o naturais. Escala\xE7\xE3o manual
+      ser\xE1 uma etapa futura."
+    English: Positions shown are natural positions. Manual team selection is a future
+      step.
+  - Key: career.tacticsDraft
+    Portuguese: "Altera\xE7\xF5es pendentes. Salve para aplic\xE1-las."
+    English: Unsaved changes. Save to apply them.
+  - Key: career.tacticsCurrent
+    Portuguese: "O padr\xE3o salvo est\xE1 aplicado."
+    English: Your saved setup is active.
+  - Key: mentality.Defensive
+    Portuguese: Defensiva
+    English: Defensive
+  - Key: mentality.Balanced
+    Portuguese: Equilibrada
+    English: Balanced
+  - Key: mentality.Attacking
+    Portuguese: Ofensiva
+    English: Attacking
+  - Key: offerStatus.Pending
+    Portuguese: Pendente
+    English: Pending
+  - Key: offerStatus.Accepted
+    Portuguese: Aceita
+    English: Accepted
+  - Key: offerStatus.Rejected
+    Portuguese: Recusada
+    English: Rejected
+  - Key: offerStatus.Cancelled
+    Portuguese: Cancelada
+    English: Cancelled
+  - Key: offerReason.None
+    Portuguese: "Aguardando resposta do pr\xF3ximo dia."
+    English: "Awaiting the next day\u2019s decision."
+  - Key: offerReason.BelowValuation
+    Portuguese: "Valor abaixo da avalia\xE7\xE3o do jogador."
+    English: "The amount is below the player\u2019s valuation."
+  - Key: offerReason.SellerSquadTooSmall
+    Portuguese: O clube vendedor ficaria sem jogadores suficientes.
+    English: The selling club would not have enough players.
+  - Key: offerReason.SellerNeedsGoalkeeper
+    Portuguese: O clube vendedor precisa manter um goleiro.
+    English: The selling club needs to retain a goalkeeper.
+  - Key: offerReason.InsufficientFunds
+    Portuguese: "Saldo insuficiente no momento da decis\xE3o."
+    English: Insufficient funds when the decision was made.
+  - Key: offerReason.PlayerUnavailable
+    Portuguese: "O jogador deixou de estar dispon\xEDvel."
+    English: The player is no longer available.
+  - Key: offerReason.Cancelled
+    Portuguese: Cancelada pelo treinador; valor reservado liberado.
+    English: Cancelled by the manager; reserved funds released.
+  - Key: news.transfer-accepted
+    Portuguese: "{0} acertou a chegada de {4} por {3}. O refor\xE7o j\xE1 integra
+      o elenco nesta carreira."
+    English: '{0} have signed {4} for {3}. The player has joined the squad in this
+      career.'
+  - Key: news.transfer-rejected
+    Portuguese: A proposta de {0} por {4}, no valor de {3}, foi recusada. Consulte
+      o motivo em Minhas propostas.
+    English: "{0}\u2019s offer of {3} for {4} was rejected. See My offers for the
+      reason."
+  - Key: ledger.transfer-fee
+    Portuguese: "Taxa de transfer\xEAncia"
+    English: Transfer fee
+  - Key: match.backCareer
+    Portuguese: "Voltar \xE0 carreira"
+    English: Back to career
+  - Key: position.GK
+    Portuguese: "GK \xB7 Goleiro"
+    English: "GK \xB7 Goalkeeper"
+  - Key: position.RB
+    Portuguese: "RB \xB7 Lateral direito"
+    English: "RB \xB7 Right back"
+  - Key: position.LB
+    Portuguese: "LB \xB7 Lateral esquerdo"
+    English: "LB \xB7 Left back"
+  - Key: position.CB
+    Portuguese: "CB \xB7 Zagueiro"
+    English: "CB \xB7 Centre back"
+  - Key: position.DM
+    Portuguese: "DM \xB7 Volante"
+    English: "DM \xB7 Defensive midfielder"
+  - Key: position.CM
+    Portuguese: "CM \xB7 Meio-campista"
+    English: "CM \xB7 Central midfielder"
+  - Key: position.RM
+    Portuguese: "RM \xB7 Meia direito"
+    English: "RM \xB7 Right midfielder"
+  - Key: position.LM
+    Portuguese: "LM \xB7 Meia esquerdo"
+    English: "LM \xB7 Left midfielder"
+  - Key: position.AM
+    Portuguese: "AM \xB7 Meia ofensivo"
+    English: "AM \xB7 Attacking midfielder"
+  - Key: position.LW
+    Portuguese: "LW \xB7 Ponta esquerda"
+    English: "LW \xB7 Left winger"
+  - Key: position.RW
+    Portuguese: "RW \xB7 Ponta direita"
+    English: "RW \xB7 Right winger"
+  - Key: position.ST
+    Portuguese: "ST \xB7 Atacante"
+    English: "ST \xB7 Striker"
+  - Key: attribute.Strength
+    Portuguese: "For\xE7a"
+    English: Strength
+  - Key: attribute.Acceleration
+    Portuguese: "Acelera\xE7\xE3o"
+    English: Acceleration
+  - Key: attribute.TopSpeed
+    Portuguese: Velocidade
+    English: Top speed
+  - Key: attribute.DribbleSpeed
+    Portuguese: Veloc. com bola
+    English: Dribble speed
+  - Key: attribute.Jump
+    Portuguese: "Impuls\xE3o"
+    English: Jump
+  - Key: attribute.Tackling
+    Portuguese: Desarme
+    English: Tackling
+  - Key: attribute.BallKeeping
+    Portuguese: "Prote\xE7\xE3o de bola"
+    English: Ball keeping
+  - Key: attribute.Passing
+    Portuguese: Passe
+    English: Passing
+  - Key: attribute.LongBall
+    Portuguese: Passe longo
+    English: Long ball
+  - Key: attribute.Agility
+    Portuguese: Agilidade
+    English: Agility
+  - Key: attribute.Shooting
+    Portuguese: "Finaliza\xE7\xE3o"
+    English: Shooting
+  - Key: attribute.ShootPower
+    Portuguese: "Pot\xEAncia de chute"
+    English: Shot power
+  - Key: attribute.Positioning
+    Portuguese: Posicionamento
+    English: Positioning
+  - Key: attribute.Reaction
+    Portuguese: "Rea\xE7\xE3o"
+    English: Reaction
+  - Key: attribute.BallControl
+    Portuguese: Controle de bola
+    English: Ball control
+  - Key: career.clubFilter
+    Portuguese: Clube
+    English: Club

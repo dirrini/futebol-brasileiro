@@ -6,7 +6,7 @@ using FStudio.FootballWorld.Domain;
 
 namespace FStudio.FootballWorld.Infrastructure.GameModes
 {
-    public enum HubPage { Home, QuickMatch, Championships, Championship, Career, Options }
+    public enum HubPage { Home, QuickMatch, Championships, Championship, Career, Options, CareerOffice, CareerSquad, CareerTactics, CareerMarket }
 
     public sealed class HubEditionOption
     {
@@ -36,6 +36,10 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public bool IsCompleted => HomeGoals.HasValue;
         public bool IsUserFixture { get; }
         public bool IsSimulated { get; }
+        public int? HomePenalties { get; }
+        public int? AwayPenalties { get; }
+        public bool HasSimulatedSupplement { get; }
+        public string Phase { get; }
         internal HubFixtureView(FixtureDefinition fixture, FixtureResult result, CompetitionSession season)
         {
             Id = fixture.Id; Round = fixture.Round; Date = fixture.Date.ToDateTime();
@@ -44,6 +48,9 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             HomeGoals = result?.HomeGoals; AwayGoals = result?.AwayGoals;
             IsUserFixture = fixture.HomeClubId == season.ControlledClubId || fixture.AwayClubId == season.ControlledClubId;
             IsSimulated = result != null && result.IsSimulated;
+            HomePenalties = result?.HomePenalties; AwayPenalties = result?.AwayPenalties;
+            HasSimulatedSupplement = result != null && result.HasSimulatedSupplement;
+            Phase = season.GetPhase(fixture).ToString();
         }
     }
 
@@ -82,18 +89,27 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public HubFixtureView NextFixture { get; }
         public IReadOnlyList<HubFixtureView> Fixtures { get; }
         public IReadOnlyList<HubStandingView> Standings { get; }
+        public string Phase { get; }
+        public string ChampionName { get; }
+        public bool IsPaulista { get; }
+        public IReadOnlyList<string> RelegatedNames { get; }
         internal HubChampionshipView(CompetitionSession season, bool busy)
         {
             Name = season.Catalog.Competitions.First(item => item.Id == season.Edition.CompetitionId).Name;
             EditionName = season.Edition.Name; UserClubId = season.ControlledClubId;
             UserClubName = season.Catalog.GetClub(UserClubId).Name;
             DatabaseId = season.Catalog.DatabaseId; DatabaseRevision = season.Catalog.DatabaseRevision;
-            IsComplete = season.IsComplete; CanPlayNext = !busy && season.NextFixture != null && season.ActiveExecution == null;
+            IsComplete = season.IsComplete; CanPlayNext = !busy && season.NextFixture != null && season.ActiveExecution == null
+                && (!season.DailyProgress || season.NextFixture.Date.CompareTo(season.CurrentDate.Value) <= 0);
             var results = season.Results.ToDictionary(result => result.FixtureId, StringComparer.Ordinal);
             Fixtures = season.Fixtures.Select(fixture => new HubFixtureView(fixture,
                 results.TryGetValue(fixture.Id, out var result) ? result : null, season)).ToArray();
             NextFixture = season.NextFixture == null ? null : Fixtures.First(fixture => fixture.Id == season.NextFixture.Id);
             Standings = season.Standings.Select(row => new HubStandingView(row, season.Catalog)).ToArray();
+            Phase = season.Phase.ToString();
+            ChampionName = season.ChampionClubId == null ? null : season.Catalog.GetClub(season.ChampionClubId).Name;
+            IsPaulista = season.Edition.Rules.IsPaulista2026;
+            RelegatedNames = season.RelegatedClubIds.Select(id => season.Catalog.GetClub(id).Name).ToArray();
         }
     }
 

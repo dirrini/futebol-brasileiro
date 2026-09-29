@@ -33,8 +33,10 @@ namespace FStudio.FootballWorld.Editor
                     FootballDatabaseBootstrap.SourceSchemaV3AssetPath));
                 var schemaV4Path = Path.GetFullPath(Path.Combine(projectPath,
                     FootballDatabaseBootstrap.SourceSchemaV4AssetPath));
+                var schemaV5Path = Path.GetFullPath(Path.Combine(projectPath,
+                    FootballDatabaseBootstrap.SourceSchemaV5AssetPath));
 
-                if (!File.Exists(databasePath) || !File.Exists(schemaPath) || !File.Exists(schemaV2Path) || !File.Exists(schemaV3Path) || !File.Exists(schemaV4Path))
+                if (!File.Exists(databasePath) || !File.Exists(schemaPath) || !File.Exists(schemaV2Path) || !File.Exists(schemaV3Path) || !File.Exists(schemaV4Path) || !File.Exists(schemaV5Path))
                     throw new BuildFailedException("[FootballWorld] Database JSON or its schema is missing: " +
                         databasePath + " / " + schemaPath + " / " + schemaV2Path + " / " + schemaV3Path + " / " + schemaV4Path);
 
@@ -51,7 +53,8 @@ namespace FStudio.FootballWorld.Editor
                     JObject.Parse(File.ReadAllText(schemaPath)),
                     JObject.Parse(File.ReadAllText(schemaV2Path)),
                     JObject.Parse(File.ReadAllText(schemaV3Path)),
-                    JObject.Parse(File.ReadAllText(schemaV4Path)));
+                    JObject.Parse(File.ReadAllText(schemaV4Path)),
+                    JObject.Parse(File.ReadAllText(schemaV5Path)));
                 var generatedSchemaPath = Path.Combine(projectPath, "Library", "FootballWorld", "database.schema.json");
                 Directory.CreateDirectory(Path.GetDirectoryName(generatedSchemaPath));
                 File.WriteAllText(generatedSchemaPath, publishedSchema.ToString(), new UTF8Encoding(false));

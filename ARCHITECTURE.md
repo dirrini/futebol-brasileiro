@@ -1,12 +1,13 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: catálogo observado v4, menu e suporte a campeonato demonstrativo. Domain,
-Application, DTOs v1–v4, importador JSON, bootstrap e ponte com a partida 3D estão
-implementados. O editor local mantém clubes, jogadores, países, estádios,
-proveniência e aparência padrão. O jogo suporta uma liga com progresso local e
-a criação de perfil de carreira. Simulação do calendário da
-carreira, editor completo e processamento de skins continuam planejados
-conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
+Estado: catálogo observado v5, competições e carreira diária de uma edição.
+Domain, Application, DTOs v1–v5, importador JSON, bootstrap e ponte com a partida
+3D estão implementados. O editor local mantém clubes, jogadores, países,
+estádios, proveniência, aparência padrão, campeonatos e edições com regras
+suportadas. O jogo suporta ligas round-robin, o perfil do Paulistão 2026 e gestão
+básica de caixa, treino, tática, propostas e notícias fictícias. Resolução histórica de vínculos,
+calendários de várias competições, editor completo e processamento de skins
+continuam planejados conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
 [DATA-FORMAT.md](DATA-FORMAT.md); uso e testes em [README-DATABASE.md](README-DATABASE.md).
 
 ## Fundação atual
@@ -17,7 +18,9 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
   incluindo fontes da observação e metadados cadastrais opcionais.
 - `Application`: CatalogSession ativa um catálogo completo; LineupPlanner escolhe
   onze jogadores para uma formação. CompetitionSession coordena confrontos,
-  tentativas, resultados, classificação e snapshots, sem Unity ou armazenamento.
+  tentativas, resultados, classificação, fases e snapshots, sem Unity ou armazenamento.
+  CareerSession coordena agenda diária, treino, tática, propostas, caixa e eventos
+  de notícias sobre uma CompetitionSession diária, mantendo a mesma separação.
 - `DataContracts`: DTOs de intercâmbio, incluindo referências visuais separadas e
   os sete IDs de preset em BuiltinAppearanceData, sem enums do motor Unity.
 - `Infrastructure/Importing`: JsonDatabaseImporter valida JSON e suas referências,
@@ -25,7 +28,7 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 - `Bootstrap`: FootballDatabaseBootstrap lê a base externa com UnityWebRequest e
   só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
 - `Editor`: FootballDatabaseBuildProcessor valida a base e a registra com um schema
-  que aceita v1–v4 como StreamingAssets adicionais, sem criar fontes fora de
+  que aceita v1–v5 como StreamingAssets adicionais, sem criar fontes fora de
   FootballSimulator.
 - `Infrastructure/LegacyMatch`: CatalogMatchAdapter converte os onze escalados em
   objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
@@ -36,14 +39,17 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 - `database-editor/server`: Node 22 com rotas HTTP, validação Ajv 8 dos schemas,
   verificação semântica e gravação do arquivo separadas em módulos.
 - `Infrastructure/GameModes`: GameHubSession conecta navegação, campeonato,
-  perfil de carreira, preferências, localização e armazenamento local. Os codecs
-  convertem snapshots para saves versionados, fora do domínio.
+  carreira diária, preferências, localização e armazenamento local. Os codecs
+  convertem snapshots para saves versionados; a compressão e os slots de gravação
+  pertencem ao armazenamento, fora do domínio.
 - `Presentation`: GameHubView e componentes UGUI/TMP exibem consultas da fachada;
   prefab, tema e avatares são recursos editáveis no Unity.
 
-O exemplo v4 contém 16 clubes e 363 jogadores relacionados nas súmulas de abertura
+O exemplo v5 contém 16 clubes e 363 jogadores relacionados nas súmulas de abertura
 do Paulista de 10/11 de janeiro de 2026. É um recorte observado, não elencos
-completos nem uma competição oficial jogável. Sua proveniência e aproximações
+completos. Inclui uma edição com calendário publicado e perfil de regras do
+Paulistão 2026, com as aproximações descritas em [CALENDAR-2026.md](CALENDAR-2026.md).
+Sua proveniência e aproximações cadastrais
 estão em [HISTORICAL-DATA.md](HISTORICAL-DATA.md); o caminho de autoria continua
 `four-clubs.database.json` para preservar a integração existente. A seleção
 aguarda o catálogo e apresenta seus clubes; o amistoso recebe nomes, medidas e
@@ -51,8 +57,8 @@ atributos importados. TeamEntry/PlayerEntry persistentes fornecem apenas recurso
 visuais e formação via LegacyMatchBindings. Aparência completa em v2 tem prioridade
 e dispensa binding de jogador; se omitida, preserva o caminho legado e seu default
 declarado. Não há fallback para DatabaseService. Apenas a aparência embutida é
-suportada; skins externas continuam planejadas. O regulamento executável continua
-sendo round-robin v1; a amostra histórica mantém competições/edições vazias.
+suportada; skins externas continuam planejadas. Os regulamentos executáveis são
+`round-robin` v1 e `paulista-2026` v1. Dados não executam código recebido do editor.
 
 ## Objetivos
 
@@ -74,7 +80,7 @@ A organização interna pode ganhar subpastas por assunto, como `Competitions`,
 | --- | --- | --- |
 | Domain | Identidades, definições esportivas, temporada, calendário, resultados e classificação | Biblioteca padrão C#; sem Unity, arquivos ou serializador |
 | Application | Criar temporada, iniciar tentativa de jogo, concluir confronto, consultar estado | Domain e contratos de execução definidos pela própria Application |
-| Infrastructure | Importação, mapeamento de dados, integração com motor 3D, mídia e futuro armazenamento | Contratos, Application, Domain e bibliotecas específicas da integração |
+| Infrastructure | Importação, mapeamento de dados, integração com motor 3D, mídia e armazenamento | Contratos, Application, Domain e bibliotecas específicas da integração |
 | Presentation | Prefabs UGUI/TMP, apresentação das consultas e envio de comandos | Application e abstrações de apresentação visual |
 | Bootstrap | Construir e conectar serviços; manter a sessão durante transições | Implementações necessárias à composição |
 
@@ -122,9 +128,10 @@ existentes ficam encapsulados pela ponte com o motor.
 
 | Informação | Proprietário | Tempo de vida |
 | --- | --- | --- |
-| Clubes, jogadores, vínculos iniciais, competições e regras | Base externa versionada | Revisão imutável importada |
+| Clubes, jogadores, vínculos iniciais, competições, regras e agenda autoral | Base externa versionada | Revisão imutável importada |
 | Países, estádios, biografia e recorte com fontes | Base externa versionada | Metadados observados; não são estado da carreira |
-| Confrontos, resultados e progresso | Sessão da competição | Snapshot versionado salvo localmente; mudanças de elenco ainda futuras |
+| Confrontos, resultados e progresso | Sessão da competição | Snapshot versionado salvo localmente |
+| Data atual, treino, tática, propostas, vínculos efetivos, caixa e notícias | Sessão da carreira | Snapshot associado à mesma competição e revisão fixada |
 | Escalação e IDs locais de jogadores na partida | Adaptador e motor de partida | Uma execução de confronto |
 | Retratos, escudos e skins | Catálogo visual e carregador de mídia | Recursos versionados, carregados conforme uso |
 
@@ -152,15 +159,25 @@ nulos; nenhum país ou nascimento é deduzido do nome do jogador.
 `PlayerDefinition.Name`, `FullName` e `Nickname` têm responsabilidades separadas.
 `DisplayName` usa o apelido quando presente, preservando o nome compatível com
 o legado e o nome completo. `PlayerId` permanece a chave em todos os casos.
-Reputação, torcida, orçamentos e patrocínio são parâmetros autorais imutáveis,
-sem efeitos financeiros implementados. Saldos, contratos vivos, lesões, cartões,
-treino e histórico produzido pelo jogador pertencerão ao save e aos serviços
-de carreira, sem modificar o catálogo importado.
+Reputação, torcida, orçamentos e patrocínio são parâmetros autorais imutáveis.
+A carreira usa o orçamento de transferências como caixa inicial de simulação e
+o orçamento mensal de salários como débito mensal. Os valores efetivos, inclusive
+defaults explícitos quando o cadastro é omisso, são fixados pela revisão e por
+`CareerManagementRules`. Caixa é derivado de lançamentos idempotentes; treino,
+condição, preparo e notícias pertencem à carreira. Propostas reservam saldo e
+alteram os vínculos efetivos após aceitação, sem modificar o catálogo importado.
+Contratos vivos, lesões e suspensões individuais continuam futuros.
 
-O importador aceita até 1 MiB, mas o armazenamento local de campeonato atual
-limita o envelope completo a 384 KiB, incluindo o JSON escapado. Aceitação da
-base não garante que uma futura competição com esse conteúdo caiba no save;
-a evolução do armazenamento precisa acompanhar elencos/histórico maiores.
+O importador aceita até 1 MiB. O armazenamento recebe envelopes de até 2 MiB
+expandidos, compacta conteúdo maior com GZip/Base64 e limita cada slot codificado
+a 112 KiB. São dois slots por modo; o snapshot confirmado é preservado durante
+a gravação do substituto. Saves v1 sem compressão permanecem legíveis.
+Quatro slots no teto somam 448 KiB de bytes codificados ou 896 KiB sob contagem
+conservadora UTF-16, deixando margem para chaves e preferências. A base histórica
+atual é testada com os quatro slots e essa contabilização abaixo de 1 MiB.
+Outras bases ou históricos
+podem exceder o limite e devem falhar preservando o save anterior. Compressão,
+limite expandido, codec e importação são verificados em fronteiras distintas.
 
 ScriptableObjects continuam adequados à autoria de materiais, catálogos de
 recursos Unity, prefabs e parâmetros de apresentação. Não são o armazenamento
@@ -195,15 +212,23 @@ autoritativo do cadastro externo nem do progresso da temporada.
 ### Competição implementada
 
 - `CompetitionDefinition` e `CompetitionEditionDefinition` pertencem ao catálogo:
-  participantes, datas por rodada e `LeagueRules` versionadas vêm do JSON v3.
+  participantes, datas por rodada e `LeagueRules` versionadas existem desde v3;
+  v5 adiciona confrontos autorais, estádio opcional por jogo e slots de playoffs.
 - `RoundRobinScheduler` gera turno único ou ida/volta; clubes ímpares recebem folgas.
+- O perfil paulista usa 64 confrontos autorais e gera quatro quartas, duas semis
+  e duas finais conforme os resultados: 72 partidas ao concluir. Reordena os
+  sobreviventes por campanha acumulada e fixa os mandos de cada fase. As regras
+  e os limites de fidelidade estão em [CALENDAR-2026.md](CALENDAR-2026.md).
 - `CompetitionSession` mantém SeasonId, FixtureId e ExecutionId independentes do
   motor. `BeginFixture`, `AbortFixture` e `CompleteFixture` coordenam a tentativa.
 - `FixtureResult` copia o placar e as identidades antes do descarregamento;
-  `StandingsCalculator` deriva a classificação. Empate esportivo completo mantém
-  a mesma posição, sem escolher campeão pelo identificador.
-- `DeterministicMatchSimulator` resolve os outros jogos da rodada. O clube
-  controlado joga no motor 3D; jogos simulados são identificados na interface.
+  `StandingsCalculator` deriva a classificação. Round-robin conserva empate
+  esportivo completo. O perfil paulista acrescenta disciplina e sorteio
+  reproduzível; cartões e pênaltis são suplementos declarados de simulação,
+  porque a ponte 3D atual fornece o placar final, não eventos disciplinares.
+- `DeterministicMatchSimulator` resolve partidas mediante execução declarada.
+  O clube controlado pode jogar em 3D ou ser simulado explicitamente. Campeonato
+  avança por rodadas; o modo diário resolve somente jogos cuja data chegou.
 - `CompetitionSnapshot` guarda somente dados de progresso. O adaptador de save
   combina esse snapshot com o JSON da revisão fixada e valida ambos ao restaurar.
 
@@ -216,6 +241,41 @@ são ignorados. Repetir o mesmo resultado aceito é inofensivo; resultado confli
 A sessão vive fora dos painéis. `MatchEngineLoader.CreateMatch` descarrega a UI
 geral, e o adaptador precisa sobreviver a isso. Assinaturas de eventos e recursos
 da partida são liberados em conclusão, falha e abandono.
+
+### Carreira diária implementada
+
+`CareerSession` contém uma `CompetitionSession.CreateDaily` e é a operação
+autoritativa para avançar o relógio. O dia inicial é o primeiro do mês; a UI exige
+uma edição participante no mês/ano escolhido. Avançar até o compromisso passa
+pelos dias intermediários e para em qualquer jogo pendente do clube controlado.
+Após eliminação, os demais jogos continuam no calendário; a gestão encerra no
+último dia da edição. Não há composição de campeonatos simultâneos ou renovação
+automática de temporada.
+
+Treino aplica deltas diários à condição e ao preparo, sem bônus por repetir
+comandos na mesma data. O adaptador 3D usa o fator derivado somente nos clones
+da equipe controlada. O simulador de placares continua independente desse fator.
+Salários e receita mensal são lançados uma vez por mês; bilheteria fixa de
+simulação, uma vez por jogo em casa. `CareerSnapshot` guarda mudanças de treino,
+livro de caixa, eventos de notícias, tática, histórico de propostas e IDs de jogos processados; na restauração,
+a gestão é reexecutada sobre os resultados validados e comparada ao histórico.
+Não se simula de novo a competição ao carregar o save.
+
+`CareerSession.EffectiveCatalog` reconstrói os vínculos após contratações aceitas;
+`Competition.Catalog` conserva a revisão autoral usada por resultados e saves.
+O adaptador da carreira recebe o catálogo efetivo e opções de formação/mentalidade,
+sem reescrever `PlayerDefinition`, o JSON original ou o cadastro de outros modos.
+Propostas guardam uma ordem de comandos e a posição do livro de caixa no envio,
+permitindo validar reservas e cancelamentos antes/depois de uma receita no mesmo
+dia. Aceitação lança a taxa uma vez; as respostas e os vínculos são reconstruídos
+no replay. A folha mensal continua o parâmetro inicial, sem novos contratos.
+
+As notícias têm EventKey, OutletId e dados. A UI resolve textos em português e
+inglês; o core não carrega textos localizados, armazenamento, rede ou geradores
+de linguagem. Saves diários usam versão 3. Versão 2 é lida com tática padrão e
+histórico de propostas vazio. Perfis antigos v1 são preservados e
+não recebem silenciosamente uma temporada inventada. Uma nova carreira é uma
+ação explícita. Detalhes e parâmetros em [CAREER-PROTOTYPE.md](CAREER-PROTOTYPE.md).
 
 Limitações observadas do legado que orientam a implementação:
 
@@ -238,20 +298,23 @@ revisão. Não é necessário que o editor participe da execução da partida.
 
 O recorte implementado permite CRUD de clubes/jogadores/estádios, cadastro de
 países, proveniência, vínculos de elenco, biografias, metadados de gestão,
-posições naturais, medidas, quinze atributos e sete presets visuais. Formulários
+posições naturais, medidas, quinze atributos e sete presets visuais. Também
+permite cadastrar campeonatos e edições, participantes, agenda e perfis de regras
+implementados. Formulários
 compartilham um rascunho em memória; salvar é uma ação explícita da base inteira,
 e exportar JSON pode preservar mudanças ainda não publicadas. A prévia é uma
 ilustração dos presets, não uma renderização do personagem do Unity.
 
-V4 é uma evolução explícita do contrato. Abrir uma base v1–v3 não inventa data,
+V4/v5 são evoluções explícitas do contrato. Abrir uma base v1–v3 não inventa data,
 fontes ou localização para promovê-la silenciosamente. Ambos os importadores
 validam forma, limites, referências e datas; dados opcionais desconhecidos são
 omitidos, enquanto `null` explícito é inválido. O metadado de estádio não muda
 o asset usado por `MatchEngineLoader`, que ainda seleciona o estádio legado.
 `ClubDefinition.StadiumId` identifica o estádio oficial principal do clube.
-Disponibilidade por período, eventos com efeito financeiro e exceções de mando
-por partida são extensões futuras separadas desse vínculo; uma mudança temporária
-de local não deve substituir o estádio principal no cadastro.
+O confronto pode referenciar um estádio distinto em v5, sem substituir esse
+vínculo. Disponibilidade por período, escolha automática por conflito e eventos
+com efeito financeiro continuam extensões futuras. O ID no calendário ainda
+não muda o modelo 3D carregado.
 
 O backend separa parsing JSON estrito, schemas/referências, transporte HTTP e
 `DatabaseStore`. A leitura devolve um ETag derivado dos bytes. O salvamento exige
@@ -285,9 +348,9 @@ regras suportados. O domínio mantém suas próprias invariantes. Um pacote inv�
 não substitui a base ativa. Não executar scripts ou nomes de tipos recebidos em
 JSON. Regulamentos parametrizam comportamentos implementados no jogo.
 
-O editor atual oferece criar, editar, validar e exportar clubes/jogadores. Preserva
-e valida as competições/regulamentos v3, editáveis no JSON; seus formulários ainda
-não existem. A rota local ainda não importa pacotes gráficos. Hospedagem
+O editor atual oferece criar, editar, validar e exportar cadastros e competições.
+Os formulários de edição suportam `round-robin` v1 e `paulista-2026` v1; não são
+um construtor de regras arbitrárias. A rota local ainda não importa pacotes gráficos. Hospedagem
 de catálogos públicos pode ser acrescentada como outra origem de conteúdo; a
 aplicação local não define autenticação ou publicação pública de uma galeria.
 
@@ -361,3 +424,7 @@ contrato ou no adaptador Unity exigem novo WebGL. Testes de regras
 puros cobrem calendário, pontuação e duplicidade; testes de integração cobrem
 transições do motor e importação; testes visuais cobrem material e animação de
 skins. Aprovar compilação não comprova que uma skin funciona durante uma partida.
+Os testes de carreira exercitam os 16 clubes até o encerramento e restauração
+entre compromissos, além da contabilidade e compressão com a base completa.
+Essas simulações automatizadas não equivalem a jogar as 72 partidas no navegador;
+a cobertura real de UI/3D deve ser informada separadamente.

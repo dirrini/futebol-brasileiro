@@ -155,7 +155,7 @@ test('legacy 1–3 keep existing scope and schema, without fabricating a histori
   for (const version of [1, 2, 3]) {
     const document = base(); document.schemaVersion = version;
     delete document.snapshot; delete document.countries; delete document.stadiums;
-    assert.deepEqual(availableViews(document), ['players', 'clubs']);
+    assert.deepEqual(availableViews(document), ['players', 'clubs', 'competitions', 'competitionEditions']);
     assert.deepEqual(validateHistory(document), []);
     addRecord(document, 'clubs', { name: 'Clube legado' }, options);
     assert.equal(document.schemaVersion, version); assert.equal(document.snapshot, undefined);

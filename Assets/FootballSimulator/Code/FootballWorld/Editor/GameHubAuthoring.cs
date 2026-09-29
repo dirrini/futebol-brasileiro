@@ -20,7 +20,7 @@ using UnityEngine.UI;
 namespace FStudio.FootballWorld.Editor
 {
     // This command authors assets once. Player builds instantiate the saved prefab; they never construct its layout.
-    public static class GameHubAuthoring
+    public static partial class GameHubAuthoring
     {
         private const string Root = "Assets/FootballSimulator/Resources/FootballWorld/";
         private const string PrefabPath = Root + "GameHub.prefab";
@@ -37,6 +37,8 @@ namespace FStudio.FootballWorld.Editor
             else Debug.Log("[GameHub] Existing prefab preserved. Edit the prefab directly or use the explicit rebuild command.");
             EnsureCanvasCameraBinding();
             EnsureCountryFilters();
+            EnsureCareerOffice();
+            EnsureCareerManagement();
             LocalizeLegacyPrefabs();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -51,6 +53,8 @@ namespace FStudio.FootballWorld.Editor
             GameHubTextSeed.MergeCatalog();
             CreatePrefab();
             EnsureCountryFilters();
+            EnsureCareerOffice();
+            EnsureCareerManagement();
             LocalizeLegacyPrefabs();
             AssetDatabase.SaveAssets();
         }
@@ -419,8 +423,9 @@ namespace FStudio.FootballWorld.Editor
             var layout = content.gameObject.AddComponent<VerticalLayoutGroup>(); layout.spacing = 6; layout.childControlHeight = true; layout.childControlWidth = true; layout.childForceExpandHeight = false; layout.childForceExpandWidth = true;
             content.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             var scrollbarObject = DefaultControls.CreateScrollbar(new DefaultControls.Resources { standard = theme.RoundedPanel, background = theme.RoundedPanel }); scrollbarObject.transform.SetParent(parent, false); scrollbarObject.name = name + "Scrollbar";
-            Place(scrollbarObject.GetComponent<RectTransform>(), x + width - 9, y, 9, height);
             var scrollbar = scrollbarObject.GetComponent<Scrollbar>(); scrollbar.SetDirection(Scrollbar.Direction.BottomToTop, true); scrollbarObject.GetComponent<Image>().color = theme.Line; scrollbar.targetGraphic.color = theme.Primary;
+            // SetDirection flips the RectTransform axes; place the vertical bar after that conversion.
+            Place(scrollbarObject.GetComponent<RectTransform>(), x + width - 9, y, 9, height);
             scroll.content = content; scroll.viewport = root; scroll.verticalScrollbar = scrollbar; scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
             return content;
         }

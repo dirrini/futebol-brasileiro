@@ -34,6 +34,8 @@ namespace FStudio.FootballWorld.Bootstrap
             "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json";
         public const string SourceSchemaV4AssetPath =
             "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v4.schema.json";
+        public const string SourceSchemaV5AssetPath =
+            "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v5.schema.json";
         public const string StreamingDatabasePath = "FootballWorld/database.json";
         public const string StreamingSchemaPath = "FootballWorld/database.schema.json";
 

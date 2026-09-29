@@ -1,36 +1,38 @@
 # Contratos de base e mídia
 
-Estado: contratos JSON v1 a v4. V2 acrescenta presets de aparência; v3 acrescenta
+Estado: contratos JSON v1 a v5. V2 acrescenta presets de aparência; v3 acrescenta
 campeonatos e edições com regulamento e datas de rodadas. V4 acrescenta países,
 estádios, biografias, metadados dos clubes e um recorte observado com fontes.
+V5 acrescenta confrontos autorais, datas das fases finais e o perfil Paulista 2026.
 Pacotes ZIP, mídia carregável e skins completas nas seções seguintes
 continuam sendo extensões planejadas. Consulte [README-DATABASE.md](README-DATABASE.md),
 [ROADMAP.md](ROADMAP.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Contratos executáveis atuais: JSON v1 a v4
+## Contratos executáveis atuais: JSON v1 a v5
 
 Schema: [database-v1.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
 Extensão de aparência: [database-v2.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json).
 Extensão de competições: [database-v3.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json).
 Extensão cadastral e de proveniência: [database-v4.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v4.schema.json).
+Extensão de calendário e Paulista: [database-v5.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v5.schema.json).
 Exemplo: [four-clubs.database.json](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 
 O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
 
 | Campo obrigatório | Conteúdo |
 | --- | --- |
-| schemaVersion | Inteiro 1, 2, 3 ou 4 |
+| schemaVersion | Inteiro 1, 2, 3, 4 ou 5 |
 | databaseId | ID permanente da base |
 | databaseRevision | Inteiro de 1 a 2147483647 |
-| clubs | Um ou mais objetos com id e name; countryCode e city também obrigatórios em v4 |
+| clubs | Um ou mais objetos com id e name; countryCode e city também obrigatórios em v4/v5 |
 | players | Um ou mais jogadores com id, name, naturalPositions, heightCm, weightKg e attributes |
 | memberships | Zero ou mais vínculos clubId/playerId; um clube inicial por jogador |
 | visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional a partir de v2; no máximo um por jogador |
-| competitions (v3/v4) | Até 128 campeonatos com id e name |
-| competitionEditions (v3/v4) | Até 128 edições com participantes, datas e regras suportadas |
-| countries (v4) | De 1 a 300 países, com code e name |
-| stadiums (v4) | De 0 a 1024 estádios, com id, name, countryCode e city; capacity opcional |
-| snapshot (v4) | Data, descrição do recorte, cobertura de elenco, notas e fontes |
+| competitions (v3–v5) | Até 128 campeonatos com id e name |
+| competitionEditions (v3–v5) | Até 128 edições com participantes, datas e regras suportadas |
+| countries (v4/v5) | De 1 a 300 países, com code e name |
+| stadiums (v4/v5) | De 0 a 1024 estádios, com id, name, countryCode e city; capacity opcional |
+| snapshot (v4/v5) | Data, descrição do recorte, cobertura de elenco, notas e fontes |
 
 `skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
 O importador valida a forma da referência e a existência de PlayerId. A ponte do
@@ -101,7 +103,7 @@ elencos vazios ou maiores que onze são válidos no catálogo. LineupPlanner ver
 se o clube pode fornecer um goleiro natural e dez jogadores de linha ao amistoso.
 
 Objetos não aceitam propriedades desconhecidas. Null, campos obrigatórios ausentes e conversões
-implícitas de strings para números são rejeitados. Competições e regras exigem v3 ou v4.
+implícitas de strings para números são rejeitados. Competições e regras exigem v3, v4 ou v5.
 Novos tipos de regra, caminhos de arquivo e recursos binários exigem outra evolução
 explícita de versão e importador; não são campos silenciosamente ignorados.
 
@@ -131,11 +133,11 @@ no Compose; novos recursos compilados ainda requerem build.
 O editor local salva JSON validado com controle de concorrência por ETag/If-Match,
 incremento de `databaseRevision` no servidor e substituição atômica do arquivo.
 Exportar um rascunho não muda a revisão publicada. A aplicação pode ler v1 e
-promove v1 para v2 ao definir uma aparência; bases v3/v4 conservam sua versão e
+promove v1 para v2 ao definir uma aparência; bases v3–v5 conservam sua versão e
 suas competições. A promoção para v4 exige os novos campos obrigatórios, sem
 inventar data, fontes ou localização. Os schemas de autoria são
 separados; `StreamingAssets/FootballWorld/database.schema.json` e
-`/editor/api/schema` publicam as quatro versões suportadas.
+`/editor/api/schema` publicam as cinco versões suportadas.
 
 ### Cadastro e recorte observado v4
 
@@ -163,15 +165,18 @@ Além de `id` e `name`, clubes v4 exigem `countryCode` e `city`. Campos opcionai
 | sponsorship | Texto não branco, até 200 pontos Unicode |
 | notes | Texto de até 4000 pontos Unicode; pode ser vazio |
 
-Os campos de gestão são parâmetros autorais de simulação. Nesta etapa não
-produzem receitas, contratos, ofertas, treino ou alterações de saldo. Não devem
-ser apresentados como finanças oficiais verificadas sem uma fonte correspondente.
-O texto de patrocínio também não é um contrato financeiro com vigência.
+Os campos de gestão são parâmetros autorais de simulação. Na carreira diária,
+`transferBudget` inicializa o caixa e `monthlyWageBudget` define a despesa mensal.
+Os valores ausentes e as receitas usam defaults explícitos das regras de gestão;
+saldo e movimentações ficam no save, sem alterar a base. Reputação, torcida e texto
+de patrocínio continuam descritivos. Não apresentar esses valores como finanças
+oficiais verificadas sem fonte. Veja [a gestão](CAREER-PROTOTYPE.md).
 
 `club.stadiumId` conserva o estádio oficial principal mesmo quando o clube manda
-uma partida em outro local. Disponibilidade por período (como reformas e eventos),
-receitas desses eventos e a escolha temporária de estádio por partida pertencem a
-etapas futuras; não são inferidas deste vínculo nem alteram esse cadastro principal.
+uma partida em outro local. Em v5, `authoredFixtures[].stadiumId` pode declarar o
+estádio efetivo de um confronto sem alterar o principal. Disponibilidade por período,
+reformas, eventos, receitas desses eventos e escolha automática de um estádio
+alternativo ficam para etapas futuras. O vínculo não seleciona um modelo 3D.
 
 Jogadores v4 preservam os campos esportivos existentes e aceitam:
 
@@ -207,7 +212,7 @@ não resolve automaticamente outro elenco para outra data e não é o relógio d
 uma carreira. Alterar `snapshot.date` exige rever o conteúdo e as fontes; não
 transforma a base em uma edição histórica diferente.
 
-A amostra v4 reúne os 16 clubes e 363 jogadores relacionados nas súmulas de
+O recorte introduzido em v4 e preservado em v5 reúne os 16 clubes e 363 jogadores relacionados nas súmulas de
 10 e 11 de janeiro de 2026; usa `snapshot.date: "2026-01-11"` e
 `rosterScope: "matchday-squads"`. Não representa elencos completos. Medidas,
 atributos e visuais aproximados estão identificados nas notas; campos biográficos
@@ -217,8 +222,8 @@ ele não informa a quantidade atual de clubes. A identidade da base e os IDs já
 existentes de São Paulo/jogadores correspondentes são preservados.
 
 `competitions` e `competitionEditions` continuam obrigatórios em v4 e aceitam
-os mesmos formatos de v3. Na amostra de janeiro estão vazios: cadastrar os clubes
-do Paulista não implementa sua tabela oficial ou seu regulamento.
+os mesmos formatos de v3. A amostra passou a v5 para declarar o calendário e o
+regulamento do Paulista descritos abaixo.
 
 ### Campeonatos e edições v3
 
@@ -229,7 +234,7 @@ sem fuso horário, no formato exato `AAAA-MM-DD`, com anos 0001 a 9999 e dias re
 Devem ser estritamente crescentes; início e fim são derivados da primeira e da
 última rodada. V1/v2 continuam aceitos, com listas de competições vazias.
 
-O regulamento implementado é:
+O perfil de liga disponível desde v3 é:
 
 ```json
 {
@@ -246,18 +251,46 @@ empate e empate maior ou igual à derrota. A ordem de desempate acima é fixa
 nesta versão; um empate esportivo completo conserva posição compartilhada.
 Para N participantes, são necessárias `(N par ? N−1 : N) × legs` datas. Clubes
 ímpares têm folgas. IDs de confrontos são gerados uma vez ao criar a sessão;
-confrontos, resultados e classificação pertencem ao progresso, não ao JSON autoral.
+nesse perfil, confrontos, resultados e classificação pertencem ao progresso,
+não ao JSON autoral. V5 também permite confrontos autorais no perfil Paulista.
 
 A revisão 6 da amostra adicionou a Liga de demonstração, em 3, 10 e 17 de outubro
 de 2026: quatro clubes, três rodadas e seis jogos, turno único, 3/1/0 pontos.
 Esse calendário é demonstrativo e não representa um campeonato oficial.
-O editor web conserva e valida estes dados ao editar jogadores/clubes; a autoria
-de competições ainda é feita no JSON. Excluir um clube participante é bloqueado
+O editor web oferece formulários de Campeonatos e Edições para esses dados. Excluir um clube participante é bloqueado
 até remover sua participação explicitamente.
 
 O mês/ano da carreira é estado da carreira, separado das datas da base. Escolher
 outro período não fabrica elencos históricos: uma futura base desse período
 deverá fornecer os clubes, jogadores, regras e edições correspondentes.
+
+### Calendário autoral e Paulista v5
+
+[database-v5.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v5.schema.json)
+conserva os cadastros de v4 e adiciona `rules.type: "paulista-2026"`, `version: 1`.
+Esse tipo exige 16 participantes, oito `roundDates` e 64 `authoredFixtures`:
+`{id, round, date, homeClubId, awayClubId, stadiumId?}`. IDs são estáveis; o estádio
+opcional é uma exceção daquele confronto, sem alterar o principal do clube.
+
+Cada clube joga uma vez por rodada, contra oito adversários distintos, quatro
+vezes em casa e quatro fora. `roundDates` indica o primeiro dia de cada rodada;
+a data do jogo pertence à sua janela e é preservada no calendário diário.
+`playoffDates` tem oito datas por **slot**, nesta ordem: quartas 1×8, 2×7, 3×6,
+4×5; semis 1×4, 2×3; final ida e volta. Datas da mesma fase podem estar fora de
+ordem, mas a fase seguinte só começa após a anterior.
+
+Pontos são fixos em 3/1/0, `legs: 1`; desempates são `wins`, `goal-difference`,
+`goals-for`, `red-cards`, `yellow-cards`, `drawing-lots`, nessa ordem. As regras
+implementadas, classificação, rebaixamento e ressalvas estão em
+[CALENDAR-2026.md](CALENDAR-2026.md). Os jogos eliminatórios são criados no save
+conforme os classificados; placares históricos não são incluídos na base.
+
+A base de exemplo v5/revisão 10 publica uma edição jogável. As duas abas do editor
+permitem criar, editar e excluir competições/edições, participantes, calendário e
+regras suportadas. Regras não executam scripts importados. Uma base v4 pode ser
+promovida explicitamente para v5 ao escolher Paulista; versões antigas continuam
+aceitas. Dados de carreira (saldo, treino, tática, propostas, vínculos efetivos,
+notícias e resultados) pertencem ao save, sem editar os vínculos iniciais da base.
 
 ## Extensões planejadas
 
@@ -302,8 +335,8 @@ ficam em perfis visuais associados aos IDs, separados dos atributos esportivos.
 Listas de resultados e progresso pertencem ao save versionado separado da base;
 veja [README-GAME-MODES.md](README-GAME-MODES.md).
 
-Regulamentos declaram um tipo suportado e seus parâmetros. O primeiro tipo é liga
-de turno único. JSON não contém código, expressões executáveis nem nomes de
+Regulamentos declaram um tipo suportado e seus parâmetros. Os perfis atuais são
+`round-robin` e `paulista-2026`, descritos acima. JSON não contém código, expressões executáveis nem nomes de
 classes a instanciar. Tipos ou versões incompatíveis são rejeitados com uma
 mensagem que identifique a competição e o campo.
 
@@ -397,7 +430,7 @@ Exemplo parcial de associação em um perfil visual:
 ```
 
 Os valores e campos desse exemplo são ilustrativos da extensão futura; não formam
-um objeto válido dos contratos v1–v4 atuais. O perfil visual não altera velocidade,
+um objeto válido dos contratos v1–v5 atuais. O perfil visual não altera velocidade,
 força, IA, colisão ou regras.
 Referências abreviadas como `portraitAssetId` e `fallbackSkinId` são resolvidas
 pelo manifesto imutável da base para revisões e digests exatos. Isso também vale

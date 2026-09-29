@@ -9,13 +9,13 @@ Direção visual em [DESIGN.md](DESIGN.md). Regras e propriedade dos dados segue
 
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
 | --- | --- | --- | --- | --- |
-| Form | GameHubView + TMP_InputField | GameHubSession e HubCareerProfile | Criar e atualizar treinador | Nome, ano, clube, erro e retenção da ficha |
+| Form | GameHubView + TMP_InputField | GameHubSession e HubCareerProfile | Criar e substituir carreira | Nome, ano, clube, erro e retenção da ficha |
 | Select/Listbox | TMP_Dropdown, template salvo em GameHub.prefab | Prefab + tema | País, edição, clube, idioma, câmera, dificuldade e mês | Popup, teclado, scroll e texto PT/EN |
 | Scrollbar | ScrollRect/Scrollbar autorados no prefab | GameHub.prefab + GameHubTheme | Classificação, confrontos, opções longas | Mouse, teclado e scrollbar visível |
 | Toast | Status/SaveWarning em GameHubView | GameHubSession | Carregando, erro, confirmação e aviso persistente | Status sem deslocar ações, retry e fechamento de aviso |
 | CRUD | GameHubSession | ARCHITECTURE.md e save local versionado | Criar/substituir carreira e campeonato | Gravação, restauração, revisão fixada e confirmação |
 | Dialog | Confirmation em GameHub.prefab + GameHubView | Este contrato | Substituir campeonato ou perfil | Cancelar inicial, Escape, foco e bloqueio do fundo |
-| Navigation | GameHubSession.Navigate | Este contrato | Hub e retorno ao modo de origem | Amistoso, campeonato, perfil e opções |
+| Navigation | GameHubSession.Navigate | Este contrato | Hub e retorno ao modo de origem | Amistoso, campeonato, carreira e opções |
 | Locale | GameText/GameTextCatalog/LocalizedText | GameText.asset | Inglês inicial e português selecionável | Novas telas e retornos afetados traduzidos |
 
 ## Navegação e preferências
@@ -60,23 +60,41 @@ se aplica a saves existentes que não puderam ser restaurados, sem descartá-los
 silenciosamente. Simulação, correlação de resultado e persistência pertencem à
 aplicação, não à tela.
 
-## Perfil de carreira
+## Carreira diária
 
-Esta etapa cria um treinador com nome, um de três retratos 2D, mês/ano inicial e
-clube. Anos de 1 a 9999 e meses de 1 a 12 são aceitos; o ano usa campo inteiro, sem
-uma lista artificial limitada a décadas. O primeiro valor vem do início da edição
-disponível, ou de `snapshot.date` quando a base não tem edição. A data não escolhe
-automaticamente outra fotografia histórica nem transforma os vínculos publicados.
+O formulário conserva nome/avatar, país, clube e mês/ano. Iniciar exige uma edição
+do clube que comece no mês escolhido; para a base atual, janeiro de 2026. O primeiro
+dia desse mês inicia o relógio da carreira. Datas sem edição recebem erro e mantêm
+os campos. O recorte cadastral é fixado, sem prometer resolver elencos históricos.
 
-A ficha declara que ainda não simula calendário. Criar/salvar mostra o perfil
-confirmado e mantém o formulário. Alterar um perfil existente exige confirmação
-antes de substituí-lo. Erros preservam os campos; nome vazio ou ano inválido recebe
-foco para correção. A ficha em memória é mantida ao alternar telas do hub; somente
-o perfil salvo sobrevive ao descarregamento da UI ou refresh do navegador.
+Criar abre o centro do treinador. Retornar a Career continua a carreira diária;
+**Nova carreira** abre o formulário e só substitui o save após confirmação explícita
+sobre perda de calendário, resultados e finanças. Perfis antigos são preservados
+como perfis, sem migração que invente uma temporada. O formulário também oferece
+**Continuar carreira** quando existe uma diária restaurada.
 
-Retratos são composição UGUI autorada, com IDs independentes do nome. Suas paletas
-são editáveis no tema. Não representam skins 3D, não mudam jogadores ou física e
-não fazem upload de modelos.
+Avançar um dia e ir ao próximo jogo atualizam treino e gestão, simulam os outros
+confrontos por data e param nos jogos do clube. Jogar/simular ficam habilitados
+somente no dia da partida. Após o jogo, a tela volta ao centro do treinador. Uma
+execução interrompida mantém seu ID consumido e restaura o confronto como pendente.
+O relógio termina no fim da edição; não cria anos, competições ou jogos fictícios.
+
+Treino só produz efeito ao avançar o dia; trocar repetidamente não gera bônus.
+Condição, preparo e rendimento 3D são visíveis. Caixa e extrato distinguem receitas
+e despesas; números usam a cultura ativa e moeda da base. Notícias vêm de veículos
+fictícios identificados. Detalhes em [CAREER-PROTOTYPE.md](CAREER-PROTOTYPE.md).
+
+Calendário/classificação é o dashboard compartilhado do campeonato, com retorno
+à carreira que o abriu. O título **Campanha acumulada** vale para Paulista; campeão
+e rebaixados aparecem separadamente. Um próximo confronto ainda não definido não
+é apresentado como eliminação definitiva. Na competição independente, simulação
+da próxima rodada permite acompanhar as fases após sair da disputa.
+
+A gravação inclui revisão completa da base, calendário e gestão. Falha mantém
+aviso persistente e o último save confirmado; o progresso em memória não deve ser
+confundido com conteúdo já salvo. Os novos slots usam compressão com limites; os
+saves antigos continuam legíveis. A integridade esportiva/financeira é validada
+ao restaurar, incluindo receitas já processadas e histórico de treino.
 
 ## Controles, layout e autoria
 
@@ -116,6 +134,54 @@ preservando posições, dimensões, textos e eventos. Traduções existentes nã
 substituídas pelo seed ao repetir a criação dos assets.
 
 ## Verificação esperada
+
+### Gestão do elenco e propostas
+
+Elenco, Tática e Mercado pertencem à carreira e retornam ao centro do treinador.
+Consultas usam o catálogo efetivo da carreira, que inclui transferências aceitas;
+o JSON autoral não é alterado por uma contratação. Busca por nome, apelido e nome
+completo ignora caixa e acentos. Posição filtra as posições naturais, sem confundi-las
+com vagas na formação. Mercado permite Todos os clubes, um clube ou Sem clube.
+Filtros e paginação ficam na apresentação; uma nova carreira reinicia esse estado.
+
+Elenco e mercado usam páginas de dez jogadores, contagem e rolagem. A seleção é um
+ID estável, mantém a ficha durante atualizações e é limpa/substituída se deixar de
+corresponder ao filtro. Fichas apresentam dados ausentes como “—” ou Não informado;
+todos os quinze atributos usam a escala 0–100. Uma busca vazia mostra instrução
+para revisar o nome ou limpar filtros e não perde o rascunho da busca.
+
+Proposta exige seleção elegível e inteiro de 0 a 2.147.483.647, com saldo disponível.
+Jogadores sem clube custam zero; jogadores com clube exigem taxa positiva. A
+confirmação informa custo total, reserva até a decisão e limite de escopo (taxa de
+transferência, sem negociar novos salários/contratos). Cancelar ou Escape restaura
+foco. Uma falha mantém diálogo e entrada, com a mensagem retornada pela aplicação;
+sucesso fecha o diálogo e atualiza o estado. A aplicação permanece a autoridade
+para orçamento, elegibilidade e aceite. A resposta é processada no próximo dia.
+
+Minhas propostas tem paginação de cinco registros e exibe nome, valor, estado,
+envio, decisão e motivo de recusa. Pendentes podem ser canceladas sem confirmação
+adicional; isso libera o valor reservado. Aceitas passam a constar no elenco efetivo
+e no XI automático quando escolhidas pelo adaptador. Transferências aceitas e
+recusadas também geram notícias fictícias; a taxa aceita aparece no extrato.
+
+Tática tem rascunho local preservado ao sair e voltar, com indicação de alterações
+pendentes. Salvar é explícito e aplica formação e postura às próximas partidas.
+O XI exibido corresponde ao padrão salvo e identifica as posições naturais dos
+jogadores; não promete escalação manual. No fim do calendário, consultas continuam,
+mas editar tática, enviar e cancelar propostas ficam desabilitados com motivo claro.
+
+Todos os textos dessas telas têm chaves PT/EN. A largura reservada ao rodapé não é
+ocupada por filtros, atributos ou botões. Nenhuma regra de transferência ou desenho
+de formulário é construída em runtime: comandos passam pelo Hub, regras ficam no
+core e componentes/linhas têm templates autorados no prefab.
+
+### Checagens da gestão
+
+Conferir todas as posições/quinze atributos, nomes extensos, pesquisa sem resultado,
+paginação, filtro de clube/sem clube, proposta inválida/sem saldo/abaixo da estimativa,
+confirmação cancelada e enviada, cancelamento pendente, resposta após avanço do dia,
+elenco após contratação, tática salva e refresh do navegador. Exercitar PT/EN e o
+retorno ao centro do treinador. Registrar o que foi efetivamente verificado no build.
 
 Verificar início, PT/EN, popup das opções, retorno do amistoso, criação e restauração
 do perfil, ano 1/9999/inválido, cancelamento de substituição, criação/retomada de

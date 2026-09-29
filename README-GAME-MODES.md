@@ -1,110 +1,86 @@
 # Menu e modos de jogo
 
-Abra [localhost:8080](http://localhost:8080) após publicar o projeto com
-`./scripts/webgl.ps1`. O menu inicial usa UGUI/TextMeshPro e oferece os fluxos abaixo.
+Abra [localhost:8080](http://localhost:8080) após `./scripts/webgl.ps1`.
+O hub UGUI/TextMeshPro oferece Quick match, Championship, Career e Options.
 
 ## Quick match
 
-Abre a seleção existente de duas equipes, seguida de uniformes e configurações
-da partida. País e equipe são escolhidos separadamente em cada lado; a base atual
-tem os 16 clubes brasileiros do Paulistão 2026. Apelidos dos jogadores aparecem
-quando preenchidos, com fallback para o nome cadastrado. Usa o catálogo externo
-carregado ao abrir o jogo. O resultado de um
-amistoso não altera o campeonato salvo.
+Escolha país e clube de cada lado, uniforme e configurações e entre na partida
+3D. A base atual tem 16 clubes do Paulista e 363 relacionados na rodada de abertura.
+Apelidos têm prioridade nos menus. Amistosos não alteram os saves de competição.
 
 ## Championship
 
-Escolha uma edição disponível na base e o clube que deseja controlar, filtrado
-por país. A base histórica atual deixa as coleções de competições vazias: o
-regulamento e o calendário oficial do Paulistão ainda são a próxima etapa. Não há
-novo campeonato disponível nessa base. Um campeonato salvo continua usando sua
-própria revisão fixada, inclusive os clubes antigos.
+Escolha **Campeonato Paulista · Paulista 2026** e seu clube. A primeira fase tem
+64 jogos em oito rodadas. Oito clubes avançam às quartas; os dois últimos caem.
+Quartas e semifinais são únicas, com mando e chaveamento pela campanha; a final
+é disputada em duas partidas. Veja [calendário, fontes e regras](CALENDAR-2026.md).
 
-A liga
-demonstrativa reúne São Paulo FC, Milano, London e Catalagna em três rodadas,
-nos dias 3, 10 e 17 de outubro de 2026. São seis confrontos: três são jogados com
-seu clube e os outros são simulados ao concluir a rodada. Essas datas e essa
-competição são exemplos de funcionamento, não um calendário oficial.
+Você pode jogar o confronto no motor 3D ou simulá-lo. Os outros jogos da rodada
+são simulados. Após a eliminação, **Simular rodada** permite acompanhar a decisão.
+A tabela exibe campanha acumulada; o campeão e os rebaixados são indicados ao fim.
+Cartões, sorteio e pênaltis são simulados e não representam eventos jogáveis em 3D.
 
-Vitória vale três pontos, empate um e derrota zero. Os desempates são vitórias,
-saldo de gols e gols marcados. Clubes com todos esses números iguais compartilham
-a posição; o identificador estabiliza a ordem visual sem criar um campeão único.
+O apito final registra o placar antes de descarregar o motor. Abandono deixa o jogo
+pendente; cada tentativa tem outra identidade. Resultados repetidos não somam
+pontos novamente. Uma partida interrompida por refresh volta ao início.
 
-O apito final registra o resultado antes de descarregar o motor 3D. Abandonar
-uma partida ou falhar no carregamento deixa o confronto pendente. Uma nova
-tentativa recebe outra identidade; repetir um resultado já aceito não soma
-pontos novamente. A tabela distingue jogos pendentes, jogados e simulados.
-
-O progresso é salvo neste navegador, com o JSON da revisão utilizada no início.
-Atualizar a página retoma os resultados salvos; não retoma o minuto de uma partida
-interrompida. Criar outro campeonato substitui o anterior após confirmação.
-Limpar os dados do site ou usar outro navegador não transfere esse progresso.
-Uma falha de salvamento é informada e mantém o último save válido.
-
-No JSON v3, `competitions` cadastra a competição e `competitionEditions` define
-participantes, datas por rodada e regras. São aceitos pontos corridos com turno
-único ou ida/volta; outros formatos recebem erro de importação. O editor externo
-preserva e valida essas coleções ao salvar clubes/jogadores, mas seus formulários
-de campeonatos ainda não foram implementados. Veja [DATA-FORMAT.md](DATA-FORMAT.md).
+Campeonatos anteriores mantêm sua revisão e seus clubes, inclusive a antiga liga
+demonstrativa. Ligas de turno único/ida e volta continuam suportadas e podem ser
+cadastradas no editor, com participantes, pontos e datas próprias.
 
 ## Career
 
-Crie o treinador com nome, um dos três avatares gráficos disponíveis, mês/ano
-inicial, país e equipe. Sem edição cadastrada, o primeiro mês/ano vem da data de
-observação da base (janeiro de 2026). O perfil fica salvo neste navegador e pode ser consultado no
-mesmo menu. Criar um novo perfil exige confirmar a substituição do anterior.
+Crie nome/avatar de treinador, país, clube e mês/ano inicial. Para esta base, use
+**janeiro de 2026**. A carreira começa em **01/01/2026** e exige uma edição do clube
+que comece no mês escolhido. Datas sem calendário compatível recebem diagnóstico.
+A escolha não inventa elencos de outros períodos; os relacionados de 10/11 de
+janeiro são a aproximação cadastral usada nesta temporada.
 
-Este recorte cria o perfil. Ainda não avança o tempo, monta calendário real,
-resolve elencos históricos, negocia contratos ou executa partidas da carreira.
-Escolher um ano passado ou futuro não transforma a base atual em uma base daquele
-período. A próxima etapa precisa acrescentar vigências e cobertura temporal aos
-dados, além da coordenação do calendário. O ano aceita 1–9999; a disponibilidade
-real de conteúdo para uma data será verificada quando esse recurso existir.
+O centro do treinador oferece:
 
-Os avatares são retratos gráficos editáveis no Unity, separados das skins 3D de
-jogadores. Não incluem upload de modelos ou criação de um treinador 3D nesta etapa.
+- **Avançar 1 dia** ou **Até o próximo jogo**, parando no dia de um jogo seu pendente.
+- Jogar em 3D ou simular quando chega a data da partida.
+- Treino equilibrado, recuperação ou intenso, com condição/preparo e rendimento
+  temporário no 3D. O catálogo original permanece intacto.
+- Elenco e ficha com os quinze atributos; formação 4-4-2, 4-3-3 ou 4-2-3-1 e
+  mentalidade defensiva, equilibrada ou ofensiva, com escalação automática.
+- Busca de jogadores, propostas com reserva de caixa, cancelamento e resposta
+  no próximo avanço diário. Contratações alteram somente o elenco dessa carreira.
+- Caixa, folha mensal, receita mensal e bilheteria, com extrato de movimentações.
+- Notícias de dois veículos fictícios, produzidas pelos acontecimentos da carreira.
+- Calendário/classificação e criação de nova carreira com confirmação de substituição.
+
+O avanço termina no fim da edição. Contratos, empréstimos, vendas, agendamento de
+amistosos, temporadas seguintes e várias competições simultâneas ficam para as
+próximas etapas. Detalhes e limites em [carreira embrionária](CAREER-PROTOTYPE.md).
+
+Saves antigos de perfil continuam legíveis; não são convertidos silenciosamente
+em temporadas. Para jogar a carreira diária, crie uma nova no mês disponível.
+Os avatares continuam retratos gráficos 2D editáveis no Unity.
 
 ## Options
 
-Idioma inglês/português, câmera padrão e dificuldade padrão ficam salvos
-localmente. A escolha inicial de idioma é inglês. Câmeras especiais de escanteio
-e impedimento não fazem parte da lista de câmeras padrão.
+Idioma inglês/português, câmera padrão e dificuldade são salvos imediatamente.
+O primeiro idioma é inglês. Nomes próprios vêm da base e não são traduzidos.
 
-Nomes próprios de clubes e competições vêm da base e não são traduzidos. A opção
-de idioma se aplica aos textos de navegação e configuração cobertos pelo catálogo
-de localização do jogo; os dados esportivos permanecem os mesmos.
+## Persistência e autoria
 
-## Autoria e responsabilidades
+A competição e a carreira fixam o JSON completo da revisão ao nascer. Editar no
+[editor da base](http://localhost:8080/editor/) e dar refresh oferece o conteúdo
+para novas sessões, sem mudar uma temporada em andamento.
 
-- `Domain` contém as definições imutáveis de competição, regras e datas.
-- `Application` gera confrontos, valida tentativas/resultados, calcula a tabela
-  e simula os jogos dos outros clubes sem depender de Unity ou JSON.
-- `Infrastructure/GameModes` conecta esses serviços ao motor, às preferências e
-  aos saves locais versionados; a base é revalidada ao restaurar seu snapshot.
-- `Presentation` exibe consultas e envia comandos. Layout, tema, tipografia,
-  cores, avatares e textos são assets editáveis, não árvores criadas pelo runtime.
-- `Editor/GameHubAuthoring` prepara os assets iniciais de autoria. O comando
-  preserva recursos já existentes para não sobrescrever ajustes no Editor.
+Campeonatos usam formato 2; carreiras diárias usam formato 3, acrescentando tática
+e propostas aos dias, resultados, treino, finanças e notícias. Carreiras diárias
+v2 e saves anteriores de formato 1 continuam aceitos. O armazenamento usa
+dois slots por modo e compressão GZip; só troca o slot ativo depois de gravar.
+Há limites de **2 MiB descomprimidos** e **112 KiB por slot armazenado**. A quota
+real do navegador ainda pode rejeitar uma escrita: o jogo avisa e preserva o
+último save confirmado. Não há recuperação automática de um slot corrompido.
+Limpar dados do site apaga o progresso; localhost e 127.0.0.1 são origens distintas.
 
-O save da competição é independente do JSON publicado pelo editor. Editar uma
-equipe afeta novas partidas rápidas e novos campeonatos após refresh. Uma
-competição já iniciada conserva sua revisão; não há migração automática.
-
-O armazenamento mantém dois slots e só troca o slot ativo após gravar o novo
-conteúdo. Tamanho excessivo, conteúdo inválido ou indisponibilidade de gravação
-geram diagnóstico. Os dados anteriores não são apagados silenciosamente.
-
-O limite atual é de 384 KiB para o save completo, incluindo o JSON da base e o
-progresso. Um campeonato que já exceda esse tamanho não pode ser criado; se o
-progresso ultrapassar o limite depois, o jogo continua em memória e informa a
-falha, mas o refresh recupera somente o último estado salvo. Se o slot ativo
-estiver corrompido ou incompatível, ele é preservado e a restauração é bloqueada;
-não há recuperação automática pelo outro slot.
-
-Novos saves compactam os espaços de formatação do JSON antes de gravar; não removem
-campos ou referências e preservam o formato de save existente. O limite continua
-valendo para o envelope completo, e não apenas para o arquivo do catálogo.
-
-O JSON salvo conserva os presets e referências de skins declarados na base.
-Escudos, uniformes e demais recursos fornecidos pelos bindings locais pertencem
-ao build instalado; o save não arquiva essas versões dos assets.
+Domain/Application contêm as regras puras. Infraestrutura converte saves e
+adapta a partida; Presentation apenas exibe consultas e envia comandos. Layout,
+fontes, cores, tema, retratos e textos ficam nos prefabs/assets autorados. O comando
+**Create game hub assets** acrescenta os controles novos preservando os existentes.
+Escudos, uniformes e modelos pertencem ao build; o save não arquiva suas versões.

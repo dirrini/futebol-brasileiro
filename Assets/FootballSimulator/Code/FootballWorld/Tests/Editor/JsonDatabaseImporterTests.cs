@@ -99,7 +99,7 @@ namespace FStudio.FootballWorld.Tests
         [TestCase("visualProfiles", "null", "invalid_type")]
         [TestCase("visualProfiles[0].skin.revision", "0", "out_of_range")]
         [TestCase("visualProfiles[0].skin.compatibilityProfile", "\"bad/profile\"", "invalid_id")]
-        [TestCase("schemaVersion", "5", "unsupported_schema_version")]
+        [TestCase("schemaVersion", "6", "unsupported_schema_version")]
         public void RejectsWrongTypesRangesAndUnsupportedVersions(string path, string replacement, string code)
         {
             // Replace textual numbers directly so exponent spelling is preserved.

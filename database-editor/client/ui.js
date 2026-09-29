@@ -1,6 +1,9 @@
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 export const $ = selector => document.querySelector(selector);
 export const announce = message => { $('#announcer').textContent = message; };
+export const normalizeIssuePath = path => path.startsWith('/')
+  ? path.slice(1).split('/').map((part, index) => /^\d+$/.test(part) ? `[${part}]` : `${index ? '.' : ''}${part.replaceAll('~1', '/').replaceAll('~0', '~')}`).join('')
+  : path.replace(/^\$\.?/, '');
 
 const editAttributes = ({ path, property, optional, sourceId }) => `${path ? ` data-path="${escapeHtml(path)}"` : ''}${property ? ` data-property="${escapeHtml(property)}"` : ''}${optional ? ' data-optional="true"' : ''}${sourceId ? ` data-source-id="${escapeHtml(sourceId)}"` : ''}`;
 
@@ -18,7 +21,11 @@ export function textarea({ id, label, value, path, property, optional = false, h
 
 export function applyFieldErrors(issues) {
   document.querySelectorAll('[data-path]').forEach(input => {
-    const match = issues.find(issue => issue.path.replace(/^\$\.?/, '') === input.dataset.path);
+    const match = issues.find(issue => {
+      const path = normalizeIssuePath(issue.path);
+      return path === input.dataset.path || (!['INPUT', 'SELECT', 'TEXTAREA'].includes(input.tagName) &&
+        (path.startsWith(input.dataset.path + '[') || path.startsWith(input.dataset.path + '.')));
+    });
     input.setAttribute('aria-invalid', match ? 'true' : 'false');
     const error = document.getElementById(`${input.id}-error`);
     if (error) error.textContent = match?.message || '';

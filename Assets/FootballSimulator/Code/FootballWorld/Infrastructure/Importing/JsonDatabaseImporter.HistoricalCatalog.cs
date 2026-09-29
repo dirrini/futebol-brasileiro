@@ -12,16 +12,16 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
         private static ClubData ReadClub(JToken token, string path, int version, List<DatabaseImportError> errors)
         {
             var obj = ObjectWithOptionalFields(token, path, errors,
-                version == 4 ? new[] {"id", "name", "countryCode", "city"} : new[] {"id", "name"},
-                version == 4 ? new[] {"officialName", "shortName", "stadiumId", "reputation", "supporterCount", "transferBudget",
+                version >= 4 ? new[] {"id", "name", "countryCode", "city"} : new[] {"id", "name"},
+                version >= 4 ? new[] {"officialName", "shortName", "stadiumId", "reputation", "supporterCount", "transferBudget",
                     "monthlyWageBudget", "currency", "sponsorship", "notes"} : Array.Empty<string>());
             if (obj == null) return null;
             var currency = OptionalCode(obj, "currency", path, 3, errors);
             if ((obj.Property("transferBudget") != null || obj.Property("monthlyWageBudget") != null) && obj.Property("currency") == null)
                 Error(errors, "required", path + ".currency", "Budgets require a currency code.");
             return new ClubData(Id(obj["id"], path + ".id", errors), Name(obj["name"], path + ".name", errors),
-                version == 4 ? Code(obj["countryCode"], path + ".countryCode", 2, errors) : null,
-                version == 4 ? Name(obj["city"], path + ".city", errors) : null,
+                version >= 4 ? Code(obj["countryCode"], path + ".countryCode", 2, errors) : null,
+                version >= 4 ? Name(obj["city"], path + ".city", errors) : null,
                 OptionalText(obj, "officialName", path, 200, false, errors), OptionalText(obj, "shortName", path, 100, false, errors),
                 obj.Property("stadiumId") == null ? null : Id(obj["stadiumId"], path + ".stadiumId", errors),
                 OptionalInteger(obj, "reputation", path, 0, 100, errors), OptionalInteger(obj, "supporterCount", path, 0, int.MaxValue, errors),

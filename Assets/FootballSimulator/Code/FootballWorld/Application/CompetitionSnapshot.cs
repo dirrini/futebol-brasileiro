@@ -6,6 +6,7 @@ using FStudio.FootballWorld.Domain;
 namespace FStudio.FootballWorld.Application
 {
     public enum FixtureCompletion { Applied, AlreadyApplied, IgnoredStale }
+    public enum CompetitionPhase { League, QuarterFinal, SemiFinal, Final, Complete }
 
     public sealed class FixtureExecution
     {
@@ -30,9 +31,11 @@ namespace FStudio.FootballWorld.Application
         public IReadOnlyList<FixtureDefinition> Fixtures { get; }
         public IReadOnlyList<FixtureResult> Results { get; }
         public IReadOnlyList<string> UsedExecutionIds { get; }
+        public bool DailyProgress { get; }
+        public GameDate? CurrentDate { get; }
         public CompetitionSnapshot(string seasonId, string databaseId, int databaseRevision, string editionId,
             string controlledClubId, IEnumerable<FixtureDefinition> fixtures, IEnumerable<FixtureResult> results,
-            IEnumerable<string> usedExecutionIds)
+            IEnumerable<string> usedExecutionIds, bool dailyProgress = false, GameDate? currentDate = null)
         {
             SeasonId = CompetitionIdentity.Validate(seasonId);
             DatabaseId = CompetitionIdentity.Validate(databaseId);
@@ -42,6 +45,10 @@ namespace FStudio.FootballWorld.Application
             Fixtures = new List<FixtureDefinition>(fixtures ?? throw new ArgumentNullException(nameof(fixtures))).AsReadOnly();
             Results = new List<FixtureResult>(results ?? throw new ArgumentNullException(nameof(results))).AsReadOnly();
             UsedExecutionIds = new List<string>(usedExecutionIds ?? throw new ArgumentNullException(nameof(usedExecutionIds))).AsReadOnly();
+            DailyProgress = dailyProgress;
+            CurrentDate = currentDate;
+            if (dailyProgress != currentDate.HasValue)
+                throw new ArgumentException("Only a daily competition snapshot carries its calendar date.");
         }
     }
 

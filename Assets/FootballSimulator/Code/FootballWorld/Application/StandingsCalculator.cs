@@ -7,11 +7,12 @@ namespace FStudio.FootballWorld.Application
     public static class StandingsCalculator
     {
         public static IReadOnlyList<StandingRow> Calculate(IEnumerable<string> participants, LeagueRules rules,
-            IEnumerable<FixtureResult> results)
+            IEnumerable<FixtureResult> results, string drawingLotsSeed = null)
         {
             if (participants == null || rules == null || results == null) throw new ArgumentNullException();
             var rows = new Dictionary<string, MutableRow>(StringComparer.Ordinal);
-            foreach (var clubId in participants) rows.Add(clubId, new MutableRow { ClubId = clubId });
+            foreach (var clubId in participants) rows.Add(clubId, new MutableRow { ClubId = clubId,
+                Lot = StableCompetitionHash.Value((drawingLotsSeed ?? "standings") + "|lot|" + clubId) });
             var seenFixtures = new HashSet<string>(StringComparer.Ordinal);
             foreach (var result in results)
             {
@@ -22,6 +23,8 @@ namespace FStudio.FootballWorld.Application
                     throw new ArgumentException("Result clubs must be distinct edition participants.", nameof(results));
                 home.GoalsFor += result.HomeGoals; home.GoalsAgainst += result.AwayGoals;
                 away.GoalsFor += result.AwayGoals; away.GoalsAgainst += result.HomeGoals;
+                home.YellowCards += result.HomeYellowCards; away.YellowCards += result.AwayYellowCards;
+                home.RedCards += result.HomeRedCards; away.RedCards += result.AwayRedCards;
                 if (result.HomeGoals == result.AwayGoals) { home.Draws++; away.Draws++; }
                 else if (result.HomeGoals > result.AwayGoals) { home.Wins++; away.Losses++; }
                 else { away.Wins++; home.Losses++; }
@@ -31,7 +34,7 @@ namespace FStudio.FootballWorld.Application
                 row.Points = row.Wins * rules.WinPoints + row.Draws * rules.DrawPoints + row.Losses * rules.LossPoints;
             ordered.Sort((left, right) =>
             {
-                var sporting = CompareSporting(left, right);
+                var sporting = CompareSporting(left, right, rules.IsPaulista2026);
                 return sporting != 0 ? sporting : string.CompareOrdinal(left.ClubId, right.ClubId);
             });
             var standings = new List<StandingRow>(ordered.Count);
@@ -39,26 +42,33 @@ namespace FStudio.FootballWorld.Application
             for (var i = 0; i < ordered.Count; i++)
             {
                 var row = ordered[i];
-                if (i > 0 && CompareSporting(ordered[i - 1], row) != 0) rank = i + 1;
+                if (i > 0 && (rules.IsPaulista2026 || CompareSporting(ordered[i - 1], row, false) != 0)) rank = i + 1;
                 standings.Add(new StandingRow(row.ClubId, rank, row.Wins, row.Draws, row.Losses,
-                    row.GoalsFor, row.GoalsAgainst, row.Points));
+                    row.GoalsFor, row.GoalsAgainst, row.Points, row.YellowCards, row.RedCards));
             }
             return standings.AsReadOnly();
         }
 
-        private static int CompareSporting(MutableRow left, MutableRow right)
+        private static int CompareSporting(MutableRow left, MutableRow right, bool paulista)
         {
             var compare = right.Points.CompareTo(left.Points);
             if (compare != 0) return compare;
             compare = right.Wins.CompareTo(left.Wins);
             if (compare != 0) return compare;
             compare = (right.GoalsFor - right.GoalsAgainst).CompareTo(left.GoalsFor - left.GoalsAgainst);
-            return compare != 0 ? compare : right.GoalsFor.CompareTo(left.GoalsFor);
+            if (compare != 0) return compare;
+            compare = right.GoalsFor.CompareTo(left.GoalsFor);
+            if (compare != 0 || !paulista) return compare;
+            compare = left.RedCards.CompareTo(right.RedCards);
+            if (compare != 0) return compare;
+            compare = left.YellowCards.CompareTo(right.YellowCards);
+            return compare != 0 ? compare : left.Lot.CompareTo(right.Lot);
         }
         private sealed class MutableRow
         {
             public string ClubId;
-            public int Wins, Draws, Losses, GoalsFor, GoalsAgainst, Points;
+            public int Wins, Draws, Losses, GoalsFor, GoalsAgainst, Points, YellowCards, RedCards;
+            public ulong Lot;
         }
     }
 }

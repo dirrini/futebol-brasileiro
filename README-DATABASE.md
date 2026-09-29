@@ -1,16 +1,15 @@
 # Base externa e modos de jogo
 
 O jogo carrega um catálogo de clubes/jogadores independente do motor Unity.
-A base v4 contém os 16 clubes e 363 jogadores relacionados nas súmulas de abertura
+A base v5 contém os 16 clubes e 363 jogadores relacionados nas súmulas de abertura
 do Paulista de 10 e 11 de janeiro de 2026. É um recorte dos relacionados nesses
 jogos, não dos elencos completos. Veja [fontes e limitações](HISTORICAL-DATA.md).
 A seleção e o amistoso usam esse catálogo para os dados esportivos e os presets
 de aparência. O [editor local](http://localhost:8080/editor/) permite editar a base
 no navegador. Escudos, uniformes, formações, modelos e as próprias paletas/meshes
 dos presets continuam sendo recursos Unity compilados.
-O jogo conserva suporte ao contrato de competições v3/v4 e aos saves existentes.
-A amostra de janeiro mantém `competitions` e `competitionEditions` vazios:
-os clubes cadastrados ainda não tornam o Paulista oficial jogável. Consulte
+O jogo aceita contratos v1–v5 e saves anteriores. A revisão 10 inclui calendário
+e regulamento do Paulista 2026, editáveis em **Campeonatos** e **Edições**. Consulte
 [os modos de jogo](README-GAME-MODES.md) para progresso salvo e carreira.
 
 ## Editar no navegador
@@ -19,7 +18,7 @@ Com os serviços do Compose iniciados, abra [localhost:8080/editor/](http://loca
 Escolha um jogador e use as abas **Ficha**, **Atributos** e **Aparência**. É possível
 criar, editar e excluir clubes/jogadores, transferir o vínculo do jogador ou deixá-lo
 sem clube, selecionar posições naturais e editar altura, peso e quinze atributos.
-Na base v4 também há países, estádios, localização dos clubes, campos de gestão,
+A partir de v4 também há países, estádios, localização dos clubes, campos de gestão,
 biografia dos jogadores e a declaração do recorte com suas fontes. O apelido é
 opcional e tem preferência na apresentação; `name` e o nome completo continuam
 preservados. Campo opcional desconhecido deve ficar vazio na edição e ausente
@@ -27,15 +26,18 @@ do JSON. Zero em um campo numérico é um valor explícito, não uma lacuna.
 
 Capacidade e localização do estádio são cadastro; não trocam o estádio 3D.
 O vínculo do clube aponta para seu estádio oficial principal, mesmo quando uma
-partida é disputada em outro local. Disponibilidade por período, eventos e mudanças
-temporárias de estádio por partida ainda não são implementados.
-Orçamentos, reputação, torcida e patrocínio são parâmetros descritivos de
-simulação, sem efeitos de gestão nesta etapa. Nascimento, nacionalidade e pé
+partida é disputada em outro local. Em v5, cada confronto autoral pode declarar
+outro estádio no campo opcional `stadiumId`, editável na aba Edições.
+Disponibilidade por período, reformas, eventos e escolha automática de um estádio
+alternativo ainda não são implementados.
+Na carreira diária, orçamento de transferências inicializa o caixa de simulação
+e orçamento salarial define a despesa mensal. Reputação, torcida e texto de
+patrocínio continuam descritivos. Consulte [a gestão](CAREER-PROTOTYPE.md). Nascimento, nacionalidade e pé
 preferido não adicionam histórico, envelhecimento ou novas regras à partida.
 
 Um clube com jogadores precisa ter esses vínculos removidos antes da exclusão.
 Clubes participantes de uma edição também precisam ser removidos dessa edição
-no JSON antes da exclusão; o editor preserva e valida esse vínculo.
+na aba Edições antes da exclusão; o editor preserva e valida esse vínculo.
 Um país ou estádio referenciado também precisa ter seus vínculos tratados antes
 da exclusão. Abrir versões v1–v3 preserva seu escopo: a ferramenta não inventa
 proveniência ou localização para convertê-las automaticamente em uma base v4.
@@ -56,9 +58,10 @@ Cada salvamento mantém uma cópia da revisão anterior em
 Esse backup local é substituído a cada gravação e não entra no Git; não é um
 histórico de revisões nem um save de temporada.
 
-Esta é uma ferramenta intermediária de cadastro e presets. A prévia é ilustrativa,
-não o personagem 3D real. Ainda não há formulários de campeonatos/regras, upload de
-imagens, importação de modelos ou processamento de skins da comunidade.
+Esta é uma ferramenta intermediária de cadastro, competições e presets. As abas
+Campeonatos e Edições editam os calendários e perfis de regras suportados. A prévia
+de aparência é ilustrativa, não o personagem 3D real. Upload de imagens,
+importação de modelos e processamento de skins da comunidade ficam para etapas futuras.
 
 ## Arquivos de autoria
 
@@ -66,6 +69,7 @@ imagens, importação de modelos ou processamento de skins da comunidade.
 - [JSON Schema v1](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
 - [JSON Schema v2](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json), com aparência portátil.
 - [JSON Schema v3](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json), com competições e edições.
+- [JSON Schema v5](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v5.schema.json), com calendário autoral e Paulista.
 - [JSON Schema v4](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v4.schema.json), com cadastro observado, países, estádios e biografias.
 - [Bindings visuais](Assets/FootballSimulator/Resources/FootballWorld/LegacyMatchBindings.asset).
 - [Contrato e limites](DATA-FORMAT.md).
@@ -93,14 +97,14 @@ largura e profundidade. Esses valores também participam do dimensionamento do
 collider legado. Salvar uma revisão compatível e atualizar o navegador aplica
 os valores na próxima partida, sem recompilar no fluxo local descrito abaixo.
 
-No JSON v2–v4, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
+No JSON v2–v5, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
 estilo e cor do cabelo, estilo e cor da barba, cor das chuteiras e cor da faixa da
 meia. A meia principal continua no uniforme do clube. Esses campos usam IDs de
 presets compilados; não são cores RGB livres ou modelos novos. Veja as opções
 completas em [DATA-FORMAT.md](DATA-FORMAT.md).
 
 A aparência completa no JSON tem prioridade sobre os bindings e dispensa um
-`PlayerEntry` de referência. Quando omitida, v1–v4 preservam a aparência associada
+`PlayerEntry` de referência. Quando omitida, v1–v5 preservam a aparência associada
 por `PlayerId` em `LegacyMatchBindings`, ou seu default declarado. O editor oferece
 **Definir aparência na base** nesses casos; uma skin externa vinculada não é
 sobrescrita por presets. Os presets da amostra são genéricos; não equivalem a
@@ -139,8 +143,8 @@ O JSON e seu schema podem ser inspecionados no servidor local:
 - [database.schema.json](http://localhost:8080/StreamingAssets/FootballWorld/database.schema.json)
 - [Schema do editor](http://localhost:8080/editor/api/schema)
 
-Os endpoints de schema descrevem as quatro versões suportadas. Os schemas de
-autoria v1–v4 continuam separados nos arquivos indicados acima.
+Os endpoints de schema descrevem as cinco versões suportadas. Os schemas de
+autoria v1–v5 continuam separados nos arquivos indicados acima.
 
 O Compose monta o diretório de autoria somente para leitura no `soccer-web`, e o Nginx entrega
 o JSON original nesse endereço com `Cache-Control: no-store`. Para testar nomes,
@@ -156,12 +160,12 @@ partida que já está em andamento. Refresh encerra essa partida. JSON inválido
 mostra o diagnóstico de importação; corrija a fonte e use Retry ou atualize.
 O diretório é montado para suportar editores que salvam substituindo o arquivo.
 Não editar a cópia em Builds/UnityWebGLProject; ela é gerada pelo script.
-O campeonato salvo retoma a revisão com que foi criado. Mudanças na base são
-usadas em novos campeonatos e amistosos; atualizar a página não migra uma
-competição em andamento. Uma partida interrompida volta a ficar pendente.
-O save do campeonato guarda o JSON completo da revisão e tem limite de 384 KiB
-para o envelope com progresso. Esse limite é menor que o limite de importação
-da base, de 1 MiB; aumentar o catálogo não aumenta a capacidade dos saves.
+Campeonatos e carreiras salvos retomam a revisão com que foram criados. Mudanças
+na base são usadas em novos campeonatos, carreiras e amistosos; atualizar a página
+não migra uma competição em andamento. Uma partida interrompida volta a ficar pendente.
+Os saves guardam o JSON completo da revisão. Compressão GZip permite usar a base
+atual; há limites de 2 MiB descomprimidos e 112 KiB por slot, além da quota do
+navegador. Consulte [persistência](README-GAME-MODES.md#persistência-e-autoria).
 
 Essa atualização direta é o fluxo local do Compose. A exportação ainda inclui
 uma cópia validada para outros servidores; nesses destinos, publique o JSON
@@ -182,7 +186,7 @@ Play. Na preparação, confira nomes, escalações e kits; Back to teams cancela
 preserva as escolhas. Ao sair da partida, a seleção volta com os mesmos ClubIds.
 Enquanto a base carrega, os seletores e Play ficam indisponíveis. Uma falha de
 leitura mostra diagnóstico e Retry, sem recorrer ao cadastro antigo.
-O filtro de país usa os códigos cadastrados em v4. Clubes de bases antigas sem
+O filtro de país usa os códigos cadastrados a partir de v4. Clubes de bases antigas sem
 país permanecem acessíveis na opção de país não informado; o filtro não troca IDs.
 
 LineupPlanner escolhe onze jogadores de forma determinística por posições e IDs:
@@ -211,8 +215,8 @@ Sem perfil visual, ou com builtin-player@1 / football-player-v1, o jogo usa a
 aparência embutida. Uma skin diferente em um titular impede a partida desse clube
 com mensagem visível; não é substituída silenciosamente. Skins dos reservas são
 verificadas quando escalados. Não há upload nem processamento de modelos externos
-nesta etapa. Campeonato salvo e perfil de carreira são separados da seleção de
-amistoso; a data do perfil não resolve outra revisão histórica da base.
+nesta etapa. Campeonatos e carreiras diárias salvos são separados da seleção de
+amistoso; o calendário da carreira não resolve outra revisão histórica da base.
 
 O console registra também a origem da seleção e da partida:
 
@@ -248,7 +252,7 @@ Validação estrutural opcional, usando PowerShell 7 com `Test-Json` disponível
 ```powershell
 Test-Json `
   -LiteralPath 'Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json' `
-  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v4.schema.json'
+  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v5.schema.json'
 ```
 
 Isso não substitui o importador: IDs duplicados, referências cruzadas e as

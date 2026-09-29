@@ -237,3 +237,56 @@ confrontos têm suas próprias barras de rolagem; nomes de clube permanecem text
 simples. O clube controlado é marcado por fundo e peso de fonte. Confirmações de
 substituição usam o mesmo painel, com Cancelar como foco inicial e botão de perigo.
 O contrato de comportamento do jogo está em `UX-CONTRACT.md`.
+
+## Calendário, editor de competições e centro do treinador
+
+O centro do treinador prolonga a ficha do clube existente: data e treinador no
+topo, treino/caixa/próximo jogo à esquerda, imprensa e extrato à direita. A data
+civil é o elemento principal da navegação diária. Ações ficam acima do rodapé
+reservado a erros e avisos de salvamento. Notícias e extrato têm rolagem própria,
+com barras visíveis; nenhuma notícia fictícia é apresentada como fonte histórica.
+
+`GameHubTheme.asset` permanece a fonte de cor/fonte, aplicada pelos mesmos helpers
+UGUI autorais e `GameHubThemeBinding`. `GameHubCareerOffice` apenas preenche campos
+e emite comandos. A árvore completa fica em `GameHub.prefab`; a migração adiciona
+esta página e seus controles sem reconstruir páginas não relacionadas. Textos PT/EN
+são chaves de `GameText.asset`, incluindo os parâmetros explícitos de simulação.
+
+No campeonato, a tabela do Paulista é rotulada **Campanha acumulada** para não
+confundir a regra dos mandos com a classificação geral final. Campeão e rebaixados
+são apresentados separadamente. Jogos mostram data, fase, origem e pênaltis.
+Quando faltam resultados da fase, a carreira informa que o próximo confronto
+aguarda definição, sem declarar eliminação antecipadamente.
+
+O editor reutiliza a identidade, campos, confirmação e rascunho existentes nas
+abas **Campeonatos** e **Edições**. Uma edição organiza participantes, regra suportada
+e calendário; Paulista exibe jogos por rodada e oito datas de slots eliminatórios.
+Estas tabelas pertencem ao editor web, sem introduzir CSS ou HTML dentro do Unity.
+
+## Elenco, padrão tático e mercado da carreira
+
+O centro do treinador oferece três destinos junto ao cabeçalho: **Elenco**,
+**Tática** e **Mercado**. O cabeçalho com data/clube ocupa a coluna esquerda;
+esses atalhos ocupam a direita sem disputar espaço com notícias, caixa ou rodapé.
+O retorno das três telas leva ao centro do treinador.
+
+Elenco e busca de mercado compartilham o mesmo padrão de lista e ficha. À esquerda,
+nome/apelido, posição natural e filtros; à direita, apelido em destaque, clube,
+nome completo, biografia e os quinze atributos em três colunas. O realce da seleção
+combina fundo e marcador textual. A lista mostra o elenco completo, tem páginas
+de dez jogadores, rolagem própria e contagem; um filtro sem resultados preserva os
+campos e oferece Limpar. O mercado acrescenta filtro de clube e jogadores sem clube.
+
+Mercado separa **Buscar jogadores** e **Minhas propostas** em duas abas na própria
+tela. Valores são números inteiros, com moeda no resumo; estimativa e saldo ficam
+próximos da ação. A confirmação apresenta jogador, clube, custo total, reserva de
+caixa e resposta no próximo dia. O diálogo é o mesmo usado nas outras telas,
+ampliado para esse resumo; enviar usa verde, substituir continua usando perigo.
+Propostas têm estado textual, datas e motivo; pendentes têm cancelamento direto.
+
+Tática separa o formulário explícito da visualização do XI automático salvo.
+Formação e postura são rascunhos até **Salvar padrão tático**. O XI vem do adaptador
+existente, sem repetir regras de escalação na UI; a tela explica a ausência de
+escalação manual nesta etapa. As três páginas usam os mesmos papéis do tema e
+templates UGUI/TMP editáveis em `GameHub.prefab`. O partial Editor adiciona apenas
+os controles ausentes e preserva as outras páginas e ajustes posteriores.

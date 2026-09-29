@@ -86,14 +86,14 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 ? candidate["schemaVersion"].ToString(Formatting.None) : null;
             var rootFields = new List<string> {"schemaVersion", "databaseId", "databaseRevision",
                 "clubs", "players", "memberships", "visualProfiles"};
-            if (declaredVersion == "3" || declaredVersion == "4") rootFields.AddRange(new[] {"competitions", "competitionEditions"});
-            if (declaredVersion == "4") rootFields.AddRange(new[] {"countries", "stadiums", "snapshot"});
+            if (declaredVersion == "3" || declaredVersion == "4" || declaredVersion == "5") rootFields.AddRange(new[] {"competitions", "competitionEditions"});
+            if (declaredVersion == "4" || declaredVersion == "5") rootFields.AddRange(new[] {"countries", "stadiums", "snapshot"});
             var root = Object(token, "$", errors, rootFields.ToArray());
             if (root == null) return null;
             var schemaVersion = Integer(root["schemaVersion"], "$.schemaVersion", int.MinValue, int.MaxValue, errors);
             if (root["schemaVersion"] != null && root["schemaVersion"].Type == JTokenType.Integer &&
-                schemaVersion != 1 && schemaVersion != 2 && schemaVersion != 3 && schemaVersion != 4)
-                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1, 2, 3 and 4 are supported.");
+                schemaVersion != 1 && schemaVersion != 2 && schemaVersion != 3 && schemaVersion != 4 && schemaVersion != 5)
+                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1, 2, 3, 4 and 5 are supported.");
             var databaseId = Id(root["databaseId"], "$.databaseId", errors);
             var revision = Integer(root["databaseRevision"], "$.databaseRevision", 1, int.MaxValue, errors);
             var clubs = new List<ClubData>();
@@ -110,7 +110,7 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
             {
                 var obj = ObjectWithOptionalFields(item, path, errors,
                     new[] {"id", "name", "naturalPositions", "heightCm", "weightKg", "attributes"},
-                    schemaVersion == 4 ? new[] {"fullName", "nickname", "birthDate", "preferredFoot", "nationalityCode", "notes"} : Array.Empty<string>());
+                    schemaVersion >= 4 ? new[] {"fullName", "nickname", "birthDate", "preferredFoot", "nationalityCode", "notes"} : Array.Empty<string>());
                 if (obj == null) return;
                 var id = Id(obj["id"], path + ".id", errors);
                 var name = Name(obj["name"], path + ".name", errors);
@@ -169,10 +169,10 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
             });
             var competitions = new List<CompetitionData>();
             var editions = new List<CompetitionEditionData>();
-            if (schemaVersion >= 3) ReadCompetitions(root, competitions, editions, errors);
+            if (schemaVersion >= 3) ReadCompetitions(root, schemaVersion, competitions, editions, errors);
             var countries = new List<CountryData>();
             var stadiums = new List<StadiumData>();
-            var snapshot = schemaVersion == 4 ? ReadHistoricalCatalog(root, countries, stadiums, errors) : null;
+            var snapshot = schemaVersion >= 4 ? ReadHistoricalCatalog(root, countries, stadiums, errors) : null;
             return new DatabaseDocument(schemaVersion, databaseId, revision, clubs, players, memberships, visuals, competitions, editions,
                 countries, stadiums, snapshot);
         }
@@ -203,7 +203,7 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 if (!visualPlayers.Add(item.PlayerId)) Error(errors, "duplicate_visual_profile", path, "A player can have only one visual profile.");
             }
             ValidateCompetitionReferences(document, clubs, errors);
-            if (document.SchemaVersion == 4) ValidateHistoricalReferences(document, errors);
+            if (document.SchemaVersion >= 4) ValidateHistoricalReferences(document, errors);
         }
 
         private static DatabaseCatalog Map(DatabaseDocument document)
@@ -235,7 +235,8 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 foreach (var value in item.RoundDates) dates.Add(ParseGameDate(value));
                 var rules = item.Rules;
                 editions.Add(new CompetitionEditionDefinition(item.Id, item.CompetitionId, item.Name, item.ParticipantClubIds,
-                    dates, new LeagueRules(rules.Legs, rules.WinPoints, rules.DrawPoints, rules.LossPoints)));
+                    dates, new LeagueRules(rules.Legs, rules.WinPoints, rules.DrawPoints, rules.LossPoints, rules.Type == "paulista-2026"),
+                    MapAuthoredFixtures(item.AuthoredFixtures), MapDates(item.PlayoffDates)));
             }
             var countries = new List<CountryDefinition>();
             foreach (var item in document.Countries) countries.Add(new CountryDefinition(item.Code, item.Name));

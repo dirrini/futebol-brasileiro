@@ -21,6 +21,7 @@ export function setRecordField(record, property, value, { optional = false, nume
 }
 
 export function deletionBlock(document, view, record) {
+  if (view === 'stadiums' && document.competitionEditions?.some(edition => edition.authoredFixtures?.some(fixture => fixture.stadiumId === record.id))) return 'Remova este estádio dos confrontos das edições antes de excluir o cadastro.';
   if (view === 'stadiums' && document.clubs.some(club => club.stadiumId === record.id)) return 'Remova o vínculo com este estádio nas fichas dos clubes antes de excluir o cadastro.';
   if (view === 'countries') {
     if (document.countries.length <= 1) return 'A base precisa de pelo menos um país.';
