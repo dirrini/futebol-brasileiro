@@ -6,12 +6,21 @@ Abra [localhost:8080](http://localhost:8080) após publicar o projeto com
 ## Quick match
 
 Abre a seleção existente de duas equipes, seguida de uniformes e configurações
-da partida. Usa o catálogo externo carregado ao abrir o jogo. O resultado de um
+da partida. País e equipe são escolhidos separadamente em cada lado; a base atual
+tem os 16 clubes brasileiros do Paulistão 2026. Apelidos dos jogadores aparecem
+quando preenchidos, com fallback para o nome cadastrado. Usa o catálogo externo
+carregado ao abrir o jogo. O resultado de um
 amistoso não altera o campeonato salvo.
 
 ## Championship
 
-Escolha uma edição disponível na base e o clube que deseja controlar. A liga
+Escolha uma edição disponível na base e o clube que deseja controlar, filtrado
+por país. A base histórica atual deixa as coleções de competições vazias: o
+regulamento e o calendário oficial do Paulistão ainda são a próxima etapa. Não há
+novo campeonato disponível nessa base. Um campeonato salvo continua usando sua
+própria revisão fixada, inclusive os clubes antigos.
+
+A liga
 demonstrativa reúne São Paulo FC, Milano, London e Catalagna em três rodadas,
 nos dias 3, 10 e 17 de outubro de 2026. São seis confrontos: três são jogados com
 seu clube e os outros são simulados ao concluir a rodada. Essas datas e essa
@@ -41,7 +50,8 @@ de campeonatos ainda não foram implementados. Veja [DATA-FORMAT.md](DATA-FORMAT
 ## Career
 
 Crie o treinador com nome, um dos três avatares gráficos disponíveis, mês/ano
-inicial e equipe. O perfil fica salvo neste navegador e pode ser consultado no
+inicial, país e equipe. Sem edição cadastrada, o primeiro mês/ano vem da data de
+observação da base (janeiro de 2026). O perfil fica salvo neste navegador e pode ser consultado no
 mesmo menu. Criar um novo perfil exige confirmar a substituição do anterior.
 
 Este recorte cria o perfil. Ainda não avança o tempo, monta calendário real,
@@ -90,6 +100,10 @@ progresso ultrapassar o limite depois, o jogo continua em memória e informa a
 falha, mas o refresh recupera somente o último estado salvo. Se o slot ativo
 estiver corrompido ou incompatível, ele é preservado e a restauração é bloqueada;
 não há recuperação automática pelo outro slot.
+
+Novos saves compactam os espaços de formatação do JSON antes de gravar; não removem
+campos ou referências e preservam o formato de save existente. O limite continua
+valendo para o envelope completo, e não apenas para o arquivo do catálogo.
 
 O JSON salvo conserva os presets e referências de skins declarados na base.
 Escudos, uniformes e demais recursos fornecidos pelos bindings locais pertencem

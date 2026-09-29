@@ -11,8 +11,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: befeafa97edd4ae7b39ee142ab02d0f0, type: 3}
   m_Name: LegacyMatchBindings
-  m_EditorClassIdentifier:
-  DefaultVisualTemplate: {fileID: 11400000, guid: 986804c1d3991e5498993312ffebb788, type: 2}
+  m_EditorClassIdentifier: 
+  DefaultVisualTemplate: {fileID: 11400000, guid: 3a0109dd76c5b4d4ebecaec17f2a6615, type: 2}
   DefaultFormation: 0
   DefaultPlayerAppearance: {fileID: -3653291091690066148, guid: 986804c1d3991e5498993312ffebb788, type: 2}
   Clubs:

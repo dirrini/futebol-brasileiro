@@ -392,3 +392,18 @@ MonoBehaviour:
   - Key: hub.played
     Portuguese: Jogado
     English: Played
+  - Key: country.label
+    Portuguese: "Pa\xEDs"
+    English: Country
+  - Key: country.unspecified
+    Portuguese: "Sem pa\xEDs informado"
+    English: Country unspecified
+  - Key: country.none
+    Portuguese: "Nenhum pa\xEDs dispon\xEDvel"
+    English: No countries available
+  - Key: country.BR
+    Portuguese: Brasil
+    English: Brazil
+  - Key: adapter.genericClub
+    Portuguese: "Escudo e uniformes gen\xE9ricos, n\xE3o oficiais."
+    English: Generic badge and kits, not official.

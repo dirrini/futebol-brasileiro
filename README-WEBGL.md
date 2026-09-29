@@ -107,7 +107,7 @@ O Nginx publica somente o JSON no endereço que o player já utiliza:
 
 Essa resposta usa `Cache-Control: no-store`, sem ETag ou respostas condicionais
 por data, para que a atualização não recupere uma revisão antiga do navegador.
-O schema publicado descreve v1, v2 e v3; ele e os outros arquivos StreamingAssets
+O schema publicado descreve v1, v2, v3 e v4; ele e os outros arquivos StreamingAssets
 continuam vindo do build. A pasta
 de autoria completa, incluindo arquivos `.meta`, não é exposta por essa rota.
 O JSON empacotado pelo Unity continua existindo no export, mas o servidor local

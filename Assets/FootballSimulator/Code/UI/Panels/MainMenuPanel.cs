@@ -1,6 +1,7 @@
 using System;
 using FStudio.FootballWorld.Infrastructure.LegacyMatch;
 using FStudio.FootballWorld.Infrastructure.GameModes;
+using FStudio.FootballWorld.Presentation;
 using FStudio.UI.Events;
 using FStudio.UI.GamepadInput;
 using FStudio.UI.Utilities;
@@ -10,6 +11,7 @@ using UnityEngine;
 namespace FStudio.UI.Panels {
     public class MainMenuPanel : EventPanel<QuickMatchEvent> {
         [SerializeField] private TeamSelectionTeam homeTeam, awayTeam;
+        [SerializeField] private TeamCountrySelection homeCountry, awayCountry;
         [SerializeField] private InteractiveUIElement playButton, retryButton;
         [SerializeField] private TextMeshProUGUI statusText;
         [SerializeField, Range(0f, 1f)] private float disabledPlayAlpha = 0.4f;
@@ -20,6 +22,8 @@ namespace FStudio.UI.Panels {
             base.OnEnable();
             homeTeam.SelectionChanged += SelectHome;
             awayTeam.SelectionChanged += SelectAway;
+            if (homeCountry != null) homeCountry.SelectionChanged += SelectHomeCountry;
+            if (awayCountry != null) awayCountry.SelectionChanged += SelectAwayCountry;
             if (playButton != null) playButton.onAppeared.AddListener(Refresh);
             if (retryButton != null) retryButton.onAppeared.AddListener(Refresh);
             AttachSession();
@@ -31,6 +35,8 @@ namespace FStudio.UI.Panels {
             session = null;
             homeTeam.SelectionChanged -= SelectHome;
             awayTeam.SelectionChanged -= SelectAway;
+            if (homeCountry != null) homeCountry.SelectionChanged -= SelectHomeCountry;
+            if (awayCountry != null) awayCountry.SelectionChanged -= SelectAwayCountry;
             if (playButton != null) playButton.onAppeared.RemoveListener(Refresh);
             if (retryButton != null) retryButton.onAppeared.RemoveListener(Refresh);
             base.OnDisable();
@@ -58,8 +64,10 @@ namespace FStudio.UI.Panels {
 
         private void Refresh() {
             var ready = session != null && session.State == FriendlyMatchState.Ready;
-            homeTeam.Bind(session?.Teams, session?.SelectedHomeClubId, ready);
-            awayTeam.Bind(session?.Teams, session?.SelectedAwayClubId, ready);
+            homeCountry?.Bind(session?.Countries, session?.SelectedHomeCountryCode, ready);
+            awayCountry?.Bind(session?.Countries, session?.SelectedAwayCountryCode, ready);
+            homeTeam.Bind(session?.HomeTeams, session?.SelectedHomeClubId, ready);
+            awayTeam.Bind(session?.AwayTeams, session?.SelectedAwayClubId, ready);
 
             if (statusText != null) {
                 statusText.richText = false;
@@ -84,6 +92,8 @@ namespace FStudio.UI.Panels {
 
         private void SelectHome(string clubId) => session?.Select(false, clubId);
         private void SelectAway(string clubId) => session?.Select(true, clubId);
+        private void SelectHomeCountry(string code) => session?.SelectCountry(false, code);
+        private void SelectAwayCountry(string code) => session?.SelectCountry(true, code);
 
         public void BackToHome() => GameHubSession.Current.Navigate(HubPage.Home);
 

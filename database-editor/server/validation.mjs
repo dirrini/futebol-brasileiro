@@ -15,7 +15,7 @@ export function createValidator(schemas) {
   const validators = new Map(schemas.map(schema => [schema.properties.schemaVersion.const, ajv.compile(schema)]));
   return document => {
     const validate = validators.get(document?.schemaVersion);
-    if (!validate) throw new EditorError(422, 'unsupported_schema_version', 'A versão da base deve ser 1, 2 ou 3.');
+    if (!validate) throw new EditorError(422, 'unsupported_schema_version', 'A versão da base deve ser 1, 2, 3 ou 4.');
     if (!validate(document)) {
       const issues = validate.errors.slice(0, 40).map(error => ({
         path: error.instancePath + (error.params.missingProperty ? '/' + error.params.missingProperty : ''),
@@ -63,6 +63,29 @@ export function createValidator(schemas) {
         });
         const { win, draw, loss } = edition.rules.points;
         if (win <= draw || draw < loss) issues.push({ path: `${path}/rules/points`, message: 'Vitória deve valer mais que empate, e empate pelo menos o mesmo que derrota.' });
+      });
+    }
+    if (document.schemaVersion === 4) {
+      const countries = unique(document.countries, 'code', 'countries');
+      const stadiums = unique(document.stadiums, 'id', 'stadiums');
+      unique(document.snapshot.sources, 'id', 'snapshot/sources');
+      if (!isCalendarDate(document.snapshot.date))
+        issues.push({ path: '/snapshot/date', message: 'Informe uma data válida no formato AAAA-MM-DD.' });
+      document.stadiums.forEach((stadium, index) => {
+        if (!countries.has(stadium.countryCode)) issues.push({ path: `/stadiums/${index}/countryCode`, message: 'País não encontrado.' });
+      });
+      document.clubs.forEach((club, index) => {
+        if (!countries.has(club.countryCode)) issues.push({ path: `/clubs/${index}/countryCode`, message: 'País não encontrado.' });
+        if (club.stadiumId !== undefined && !stadiums.has(club.stadiumId))
+          issues.push({ path: `/clubs/${index}/stadiumId`, message: 'Estádio não encontrado.' });
+      });
+      document.players.forEach((player, index) => {
+        if (player.nationalityCode !== undefined && !countries.has(player.nationalityCode))
+          issues.push({ path: `/players/${index}/nationalityCode`, message: 'País não encontrado.' });
+        if (player.birthDate !== undefined) {
+          if (!isCalendarDate(player.birthDate)) issues.push({ path: `/players/${index}/birthDate`, message: 'Informe uma data de nascimento válida no formato AAAA-MM-DD.' });
+          else if (player.birthDate > document.snapshot.date) issues.push({ path: `/players/${index}/birthDate`, message: 'O nascimento não pode ser posterior à data de referência da base.' });
+        }
       });
     }
     if (issues.length) throw new EditorError(422, 'invalid_references', 'A base contém vínculos ou identidades inválidos.', issues.slice(0, 40));

@@ -1,9 +1,10 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: menu e campeonato demonstrativo, 29/09/2026. Domain, Application,
-DTOs v1/v2/v3, importador JSON, bootstrap e ponte com a partida 3D estão implementados.
-Há um editor local intermediário de clubes/jogadores e aparência padrão, uma liga
-com progresso local e a criação de perfil de carreira. Simulação do calendário da
+Estado: catálogo observado v4, menu e suporte a campeonato demonstrativo. Domain,
+Application, DTOs v1–v4, importador JSON, bootstrap e ponte com a partida 3D estão
+implementados. O editor local mantém clubes, jogadores, países, estádios,
+proveniência e aparência padrão. O jogo suporta uma liga com progresso local e
+a criação de perfil de carreira. Simulação do calendário da
 carreira, editor completo e processamento de skins continuam planejados
 conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
 [DATA-FORMAT.md](DATA-FORMAT.md); uso e testes em [README-DATABASE.md](README-DATABASE.md).
@@ -11,7 +12,9 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 ## Fundação atual
 
 - `Domain`: ClubDefinition, PlayerDefinition, PlayerAttributes, PlayerPosition,
-  RosterMembership e DatabaseCatalog imutáveis, com invariantes próprias.
+  RosterMembership e DatabaseCatalog imutáveis, com invariantes próprias. V4
+  acrescenta CountryDefinition, StadiumDefinition e DatabaseSnapshotDefinition,
+  incluindo fontes da observação e metadados cadastrais opcionais.
 - `Application`: CatalogSession ativa um catálogo completo; LineupPlanner escolhe
   onze jogadores para uma formação. CompetitionSession coordena confrontos,
   tentativas, resultados, classificação e snapshots, sem Unity ou armazenamento.
@@ -22,7 +25,7 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 - `Bootstrap`: FootballDatabaseBootstrap lê a base externa com UnityWebRequest e
   só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
 - `Editor`: FootballDatabaseBuildProcessor valida a base e a registra com um schema
-  que aceita v1/v2/v3 como StreamingAssets adicionais, sem criar fontes fora de
+  que aceita v1–v4 como StreamingAssets adicionais, sem criar fontes fora de
   FootballSimulator.
 - `Infrastructure/LegacyMatch`: CatalogMatchAdapter converte os onze escalados em
   objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
@@ -38,13 +41,18 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 - `Presentation`: GameHubView e componentes UGUI/TMP exibem consultas da fachada;
   prefab, tema e avatares são recursos editáveis no Unity.
 
-O exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores. A seleção
+O exemplo v4 contém 16 clubes e 363 jogadores relacionados nas súmulas de abertura
+do Paulista de 10/11 de janeiro de 2026. É um recorte observado, não elencos
+completos nem uma competição oficial jogável. Sua proveniência e aproximações
+estão em [HISTORICAL-DATA.md](HISTORICAL-DATA.md); o caminho de autoria continua
+`four-clubs.database.json` para preservar a integração existente. A seleção
 aguarda o catálogo e apresenta seus clubes; o amistoso recebe nomes, medidas e
 atributos importados. TeamEntry/PlayerEntry persistentes fornecem apenas recursos
 visuais e formação via LegacyMatchBindings. Aparência completa em v2 tem prioridade
 e dispensa binding de jogador; se omitida, preserva o caminho legado e seu default
 declarado. Não há fallback para DatabaseService. Apenas a aparência embutida é
-suportada; skins externas continuam planejadas.
+suportada; skins externas continuam planejadas. O regulamento executável continua
+sendo round-robin v1; a amostra histórica mantém competições/edições vazias.
 
 ## Objetivos
 
@@ -115,6 +123,7 @@ existentes ficam encapsulados pela ponte com o motor.
 | Informação | Proprietário | Tempo de vida |
 | --- | --- | --- |
 | Clubes, jogadores, vínculos iniciais, competições e regras | Base externa versionada | Revisão imutável importada |
+| Países, estádios, biografia e recorte com fontes | Base externa versionada | Metadados observados; não são estado da carreira |
 | Confrontos, resultados e progresso | Sessão da competição | Snapshot versionado salvo localmente; mudanças de elenco ainda futuras |
 | Escalação e IDs locais de jogadores na partida | Adaptador e motor de partida | Uma execução de confronto |
 | Retratos, escudos e skins | Catálogo visual e carregador de mídia | Recursos versionados, carregados conforme uso |
@@ -133,6 +142,25 @@ e referências de skins declarados nesse JSON. Escudos, uniformes, formação e
 aparências de fallback continuam vindo dos `LegacyMatchBindings` do build em uso;
 o save atual não fixa revisões desses assets compilados nem empacota meshes ou
 texturas. Alterá-los em outro build pode mudar a apresentação de um save antigo.
+
+`DatabaseCatalog.Snapshot` descreve a observação autoral: data, escopo dos
+relacionados e fontes. Não acrescenta intervalos de vigência a `RosterMembership`
+nem seleciona outra revisão ao mudar a data da carreira. Nas versões v1–v3 esse
+metadado é ausente, países/estádios ficam vazios e os novos campos opcionais ficam
+nulos; nenhum país ou nascimento é deduzido do nome do jogador.
+
+`PlayerDefinition.Name`, `FullName` e `Nickname` têm responsabilidades separadas.
+`DisplayName` usa o apelido quando presente, preservando o nome compatível com
+o legado e o nome completo. `PlayerId` permanece a chave em todos os casos.
+Reputação, torcida, orçamentos e patrocínio são parâmetros autorais imutáveis,
+sem efeitos financeiros implementados. Saldos, contratos vivos, lesões, cartões,
+treino e histórico produzido pelo jogador pertencerão ao save e aos serviços
+de carreira, sem modificar o catálogo importado.
+
+O importador aceita até 1 MiB, mas o armazenamento local de campeonato atual
+limita o envelope completo a 384 KiB, incluindo o JSON escapado. Aceitação da
+base não garante que uma futura competição com esse conteúdo caiba no save;
+a evolução do armazenamento precisa acompanhar elencos/histórico maiores.
 
 ScriptableObjects continuam adequados à autoria de materiais, catálogos de
 recursos Unity, prefabs e parâmetros de apresentação. Não são o armazenamento
@@ -208,11 +236,22 @@ o contrato portátil e as opções de presets com o backend. A partida continua
 recebendo conteúdo pelo importador C#, com validação própria, antes de ativar a
 revisão. Não é necessário que o editor participe da execução da partida.
 
-O recorte implementado permite CRUD de clubes/jogadores, vínculos de elenco,
+O recorte implementado permite CRUD de clubes/jogadores/estádios, cadastro de
+países, proveniência, vínculos de elenco, biografias, metadados de gestão,
 posições naturais, medidas, quinze atributos e sete presets visuais. Formulários
 compartilham um rascunho em memória; salvar é uma ação explícita da base inteira,
 e exportar JSON pode preservar mudanças ainda não publicadas. A prévia é uma
 ilustração dos presets, não uma renderização do personagem do Unity.
+
+V4 é uma evolução explícita do contrato. Abrir uma base v1–v3 não inventa data,
+fontes ou localização para promovê-la silenciosamente. Ambos os importadores
+validam forma, limites, referências e datas; dados opcionais desconhecidos são
+omitidos, enquanto `null` explícito é inválido. O metadado de estádio não muda
+o asset usado por `MatchEngineLoader`, que ainda seleciona o estádio legado.
+`ClubDefinition.StadiumId` identifica o estádio oficial principal do clube.
+Disponibilidade por período, eventos com efeito financeiro e exceções de mando
+por partida são extensões futuras separadas desse vínculo; uma mudança temporária
+de local não deve substituir o estádio principal no cadastro.
 
 O backend separa parsing JSON estrito, schemas/referências, transporte HTTP e
 `DatabaseStore`. A leitura devolve um ETag derivado dos bytes. O salvamento exige

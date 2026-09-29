@@ -1,5 +1,11 @@
 # Amostra do São Paulo FC
 
+> Registro da amostra anterior, preservado como fonte dos IDs, alturas e presets
+> reutilizados. A base ativa passou ao recorte de janeiro de 2026 documentado em
+> [HISTORICAL-DATA.md](HISTORICAL-DATA.md): 16 clubes e 363 relacionados, incluindo
+> os 23 relacionados do São Paulo na estreia. As contagens e a composição abaixo
+> descrevem a revisão antiga e não o JSON publicado atualmente.
+
 Consulta das fontes: **28/09/2026**. Esta é uma base de demonstração para testar
 o cadastro externo e o amistoso, preparada para este projeto. Não é uma publicação
 oficial do clube.

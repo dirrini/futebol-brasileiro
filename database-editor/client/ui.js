@@ -2,12 +2,18 @@ export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char 
 export const $ = selector => document.querySelector(selector);
 export const announce = message => { $('#announcer').textContent = message; };
 
-export function field({ id, label, value, type = 'text', min, max, suffix, path, hint = '', readOnly = false }) {
-  return `<div class="field"><label for="${id}">${escapeHtml(label)}</label><div class="input-wrap"><input id="${id}" name="${id}" type="${type}" value="${escapeHtml(value)}"${min !== undefined ? ` min="${min}"` : ''}${max !== undefined ? ` max="${max}"` : ''}${type === 'number' ? ' step="1" inputmode="numeric"' : ''}${readOnly ? ' readonly' : ''}${path ? ` data-path="${escapeHtml(path)}"` : ''} aria-describedby="${id}-hint ${id}-error">${suffix ? `<span class="input-suffix">${escapeHtml(suffix)}</span>` : ''}</div><small id="${id}-hint" class="field-hint">${escapeHtml(hint)}</small><small id="${id}-error" class="field-error"></small></div>`;
+const editAttributes = ({ path, property, optional, sourceId }) => `${path ? ` data-path="${escapeHtml(path)}"` : ''}${property ? ` data-property="${escapeHtml(property)}"` : ''}${optional ? ' data-optional="true"' : ''}${sourceId ? ` data-source-id="${escapeHtml(sourceId)}"` : ''}`;
+
+export function field({ id, label, value, type = 'text', min, max, maxLength, suffix, path, property, optional = false, sourceId, hint = '', readOnly = false }) {
+  return `<div class="field"><label for="${id}">${escapeHtml(label)}</label><div class="input-wrap"><input id="${id}" name="${id}" type="${type}" value="${escapeHtml(value)}"${min !== undefined ? ` min="${min}"` : ''}${max !== undefined ? ` max="${max}"` : ''}${maxLength ? ` maxlength="${maxLength}"` : ''}${type === 'number' ? ' step="1" inputmode="numeric"' : ''}${readOnly ? ' readonly' : ''}${editAttributes({ path, property, optional, sourceId })} aria-describedby="${id}-hint ${id}-error">${suffix ? `<span class="input-suffix">${escapeHtml(suffix)}</span>` : ''}</div><small id="${id}-hint" class="field-hint">${escapeHtml(hint)}</small><small id="${id}-error" class="field-error"></small></div>`;
 }
 
-export function select({ id, label, value, options, path, hint = '' }) {
-  return `<div class="field"><label for="${id}">${escapeHtml(label)}</label><select id="${id}" name="${id}"${path ? ` data-path="${escapeHtml(path)}"` : ''} aria-describedby="${id}-hint ${id}-error">${options.map(option => `<option value="${escapeHtml(option.value)}"${option.value === value ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select><small id="${id}-hint" class="field-hint">${escapeHtml(hint)}</small><small id="${id}-error" class="field-error"></small></div>`;
+export function select({ id, label, value, options, path, property, optional = false, hint = '' }) {
+  return `<div class="field"><label for="${id}">${escapeHtml(label)}</label><select id="${id}" name="${id}"${editAttributes({ path, property, optional })} aria-describedby="${id}-hint ${id}-error">${options.map(option => `<option value="${escapeHtml(option.value)}"${option.value === value ? ' selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select><small id="${id}-hint" class="field-hint">${escapeHtml(hint)}</small><small id="${id}-error" class="field-error"></small></div>`;
+}
+
+export function textarea({ id, label, value, path, property, optional = false, hint = '', maxLength = 4000 }) {
+  return `<div class="field field-notes"><label for="${id}">${escapeHtml(label)}</label><textarea id="${id}" name="${id}" rows="5" maxlength="${maxLength}"${editAttributes({ path, property, optional })} aria-describedby="${id}-hint ${id}-error">${escapeHtml(value)}</textarea><small id="${id}-hint" class="field-hint">${escapeHtml(hint)}</small><small id="${id}-error" class="field-error"></small></div>`;
 }
 
 export function applyFieldErrors(issues) {
@@ -28,6 +34,22 @@ export function downloadJson(value) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+export function applyDialogError(dialog, error) {
+  dialog.querySelectorAll('[aria-invalid="true"]').forEach(input => input.setAttribute('aria-invalid', 'false'));
+  dialog.querySelectorAll('.field-error').forEach(message => { message.textContent = ''; });
+  if (!error) return;
+  const summary = dialog.querySelector('#dialog-error');
+  if (typeof error === 'string') { summary.textContent = error; return; }
+  const input = dialog.querySelector(`#${error.field}`);
+  const message = dialog.querySelector(`#${error.field}-error`);
+  if (input && message) {
+    input.setAttribute('aria-invalid', 'true');
+    message.textContent = error.message;
+    summary.textContent = 'Revise o campo indicado antes de continuar.';
+    input.focus();
+  } else summary.textContent = error.message;
+}
+
 export function showDialog({ title, description, content = '', action, danger = false, onAccept }) {
   const dialog = $('#app-dialog');
   const previous = document.activeElement;
@@ -36,8 +58,9 @@ export function showDialog({ title, description, content = '', action, danger = 
   dialog.querySelector('#dialog-cancel').addEventListener('click', () => dialog.close());
   dialog.querySelector('form').addEventListener('submit', event => {
     event.preventDefault();
+    applyDialogError(dialog, null);
     const error = onAccept(dialog);
-    if (error) { dialog.querySelector('#dialog-error').textContent = error; return; }
+    if (error) { applyDialogError(dialog, error); return; }
     dialog.close();
   });
   dialog.showModal();

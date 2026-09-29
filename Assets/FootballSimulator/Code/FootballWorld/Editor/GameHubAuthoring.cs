@@ -6,6 +6,10 @@ using System.Text.RegularExpressions;
 using FStudio.FootballWorld.Infrastructure.GameModes;
 using FStudio.FootballWorld.Presentation;
 using FStudio.Graphics.Cameras;
+using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using FStudio.UI;
+using FStudio.UI.Panels;
+using FStudio.UI.Utilities;
 using TMPro;
 using UnityEditor;
 using UnityEditor.Events;
@@ -32,6 +36,7 @@ namespace FStudio.FootballWorld.Editor
             if (AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath) == null) CreatePrefab();
             else Debug.Log("[GameHub] Existing prefab preserved. Edit the prefab directly or use the explicit rebuild command.");
             EnsureCanvasCameraBinding();
+            EnsureCountryFilters();
             LocalizeLegacyPrefabs();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -45,6 +50,7 @@ namespace FStudio.FootballWorld.Editor
             EnsureTheme();
             GameHubTextSeed.MergeCatalog();
             CreatePrefab();
+            EnsureCountryFilters();
             LocalizeLegacyPrefabs();
             AssetDatabase.SaveAssets();
         }
@@ -107,6 +113,80 @@ namespace FStudio.FootballWorld.Editor
                 Debug.Log("[GameHub] Canonical UI camera binding added without changing the authored layout.");
             }
             finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
+
+        // One-time migration; repeat calls preserve the saved layout and field references.
+        private static void EnsureCountryFilters()
+        {
+            var hub = PrefabUtility.LoadPrefabContents(PrefabPath);
+            try
+            {
+                var properties = new SerializedObject(hub.GetComponent<GameHubView>());
+                if (properties.FindProperty("careerCountryDropdown").objectReferenceValue == null)
+                {
+                    var parent = hub.transform.Find("CareerProfile");
+                    Set(properties, "careerCountryDropdown", Dropdown(parent, "CareerCountry", "country.label", 519, 361, 300));
+                    Place(parent.Find("CareerClub").GetComponent<RectTransform>(), 850, 404, 607, 61);
+                    Place(parent.Find("CareerClubLabel").GetComponent<RectTransform>(), 850, 361, 607, 35);
+                }
+                if (properties.FindProperty("championshipCountryDropdown").objectReferenceValue == null)
+                {
+                    var parent = hub.transform.Find("ChampionshipSelection");
+                    Set(properties, "championshipCountryDropdown", Dropdown(parent, "ChampionshipCountry", "country.label", 126, 402, 440));
+                    Place(parent.Find("Edition").GetComponent<RectTransform>(), 126, 316, 1346, 61);
+                    Place(parent.Find("EditionLabel").GetComponent<RectTransform>(), 126, 273, 1346, 35);
+                    Place(parent.Find("Club").GetComponent<RectTransform>(), 606, 445, 866, 61);
+                    Place(parent.Find("ClubLabel").GetComponent<RectTransform>(), 606, 402, 866, 35);
+                    Place(parent.Find("EditionDates").GetComponent<RectTransform>(), 130, 515, 1270, 43);
+                }
+                properties.ApplyModifiedPropertiesWithoutUndo();
+                foreach (var child in hub.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 5;
+                PrefabUtility.SaveAsPrefabAsset(hub, PrefabPath);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(hub); }
+
+            const string quickPath = "Assets/FootballSimulator/Arts/UI/Panels/MainMenuPanel.prefab";
+            var quick = PrefabUtility.LoadPrefabContents(quickPath);
+            try
+            {
+                var properties = new SerializedObject(quick.GetComponent<MainMenuPanel>());
+                foreach (var side in new[] { "home", "away" })
+                {
+                    if (properties.FindProperty(side + "Country").objectReferenceValue != null) continue;
+                    var team = (TeamSelectionTeam)properties.FindProperty(side + "Team").objectReferenceValue;
+                    var teamProperties = new SerializedObject(team);
+                    var teamRect = (RectTransform)team.transform;
+                    var x = teamRect.anchoredPosition.x;
+                    teamRect.anchoredPosition = new Vector2(x, -55);
+                    teamRect.localScale = Vector3.one * .9f;
+                    var group = new GameObject(side + "Country", typeof(RectTransform)); group.SetActive(false);
+                    group.transform.SetParent(team.transform.parent, false);
+                    var rect = group.GetComponent<RectTransform>(); rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(.5f, .5f);
+                    rect.anchoredPosition = new Vector2(x, 252); rect.sizeDelta = new Vector2(500, 74);
+                    var country = group.AddComponent<TeamCountrySelection>();
+                    var countryProperties = new SerializedObject(country);
+                    Set(countryProperties, "countryName", Label(group.transform, "CountryName", null, 62, 31, 376, 41, 28, theme.White, true, TextAlignmentOptions.Center));
+                    Label(group.transform, "CountryLabel", "country.label", 62, 0, 376, 29, 20, theme.Accent, false, TextAlignmentOptions.Center);
+                    foreach (var previous in new[] { true, false })
+                    {
+                        var field = previous ? "previousButton" : "nextButton";
+                        var template = (InteractiveUIElement)teamProperties.FindProperty(field).objectReferenceValue;
+                        var button = UnityEngine.Object.Instantiate(template, group.transform, false);
+                        button.name = previous ? "PreviousCountry" : "NextCountry";
+                        button.onClick = new UnityEvent(); button.onLateClick = new UnityEvent();
+                        if (previous) UnityEventTools.AddPersistentListener(button.onClick, country.Previous);
+                        else UnityEventTools.AddPersistentListener(button.onClick, country.Next);
+                        Place(button.GetComponent<RectTransform>(), previous ? 0 : 446, 22, 54, 54);
+                        Set(countryProperties, field, button);
+                    }
+                    countryProperties.ApplyModifiedPropertiesWithoutUndo();
+                    group.SetActive(true); Set(properties, side + "Country", country);
+                }
+                properties.ApplyModifiedPropertiesWithoutUndo();
+                foreach (var child in quick.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 5;
+                PrefabUtility.SaveAsPrefabAsset(quick, quickPath);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(quick); }
         }
 
         private static void CreatePrefab()

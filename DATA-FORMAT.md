@@ -1,35 +1,40 @@
 # Contratos de base e mídia
 
-Estado: contratos JSON v1, v2 e v3 em 29/09/2026. V2 acrescenta presets de
-aparência; v3 acrescenta campeonatos e edições com regulamento e datas de rodadas.
+Estado: contratos JSON v1 a v4. V2 acrescenta presets de aparência; v3 acrescenta
+campeonatos e edições com regulamento e datas de rodadas. V4 acrescenta países,
+estádios, biografias, metadados dos clubes e um recorte observado com fontes.
 Pacotes ZIP, mídia carregável e skins completas nas seções seguintes
 continuam sendo extensões planejadas. Consulte [README-DATABASE.md](README-DATABASE.md),
 [ROADMAP.md](ROADMAP.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Contratos executáveis atuais: JSON v1, v2 e v3
+## Contratos executáveis atuais: JSON v1 a v4
 
 Schema: [database-v1.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
 Extensão de aparência: [database-v2.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json).
 Extensão de competições: [database-v3.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json).
+Extensão cadastral e de proveniência: [database-v4.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v4.schema.json).
 Exemplo: [four-clubs.database.json](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 
 O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
 
 | Campo obrigatório | Conteúdo |
 | --- | --- |
-| schemaVersion | Inteiro 1, 2 ou 3 |
+| schemaVersion | Inteiro 1, 2, 3 ou 4 |
 | databaseId | ID permanente da base |
 | databaseRevision | Inteiro de 1 a 2147483647 |
-| clubs | Um ou mais objetos com id e name |
+| clubs | Um ou mais objetos com id e name; countryCode e city também obrigatórios em v4 |
 | players | Um ou mais jogadores com id, name, naturalPositions, heightCm, weightKg e attributes |
 | memberships | Zero ou mais vínculos clubId/playerId; um clube inicial por jogador |
-| visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional em v2/v3; no máximo um por jogador |
-| competitions (apenas v3) | Até 128 campeonatos com id e name |
-| competitionEditions (apenas v3) | Até 128 edições com participantes, datas e regras suportadas |
+| visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional a partir de v2; no máximo um por jogador |
+| competitions (v3/v4) | Até 128 campeonatos com id e name |
+| competitionEditions (v3/v4) | Até 128 edições com participantes, datas e regras suportadas |
+| countries (v4) | De 1 a 300 países, com code e name |
+| stadiums (v4) | De 0 a 1024 estádios, com id, name, countryCode e city; capacity opcional |
+| snapshot (v4) | Data, descrição do recorte, cobertura de elenco, notas e fontes |
 
 `skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
 O importador valida a forma da referência e a existência de PlayerId. A ponte do
-amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`. Em v2/v3,
+amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`. A partir de v2,
 uma `appearance` completa define os sete presets; se omitida, usa a aparência
 local associada ao PlayerId ou o default declarado com diagnóstico. Perfil
 ausente também mantém o comportamento legado. V1 continua válido e rejeita o
@@ -88,7 +93,7 @@ RW e ST, sem repetição. Altura é um inteiro entre 150 e 210 cm; peso entre 45
 dribbleSpeed, jump, tackling, ballKeeping, passing, longBall, agility, shooting,
 shootPower, positioning, reaction e ballControl; todos inteiros entre 0 e 100.
 
-Nomes têm até 100 pontos de código Unicode e não podem conter apenas espaços.
+O campo `name` tem até 100 pontos de código Unicode e não pode conter apenas espaços.
 Não são normalizados silenciosamente. IDs têm 1 a 64 caracteres ASCII dentre
 letras, números, ponto, sublinhado e hífen, começando por letra ou número. São
 sensíveis a maiúsculas. Jogador sem vínculo representa um jogador sem clube;
@@ -96,7 +101,7 @@ elencos vazios ou maiores que onze são válidos no catálogo. LineupPlanner ver
 se o clube pode fornecer um goleiro natural e dez jogadores de linha ao amistoso.
 
 Objetos não aceitam propriedades desconhecidas. Null, campos obrigatórios ausentes e conversões
-implícitas de strings para números são rejeitados. Competições e regras exigem v3.
+implícitas de strings para números são rejeitados. Competições e regras exigem v3 ou v4.
 Novos tipos de regra, caminhos de arquivo e recursos binários exigem outra evolução
 explícita de versão e importador; não são campos silenciosamente ignorados.
 
@@ -111,14 +116,14 @@ O importador devolve sucesso com um snapshot completo, ou erros com `Code`,
 O bootstrap só chama `CatalogSession.Activate` depois do sucesso; falhas conservam
 o catálogo e os perfis visuais anteriores.
 
-Os IDs aleatórios do exemplo foram gerados uma vez e ficam gravados no arquivo;
-não devem ser regenerados ao editar nomes. Milano, London e Catalagna preservam
-os dados copiados dos assets originais e posições inferidas das formações na
-migração inicial. A revisão 2 substitui Royal por São Paulo FC e seus 39 atletas,
+Os IDs do exemplo são permanentes e não devem ser regenerados ao editar nomes.
+A amostra inicial de Milano, London e Catalagna usava dados copiados dos assets
+originais e posições inferidas das formações. A revisão 2 substituiu Royal por
+São Paulo FC e seus 39 atletas,
 com novas identidades. Nomes e alturas têm fontes oficiais; pesos, atributos e
 adaptações táticas são demonstrativos, conforme [SAO-PAULO-DATA.md](SAO-PAULO-DATA.md).
 Escudo e dois uniformes são recursos Unity associados ao ClubId, sem acrescentar
-campos de mídia ao JSON. A revisão 3 usa v2 e registra as sete escolhas visuais
+campos de mídia ao JSON. A revisão 3 usou v2 e registrou as sete escolhas visuais
 copiadas dos bindings genéricos dos 72 jogadores; não são feições pesquisadas dos
 atletas. A edição local compatível do JSON é lida por refresh
 no Compose; novos recursos compilados ainda requerem build.
@@ -126,10 +131,94 @@ no Compose; novos recursos compilados ainda requerem build.
 O editor local salva JSON validado com controle de concorrência por ETag/If-Match,
 incremento de `databaseRevision` no servidor e substituição atômica do arquivo.
 Exportar um rascunho não muda a revisão publicada. A aplicação pode ler v1 e
-promove v1 para v2 ao definir uma aparência; uma base v3 permanece v3 e conserva
-suas competições. Os schemas de autoria são
+promove v1 para v2 ao definir uma aparência; bases v3/v4 conservam sua versão e
+suas competições. A promoção para v4 exige os novos campos obrigatórios, sem
+inventar data, fontes ou localização. Os schemas de autoria são
 separados; `StreamingAssets/FootballWorld/database.schema.json` e
-`/editor/api/schema` publicam as três versões suportadas.
+`/editor/api/schema` publicam as quatro versões suportadas.
+
+### Cadastro e recorte observado v4
+
+`countries[]` contém `code` (duas letras ASCII maiúsculas) e `name` (até 100
+pontos Unicode). Os códigos são únicos e usados por clubes, estádios e
+nacionalidades; todas essas referências devem existir na mesma base. O validador
+verifica o formato e o cadastro declarado, não consulta um registro externo de países.
+
+`stadiums[]` contém `id`, `name`, `countryCode`, `city` e, opcionalmente, `capacity`
+inteira entre 1 e 1.000.000. Nome e cidade têm o limite de 100 pontos Unicode.
+Um estádio pode ser compartilhado por clubes. Esse cadastro não cria um estádio
+3D nem seleciona automaticamente outro recurso do motor.
+
+Além de `id` e `name`, clubes v4 exigem `countryCode` e `city`. Campos opcionais:
+
+| Campo | Contrato |
+| --- | --- |
+| officialName | Texto não branco, até 200 pontos Unicode |
+| shortName | Texto não branco, até 100 pontos Unicode |
+| stadiumId | ID do estádio oficial principal do clube, declarado em stadiums |
+| reputation | Inteiro de 0 a 100 |
+| supporterCount | Inteiro de 0 a 2147483647 |
+| transferBudget / monthlyWageBudget | Inteiros de 0 a 2147483647, em unidades inteiras da moeda |
+| currency | Três letras ASCII maiúsculas; obrigatório se qualquer orçamento for informado |
+| sponsorship | Texto não branco, até 200 pontos Unicode |
+| notes | Texto de até 4000 pontos Unicode; pode ser vazio |
+
+Os campos de gestão são parâmetros autorais de simulação. Nesta etapa não
+produzem receitas, contratos, ofertas, treino ou alterações de saldo. Não devem
+ser apresentados como finanças oficiais verificadas sem uma fonte correspondente.
+O texto de patrocínio também não é um contrato financeiro com vigência.
+
+`club.stadiumId` conserva o estádio oficial principal mesmo quando o clube manda
+uma partida em outro local. Disponibilidade por período (como reformas e eventos),
+receitas desses eventos e a escolha temporária de estádio por partida pertencem a
+etapas futuras; não são inferidas deste vínculo nem alteram esse cadastro principal.
+
+Jogadores v4 preservam os campos esportivos existentes e aceitam:
+
+| Campo | Contrato |
+| --- | --- |
+| fullName | Nome completo separado de name, não branco, até 200 pontos Unicode |
+| nickname | Apelido não branco, até 100 pontos Unicode |
+| birthDate | Data civil real AAAA-MM-DD, anos 0001–9999, não posterior a snapshot.date |
+| preferredFoot | right, left ou both; ausência significa desconhecido |
+| nationalityCode | Código de duas letras maiúsculas declarado em countries |
+| notes | Texto de até 4000 pontos Unicode; pode ser vazio |
+
+`name` continua obrigatório e conserva a identidade de apresentação legada.
+`PlayerDefinition.DisplayName` devolve `Nickname ?? Name`: definir um apelido
+não renomeia o nome completo nem troca o `PlayerId`. A biografia e o pé preferido
+são metadados; os quinze atributos já existentes continuam alimentando a partida.
+
+Campos opcionais desconhecidos são **omitidos**. `null`, texto branco em nomes,
+strings numéricas e valores inventados para preencher lacunas são rejeitados ou
+devem permanecer fora do cadastro. Zero explícito em orçamento/reputação/torcida
+é um valor conhecido; não significa desconhecido. Na API C#, ausência vira `null`
+ou `int?`/`GameDate?`, e o importador preserva os valores sem normalização silenciosa.
+
+`snapshot` tem exatamente `date`, `label`, `rosterScope`, `notes` e `sources`.
+`date` segue o formato civil acima; `label` tem até 100 pontos Unicode não brancos;
+`notes` admite até 4000 pontos e pode ser vazio. `rosterScope` aceita
+`matchday-squads` (relacionados observados) ou `full-squads` (elencos completos).
+`sources` exige 1–128 objetos com `id` único, `title` não branco de até 200 pontos
+e `url` HTTP(S) absoluta de até 2048 pontos, sem espaços em branco.
+
+Esse recorte declara a observação da base. Não adiciona vigências aos vínculos,
+não resolve automaticamente outro elenco para outra data e não é o relógio de
+uma carreira. Alterar `snapshot.date` exige rever o conteúdo e as fontes; não
+transforma a base em uma edição histórica diferente.
+
+A amostra v4 reúne os 16 clubes e 363 jogadores relacionados nas súmulas de
+10 e 11 de janeiro de 2026; usa `snapshot.date: "2026-01-11"` e
+`rosterScope: "matchday-squads"`. Não representa elencos completos. Medidas,
+atributos e visuais aproximados estão identificados nas notas; campos biográficos
+sem verificação ficam ausentes. Veja [HISTORICAL-DATA.md](HISTORICAL-DATA.md).
+O nome `four-clubs.database.json` permanece por compatibilidade com as rotas;
+ele não informa a quantidade atual de clubes. A identidade da base e os IDs já
+existentes de São Paulo/jogadores correspondentes são preservados.
+
+`competitions` e `competitionEditions` continuam obrigatórios em v4 e aceitam
+os mesmos formatos de v3. Na amostra de janeiro estão vazios: cadastrar os clubes
+do Paulista não implementa sua tabela oficial ou seu regulamento.
 
 ### Campeonatos e edições v3
 
@@ -159,7 +248,7 @@ Para N participantes, são necessárias `(N par ? N−1 : N) × legs` datas. Clu
 ímpares têm folgas. IDs de confrontos são gerados uma vez ao criar a sessão;
 confrontos, resultados e classificação pertencem ao progresso, não ao JSON autoral.
 
-A revisão 6 da amostra adiciona a Liga de demonstração, em 3, 10 e 17 de outubro
+A revisão 6 da amostra adicionou a Liga de demonstração, em 3, 10 e 17 de outubro
 de 2026: quatro clubes, três rodadas e seis jogos, turno único, 3/1/0 pontos.
 Esse calendário é demonstrativo e não representa um campeonato oficial.
 O editor web conserva e valida estes dados ao editar jogadores/clubes; a autoria
@@ -308,7 +397,7 @@ Exemplo parcial de associação em um perfil visual:
 ```
 
 Os valores e campos desse exemplo são ilustrativos da extensão futura; não formam
-um objeto válido dos contratos v1/v2/v3 atuais. O perfil visual não altera velocidade,
+um objeto válido dos contratos v1–v4 atuais. O perfil visual não altera velocidade,
 força, IA, colisão ou regras.
 Referências abreviadas como `portraitAssetId` e `fallbackSkinId` são resolvidas
 pelo manifesto imutável da base para revisões e digests exatos. Isso também vale

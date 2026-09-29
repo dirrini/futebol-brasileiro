@@ -61,7 +61,9 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public bool IsBusy => busy || FriendlyMatchSession.Current.ActiveMatch != null;
         public bool DatabaseReady => FootballDatabaseBootstrap.Current != null && FootballDatabaseBootstrap.Current.State == FootballDatabaseLoadState.Ready;
         public IReadOnlyList<CatalogTeamOption> Teams => FriendlyMatchSession.Current.Teams;
+        public IReadOnlyList<CatalogCountryOption> Countries => FriendlyMatchSession.Current.Countries;
         public IReadOnlyList<HubEditionOption> Editions { get; private set; } = Array.Empty<HubEditionOption>();
+        public DateTime DefaultCareerDate { get; private set; } = DateTime.Today;
         public HubChampionshipView Championship => season == null ? null : new HubChampionshipView(season, IsBusy);
         public HubCareerProfile Career { get; private set; }
         public bool HasChampionshipSave { get; private set; }
@@ -129,6 +131,8 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
             observedCatalog = catalog; observedState = state;
             Editions = catalog == null ? Array.Empty<HubEditionOption>() : catalog.CompetitionEditions.Select(edition =>
                 new HubEditionOption(edition, catalog.Competitions.First(competition => competition.Id == edition.CompetitionId).Name)).ToArray();
+            DefaultCareerDate = catalog?.Snapshot != null ? catalog.Snapshot.Date.ToDateTime()
+                : Editions.Count > 0 ? Editions[0].FirstDate : DateTime.Today;
             Changed?.Invoke();
         }
 

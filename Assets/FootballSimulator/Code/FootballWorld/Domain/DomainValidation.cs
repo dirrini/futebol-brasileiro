@@ -42,6 +42,30 @@ namespace FStudio.FootballWorld.Domain
             return value;
         }
 
+        public static string Text(string value, int maximum, bool allowEmpty, string parameterName)
+        {
+            if (value == null) throw new ArgumentNullException(parameterName);
+            if ((!allowEmpty && string.IsNullOrWhiteSpace(value)) || UnicodeLength(value) > maximum)
+                throw new ArgumentException("Text exceeds its limit or is empty.", parameterName);
+            return value;
+        }
+
+        public static string Code(string value, int length, string parameterName)
+        {
+            if (value == null || value.Length != length) throw new ArgumentException("Invalid code length.", parameterName);
+            foreach (var character in value)
+                if (character < 'A' || character > 'Z') throw new ArgumentException("Use uppercase ASCII letters.", parameterName);
+            return value;
+        }
+
+        public static string HttpUrl(string value, string parameterName)
+        {
+            Text(value, 2048, false, parameterName);
+            if (!Regex.IsMatch(value, @"\Ahttps?://[^\u0009-\u000D\u0020\u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF/?#]+(?:[/?#][^\u0009-\u000D\u0020\u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*)?\z", RegexOptions.CultureInvariant))
+                throw new ArgumentException("Use an absolute HTTP(S) source URL without whitespace.", parameterName);
+            return value;
+        }
+
         private static int UnicodeLength(string value)
         {
             var count = 0;

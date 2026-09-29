@@ -8,7 +8,7 @@ import { DatabaseStore } from '../server/database-store.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const legacyPath = join(root, 'Assets/FootballSimulator/Code/FootballWorld/Tests/Fixtures/legacy-four-clubs.database.json');
-export const schemas = await Promise.all([1, 2, 3].map(async version => JSON.parse(await readFile(
+export const schemas = await Promise.all([1, 2, 3, 4].map(async version => JSON.parse(await readFile(
   join(root, `Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v${version}.schema.json`), 'utf8'))));
 const legacy = JSON.parse(await readFile(legacyPath, 'utf8'));
 export const validate = createValidator(schemas);
@@ -25,6 +25,13 @@ export function fixture(version = 2) {
     document.competitionEditions = [{ id: 'edition-demo-2026', competitionId: 'competition-demo', name: 'Edição de teste 2026',
       participantClubIds: document.clubs.map(club => club.id), roundDates: ['2026-10-03', '2026-10-10', '2026-10-17'],
       rules: { type: 'round-robin', version: 1, legs: 1, points: { win: 3, draw: 1, loss: 0 }, tieBreakers: ['wins', 'goal-difference', 'goals-for'] } }];
+  }
+  if (version >= 4) {
+    document.countries = [{ code: 'BR', name: 'Brasil' }];
+    document.stadiums = [{ id: 'stadium-demo', name: 'Estádio de teste', countryCode: 'BR', city: 'São Paulo', capacity: 12000 }];
+    document.snapshot = { date: '2026-01-11', label: 'Recorte de teste', rosterScope: 'matchday-squads', notes: '',
+      sources: [{ id: 'source-demo', title: 'Documento de teste', url: 'https://example.com/match-report.pdf' }] };
+    for (const club of document.clubs) Object.assign(club, { countryCode: 'BR', city: 'São Paulo' });
   }
   return document;
 }

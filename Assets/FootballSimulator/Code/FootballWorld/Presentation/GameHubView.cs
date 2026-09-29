@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using FStudio.FootballWorld.Infrastructure.GameModes;
+using FStudio.FootballWorld.Infrastructure.LegacyMatch;
 using FStudio.MatchEngine.Enums;
 using TMPro;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace FStudio.FootballWorld.Presentation
         [SerializeField] private TMP_Text pageTitle, statusText, saveWarningText;
         [SerializeField] private Button backButton, retryButton, dismissWarningButton;
         [Header("Championship selection")]
-        [SerializeField] private TMP_Dropdown editionDropdown, championshipClubDropdown;
+        [SerializeField] private TMP_Dropdown editionDropdown, championshipCountryDropdown, championshipClubDropdown;
         [SerializeField] private TMP_Text editionDescription;
         [SerializeField] private Button startChampionshipButton, continueChampionshipButton;
         [Header("Championship dashboard")]
@@ -34,7 +35,7 @@ namespace FStudio.FootballWorld.Presentation
         [SerializeField] private HubFixtureRow fixtureTemplate;
         [Header("Career draft")]
         [SerializeField] private TMP_InputField coachName, careerYearInput;
-        [SerializeField] private TMP_Dropdown careerMonthDropdown, careerClubDropdown;
+        [SerializeField] private TMP_Dropdown careerMonthDropdown, careerCountryDropdown, careerClubDropdown;
         [SerializeField] private TMP_Text careerSummary;
         [SerializeField] private Button saveCareerButton;
         [SerializeField] private CoachAvatarView careerPortrait;
@@ -55,6 +56,8 @@ namespace FStudio.FootballWorld.Presentation
         private readonly List<string> editionIds = new List<string>();
         private readonly List<string> championshipClubIds = new List<string>();
         private readonly List<string> careerClubIds = new List<string>();
+        private readonly List<string> championshipCountryCodes = new List<string>(), careerCountryCodes = new List<string>();
+        private string selectedChampionshipCountryCode, selectedCareerCountryCode;
         private GameHubSession session;
         private bool refreshing, careerInitialized;
         private string selectedEditionId, selectedChampionshipClubId, selectedCareerClubId, selectedAvatarId = "coach-1";
@@ -96,6 +99,8 @@ namespace FStudio.FootballWorld.Presentation
             playFixtureButton.onClick.AddListener(PlayNext);
             saveCareerButton.onClick.AddListener(SaveCareer);
             editionDropdown.onValueChanged.AddListener(SelectEdition);
+            championshipCountryDropdown.onValueChanged.AddListener(SelectChampionshipCountry);
+            careerCountryDropdown.onValueChanged.AddListener(SelectCareerCountry);
             championshipClubDropdown.onValueChanged.AddListener(SelectChampionshipClub);
             careerClubDropdown.onValueChanged.AddListener(SelectCareerClub);
             careerMonthDropdown.onValueChanged.AddListener(SelectMonth);
@@ -117,6 +122,8 @@ namespace FStudio.FootballWorld.Presentation
             playFixtureButton.onClick.RemoveListener(PlayNext);
             saveCareerButton.onClick.RemoveListener(SaveCareer);
             editionDropdown.onValueChanged.RemoveListener(SelectEdition);
+            championshipCountryDropdown.onValueChanged.RemoveListener(SelectChampionshipCountry);
+            careerCountryDropdown.onValueChanged.RemoveListener(SelectCareerCountry);
             championshipClubDropdown.onValueChanged.RemoveListener(SelectChampionshipClub);
             careerClubDropdown.onValueChanged.RemoveListener(SelectCareerClub);
             careerMonthDropdown.onValueChanged.RemoveListener(SelectMonth);
@@ -173,6 +180,8 @@ namespace FStudio.FootballWorld.Presentation
         private void SelectEdition(int index) { if (!refreshing && index < editionIds.Count) { selectedEditionId = editionIds[index]; selectedChampionshipClubId = null; Refresh(); } }
         private void SelectChampionshipClub(int index) { if (!refreshing && index < championshipClubIds.Count) selectedChampionshipClubId = championshipClubIds[index]; }
         private void SelectCareerClub(int index) { if (!refreshing && index < careerClubIds.Count) selectedCareerClubId = careerClubIds[index]; }
+        private void SelectChampionshipCountry(int index) { if (!refreshing && index >= 0 && index < championshipCountryCodes.Count) { selectedChampionshipCountryCode = championshipCountryCodes[index]; Refresh(); } }
+        private void SelectCareerCountry(int index) { if (!refreshing && index >= 0 && index < careerCountryCodes.Count) { selectedCareerCountryCode = careerCountryCodes[index]; Refresh(); } }
         private void SelectMonth(int index) { if (!refreshing) selectedMonth = index + 1; }
         private void SelectYear(string value) { if (!refreshing) selectedYear = int.TryParse(value, out var year) ? year : 0; }
         private void SelectLanguage(int index) { if (!refreshing && index < languages.Length) session.SetLanguage(languages[index]); }
@@ -221,7 +230,12 @@ namespace FStudio.FootballWorld.Presentation
             if (!editionIds.Contains(selectedEditionId)) selectedEditionId = editionIds.FirstOrDefault();
             SetOptions(editionDropdown, session.Editions.Select(edition => edition.CompetitionName + " · " + edition.Name), editionIds.IndexOf(selectedEditionId), "hub.noEditions");
             var selected = session.Editions.FirstOrDefault(edition => edition.Id == selectedEditionId);
-            var teams = session.Teams.Where(team => selected != null && selected.ParticipantClubIds.Contains(team.ClubId)).ToArray();
+            var participants = session.Teams.Where(team => selected != null && selected.ParticipantClubIds.Contains(team.ClubId)).ToArray();
+            var countries = session.Countries.Where(country => participants.Any(team => team.CountryCode == country.Code)).ToArray();
+            selectedChampionshipCountryCode = CatalogCountryFilter.RetainCountry(countries, selectedChampionshipCountryCode, participants, selectedChampionshipClubId);
+            championshipCountryCodes.Clear(); championshipCountryCodes.AddRange(countries.Select(country => country.Code));
+            SetOptions(championshipCountryDropdown, countries.Select(country => GameText.CountryName(country.Code, country.Name)), championshipCountryCodes.IndexOf(selectedChampionshipCountryCode), "country.none");
+            var teams = CatalogCountryFilter.Teams(participants, selectedChampionshipCountryCode);
             championshipClubIds.Clear(); championshipClubIds.AddRange(teams.Select(team => team.ClubId));
             if (!championshipClubIds.Contains(selectedChampionshipClubId)) selectedChampionshipClubId = championshipClubIds.FirstOrDefault();
             SetOptions(championshipClubDropdown, teams.Select(team => team.Name), championshipClubIds.IndexOf(selectedChampionshipClubId), "hub.noClubs");
@@ -253,7 +267,7 @@ namespace FStudio.FootballWorld.Presentation
 
         private void RefreshCareer()
         {
-            if (!careerInitialized && session.DatabaseReady)
+            if (!careerInitialized && session.DatabaseReady && session.Teams.Count > 0)
             {
                 var profile = session.Career;
                 if (profile != null)
@@ -262,17 +276,22 @@ namespace FStudio.FootballWorld.Presentation
                     selectedAvatarId = profile.AvatarId;
                     selectedMonth = profile.StartMonth; selectedYear = profile.StartYear; selectedCareerClubId = profile.ClubId;
                 }
-                else if (session.Editions.Count > 0)
+                else
                 {
-                    selectedMonth = session.Editions[0].FirstDate.Month;
-                    selectedYear = session.Editions[0].FirstDate.Year;
+                    selectedMonth = session.DefaultCareerDate.Month;
+                    selectedYear = session.DefaultCareerDate.Year;
                 }
                 careerYearInput.SetTextWithoutNotify(selectedYear.ToString());
                 careerInitialized = true;
             }
-            careerClubIds.Clear(); careerClubIds.AddRange(session.Teams.Select(team => team.ClubId));
+            var countries = session.Countries;
+            selectedCareerCountryCode = CatalogCountryFilter.RetainCountry(countries, selectedCareerCountryCode, session.Teams, selectedCareerClubId);
+            careerCountryCodes.Clear(); careerCountryCodes.AddRange(countries.Select(country => country.Code));
+            SetOptions(careerCountryDropdown, countries.Select(country => GameText.CountryName(country.Code, country.Name)), careerCountryCodes.IndexOf(selectedCareerCountryCode), "country.none");
+            var teams = CatalogCountryFilter.Teams(session.Teams, selectedCareerCountryCode);
+            careerClubIds.Clear(); careerClubIds.AddRange(teams.Select(team => team.ClubId));
             if (!careerClubIds.Contains(selectedCareerClubId)) selectedCareerClubId = careerClubIds.FirstOrDefault();
-            SetOptions(careerClubDropdown, session.Teams.Select(team => team.Name), careerClubIds.IndexOf(selectedCareerClubId), "hub.noClubs");
+            SetOptions(careerClubDropdown, teams.Select(team => team.Name), careerClubIds.IndexOf(selectedCareerClubId), "hub.noClubs");
             var culture = CultureInfo.GetCultureInfo(session.Settings.Language == "en" ? "en-US" : "pt-BR");
             SetOptions(careerMonthDropdown, Enumerable.Range(1, 12).Select(month => culture.DateTimeFormat.GetMonthName(month)), selectedMonth - 1, "");
             saveCareerButton.interactable = session.DatabaseReady && selectedCareerClubId != null;

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Generic football badge — not an official club emblem</title>
+  <path fill="#0000ff" d="M72 42h368v226c0 93-105 167-184 205C177 435 72 361 72 268Z"/>
+  <path fill="#ff0000" d="M96 66h320v199c0 77-90 142-160 180C186 407 96 342 96 265Z"/>
+  <circle cx="256" cy="226" r="115" fill="#0000ff"/>
+  <circle cx="256" cy="226" r="94" fill="#ff0000"/>
+  <path fill="#0000ff" d="m256 173 50 37-19 59h-62l-19-59Zm-70-24 19 33-32 43-31-8Zm140 0-19 33 32 43 31-8Zm-160 126 38-1 22 42-23 24Zm180 0-38-1-22 42 23 24Z"/>
+</svg>

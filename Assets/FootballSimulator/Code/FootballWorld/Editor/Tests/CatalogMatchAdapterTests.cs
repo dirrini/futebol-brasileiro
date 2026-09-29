@@ -154,6 +154,24 @@ namespace FStudio.FootballWorld.Editor.Tests
         }
 
         [Test]
+        public void PlayerNicknameIsUsedInMatchWhileCatalogNamesAndIdentityArePreserved()
+        {
+            var original = imported.Catalog.Players[0];
+            var edited = new PlayerDefinition(original.Id, original.Name, original.NaturalPositions, original.HeightCm,
+                original.WeightKg, original.Attributes, fullName: "Full registered name", nickname: "Match nickname");
+            var catalog = ReplacePlayers(imported.Catalog.Players.Select(player => player.Id == original.Id ? edited : player));
+            var adapter = CreateAdapter(catalog);
+            var lease = CreateLease(adapter, catalog.Clubs[0].Id, catalog.Clubs[1].Id);
+            var identity = lease.Players.Single(player => player.PlayerId == original.Id);
+            var matchPlayer = lease.Request.homeTeam.Players[identity.LocalId];
+            Assert.AreEqual("Match nickname", matchPlayer.Name);
+            Assert.AreEqual("Match nickname", matchPlayer.name);
+            Assert.AreEqual(original.Name, catalog.GetPlayer(original.Id).Name);
+            Assert.AreEqual("Full registered name", catalog.GetPlayer(original.Id).FullName);
+            AssertSportingData(edited, matchPlayer);
+        }
+
+        [Test]
         public void SportingDataComesFromCatalogEvenWhenVisualTemplateHasDifferentValues()
         {
             var original = imported.Catalog.Players[0];
@@ -380,7 +398,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             var adapter = CreateAdapter(expanded);
             var option = adapter.Teams.Single(item => item.ClubId == club.Id);
             Assert.IsTrue(option.CanPlay, option.Error);
-            StringAssert.Contains(GameText.Get("adapter.defaultClub"), option.Warning);
+            StringAssert.Contains(GameText.Get("adapter.genericClub"), option.Warning);
             StringAssert.Contains(GameText.Get("adapter.defaultAppearance"), option.Warning);
             StringAssert.Contains(GameText.Get("adapter.outOfPosition", string.Empty).TrimStart(), option.Warning);
             Assert.AreEqual(Formations._4_4_2, option.Preview.Formation);
@@ -467,8 +485,8 @@ namespace FStudio.FootballWorld.Editor.Tests
 
         private static void AssertSportingData(PlayerDefinition expected, PlayerEntry actual)
         {
-            Assert.AreEqual(expected.Name, actual.Name);
-            Assert.AreEqual(expected.Name, actual.name);
+            Assert.AreEqual(expected.DisplayName, actual.Name);
+            Assert.AreEqual(expected.DisplayName, actual.name);
             Assert.AreEqual(expected.HeightCm, actual.height);
             Assert.AreEqual(expected.WeightKg, actual.weight);
             var attributes = expected.Attributes;

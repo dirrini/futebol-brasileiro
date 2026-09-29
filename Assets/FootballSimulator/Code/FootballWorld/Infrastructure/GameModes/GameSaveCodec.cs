@@ -28,6 +28,9 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
         public static string Championship(CompetitionSession session, string databaseJson)
         {
             var snapshot = session.CaptureSnapshot();
+            // Keep every authored field while avoiding doubled whitespace inside the escaped snapshot string.
+            using (var reader = new JsonTextReader(new StringReader(databaseJson)) { DateParseHandling = DateParseHandling.None })
+                databaseJson = JObject.Load(reader).ToString(Formatting.None);
             var root = new JObject {
                 ["version"] = 1, ["databaseJson"] = databaseJson,
                 ["seasonId"] = snapshot.SeasonId, ["databaseId"] = snapshot.DatabaseId,

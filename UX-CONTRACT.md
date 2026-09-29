@@ -10,7 +10,7 @@ Direção visual em [DESIGN.md](DESIGN.md). Regras e propriedade dos dados segue
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
 | --- | --- | --- | --- | --- |
 | Form | GameHubView + TMP_InputField | GameHubSession e HubCareerProfile | Criar e atualizar treinador | Nome, ano, clube, erro e retenção da ficha |
-| Select/Listbox | TMP_Dropdown, template salvo em GameHub.prefab | Prefab + tema | Edição, clube, idioma, câmera, dificuldade e mês | Popup, teclado, scroll e texto PT/EN |
+| Select/Listbox | TMP_Dropdown, template salvo em GameHub.prefab | Prefab + tema | País, edição, clube, idioma, câmera, dificuldade e mês | Popup, teclado, scroll e texto PT/EN |
 | Scrollbar | ScrollRect/Scrollbar autorados no prefab | GameHub.prefab + GameHubTheme | Classificação, confrontos, opções longas | Mouse, teclado e scrollbar visível |
 | Toast | Status/SaveWarning em GameHubView | GameHubSession | Carregando, erro, confirmação e aviso persistente | Status sem deslocar ações, retry e fechamento de aviso |
 | CRUD | GameHubSession | ARCHITECTURE.md e save local versionado | Criar/substituir carreira e campeonato | Gravação, restauração, revisão fixada e confirmação |
@@ -29,6 +29,14 @@ Amistoso abre a seleção existente; seu botão de retorno leva ao hub. A navega
 durante preparação, abandono e conclusão deve conservar o modo que originou a
 partida. O hub não substitui o catálogo por dados legados em uma falha de leitura.
 Carregamento e erros ocupam o rodapé reservado, com Tentar novamente quando cabe.
+
+Quick match usa o seletor de setas já existente para país e clube, independentemente
+para mandante e visitante. Career e Championship usam TMP_Dropdown, com país antes
+do clube; no campeonato, somente os participantes da edição aparecem. País com
+apenas uma opção não oferece troca fictícia. Bases antigas agrupam clubes sem
+país em “Sem país informado / Country unspecified”. A seleção continua por ClubId.
+Jogadores exibem `nickname` quando preenchido, com fallback para `name`; `fullName`
+permanece um dado cadastral. Textos do catálogo são literais, sem rich text.
 
 Idioma, dificuldade e câmera são preferências locais, salvas imediatamente; o
 texto explica esse comportamento. A câmera escolhida é aplicada ao iniciar a
@@ -57,7 +65,8 @@ aplicação, não à tela.
 Esta etapa cria um treinador com nome, um de três retratos 2D, mês/ano inicial e
 clube. Anos de 1 a 9999 e meses de 1 a 12 são aceitos; o ano usa campo inteiro, sem
 uma lista artificial limitada a décadas. O primeiro valor vem do início da edição
-disponível. A data não transforma o elenco atual em uma base histórica.
+disponível, ou de `snapshot.date` quando a base não tem edição. A data não escolhe
+automaticamente outra fotografia histórica nem transforma os vínculos publicados.
 
 A ficha declara que ainda não simula calendário. Criar/salvar mostra o perfil
 confirmado e mantém o formulário. Alterar um perfil existente exige confirmação

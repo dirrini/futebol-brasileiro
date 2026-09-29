@@ -21,6 +21,22 @@ namespace FStudio.FootballWorld.Editor.Tests
     public sealed class GameSaveTests
     {
         [Test]
+        public void ChampionshipSnapshotCompactsWhitespaceWithoutDroppingAuthoredData()
+        {
+            var json = JToken.Parse(ChampionshipDatabase()).ToString(Formatting.Indented);
+            var imported = new JsonDatabaseImporter().Import(json);
+            var season = CompetitionSession.Create(imported.Catalog, "save-edition", "compact-save", imported.Catalog.Clubs[0].Id);
+            var saved = GameSaveCodec.Championship(season, json);
+            var compacted = (string)JObject.Parse(saved)["databaseJson"];
+            Assert.That(compacted.Length, Is.LessThan(json.Length));
+            Assert.That(JToken.DeepEquals(JToken.Parse(compacted), JToken.Parse(json)), Is.True);
+            Assert.That(GameSaveCodec.RestoreChampionship(saved).Profiles.Count, Is.EqualTo(imported.VisualProfiles.Count));
+            // Existing v1 saves can retain their original formatting and still restore.
+            var legacy = JObject.Parse(saved); legacy["databaseJson"] = json;
+            Assert.That(GameSaveCodec.RestoreChampionship(legacy.ToString(Formatting.None)).Session.SeasonId, Is.EqualTo("compact-save"));
+        }
+
+        [Test]
         public void RuntimeBridgeAcceptsOnlyItsLeaseIgnoresDuplicateWhistlesAndAbortsWithoutAwardingPoints()
         {
             var json = ChampionshipDatabase();
@@ -100,7 +116,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             var persisted = GameSaveCodec.Championship(season, json);
             var restored = GameSaveCodec.RestoreChampionship(persisted);
 
-            Assert.That(restored.DatabaseJson, Is.EqualTo(json));
+            Assert.That(JToken.DeepEquals(JToken.Parse(restored.DatabaseJson), JToken.Parse(json)), Is.True);
             Assert.That(restored.Session.Catalog, Is.Not.SameAs(imported.Catalog));
             Assert.That(restored.Session.Catalog.DatabaseRevision, Is.EqualTo(17));
             Assert.That(restored.Profiles[0].Appearance.HairStyle, Is.EqualTo("locs"));

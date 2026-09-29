@@ -1,3 +1,5 @@
+import { validateHistory } from './history-model.js';
+
 export const clone = value => structuredClone(value);
 export const createId = prefix => `${prefix}-${crypto.randomUUID().replaceAll('-', '')}`;
 export const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
@@ -51,7 +53,7 @@ export function validateDocument(document, options) {
   const issues = [];
   const issue = (path, message) => issues.push({ path, message });
   const checkName = (name, path) => {
-    if (!name.trim()) issue(path, 'Informe um nome.');
+    if (typeof name !== 'string' || !name.trim()) issue(path, 'Informe um nome.');
     else if ([...name].length > 100) issue(path, 'Use no máximo 100 caracteres.');
   };
   if (!document.clubs.length) issue('clubs', 'A base precisa de pelo menos um clube.');
@@ -60,15 +62,15 @@ export function validateDocument(document, options) {
   document.players.forEach((player, i) => {
     const root = `players[${i}]`;
     checkName(player.name, `${root}.name`);
-    if (!player.naturalPositions.length) issue(`${root}.naturalPositions`, 'Selecione pelo menos uma posição natural.');
+    if (!Array.isArray(player.naturalPositions) || !player.naturalPositions.length) issue(`${root}.naturalPositions`, 'Selecione pelo menos uma posição natural.');
     for (const [field, label] of [['heightCm', 'altura'], ['weightKg', 'peso']]) {
       const { min, max } = options.limits[field];
       if (!Number.isInteger(player[field]) || player[field] < min || player[field] > max) issue(`${root}.${field}`, `Informe ${label} com valor inteiro entre ${min} e ${max}.`);
     }
     for (const { field, label } of options.attributes) {
-      const value = player.attributes[field];
+      const value = player.attributes?.[field];
       if (!Number.isInteger(value) || value < 0 || value > 100) issue(`${root}.attributes.${field}`, `${label}: informe um valor inteiro de 0 a 100.`);
     }
   });
-  return issues;
+  return [...issues, ...validateHistory(document)];
 }

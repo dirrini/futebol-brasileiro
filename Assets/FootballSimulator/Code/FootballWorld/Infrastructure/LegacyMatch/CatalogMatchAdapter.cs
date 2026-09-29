@@ -134,7 +134,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             var formation = hasBinding ? binding.Formation : bindings.DefaultFormation;
             var warnings = new List<string>();
             if (!hasBinding)
-                warnings.Add(GameText.Get("adapter.defaultClub"));
+                warnings.Add(GameText.Get("adapter.genericClub"));
             var logo = template != null ? template.TeamLogo : null;
             var visualError = ValidateTeamVisuals(template);
             if (visualError != null) return Invalid(club, logo, visualError, warnings);
@@ -215,7 +215,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                 }
                 team.IsValid = true;
                 return new CatalogTeamOption(club.Id, club.Name, team, logo, null,
-                    Warning(warnings), playerIds.AsReadOnly());
+                    Warning(warnings), playerIds.AsReadOnly(), club.CountryCode);
             }
             catch
             {
@@ -225,7 +225,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         }
 
         private static CatalogTeamOption Invalid(ClubDefinition club, LogoEntry logo, string error, List<string> warnings)
-            => new CatalogTeamOption(club.Id, club.Name, null, logo, error, Warning(warnings), Array.Empty<string>());
+            => new CatalogTeamOption(club.Id, club.Name, null, logo, error, Warning(warnings), Array.Empty<string>(), club.CountryCode);
 
         private static string Warning(List<string> warnings) => warnings.Count == 0 ? null : string.Join(" ", warnings);
 
@@ -260,8 +260,8 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
 
         private static void ApplyCatalogPlayer(PlayerEntry target, PlayerDefinition source)
         {
-            target.Name = source.Name;
-            target.name = source.Name;
+            target.Name = source.DisplayName;
+            target.name = source.DisplayName;
             target.height = source.HeightCm;
             target.weight = source.WeightKg;
             var attributes = source.Attributes;

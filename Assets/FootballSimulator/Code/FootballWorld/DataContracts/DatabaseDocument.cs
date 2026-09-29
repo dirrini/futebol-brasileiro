@@ -16,11 +16,15 @@ namespace FStudio.FootballWorld.DataContracts
         public IReadOnlyList<VisualProfileData> VisualProfiles { get; }
         public IReadOnlyList<CompetitionData> Competitions { get; }
         public IReadOnlyList<CompetitionEditionData> CompetitionEditions { get; }
+        public IReadOnlyList<CountryData> Countries { get; }
+        public IReadOnlyList<StadiumData> Stadiums { get; }
+        public DatabaseSnapshotData Snapshot { get; }
 
         public DatabaseDocument(int schemaVersion, string databaseId, int databaseRevision,
             IEnumerable<ClubData> clubs, IEnumerable<PlayerData> players,
             IEnumerable<MembershipData> memberships, IEnumerable<VisualProfileData> visualProfiles,
-            IEnumerable<CompetitionData> competitions = null, IEnumerable<CompetitionEditionData> competitionEditions = null)
+            IEnumerable<CompetitionData> competitions = null, IEnumerable<CompetitionEditionData> competitionEditions = null,
+            IEnumerable<CountryData> countries = null, IEnumerable<StadiumData> stadiums = null, DatabaseSnapshotData snapshot = null)
         {
             SchemaVersion = schemaVersion;
             DatabaseId = databaseId;
@@ -31,6 +35,8 @@ namespace FStudio.FootballWorld.DataContracts
             VisualProfiles = DataSnapshot.Copy(visualProfiles);
             Competitions = DataSnapshot.Copy(competitions ?? Array.Empty<CompetitionData>());
             CompetitionEditions = DataSnapshot.Copy(competitionEditions ?? Array.Empty<CompetitionEditionData>());
+            Countries = DataSnapshot.Copy(countries ?? Array.Empty<CountryData>());
+            Stadiums = DataSnapshot.Copy(stadiums ?? Array.Empty<StadiumData>()); Snapshot = snapshot;
         }
     }
 
@@ -38,7 +44,26 @@ namespace FStudio.FootballWorld.DataContracts
     {
         public string Id { get; }
         public string Name { get; }
-        public ClubData(string id, string name) { Id = id; Name = name; }
+        public string CountryCode { get; }
+        public string City { get; }
+        public string OfficialName { get; }
+        public string ShortName { get; }
+        public string StadiumId { get; }
+        public int? Reputation { get; }
+        public int? SupporterCount { get; }
+        public int? TransferBudget { get; }
+        public int? MonthlyWageBudget { get; }
+        public string Currency { get; }
+        public string Sponsorship { get; }
+        public string Notes { get; }
+        public ClubData(string id, string name, string countryCode = null, string city = null, string officialName = null,
+            string shortName = null, string stadiumId = null, int? reputation = null, int? supporterCount = null,
+            int? transferBudget = null, int? monthlyWageBudget = null, string currency = null, string sponsorship = null, string notes = null)
+        {
+            Id = id; Name = name; CountryCode = countryCode; City = city; OfficialName = officialName; ShortName = shortName;
+            StadiumId = stadiumId; Reputation = reputation; SupporterCount = supporterCount; TransferBudget = transferBudget;
+            MonthlyWageBudget = monthlyWageBudget; Currency = currency; Sponsorship = sponsorship; Notes = notes;
+        }
     }
 
     public sealed class PlayerData
@@ -49,9 +74,16 @@ namespace FStudio.FootballWorld.DataContracts
         public int HeightCm { get; }
         public int WeightKg { get; }
         public PlayerAttributesData Attributes { get; }
+        public string FullName { get; }
+        public string Nickname { get; }
+        public string BirthDate { get; }
+        public string PreferredFoot { get; }
+        public string NationalityCode { get; }
+        public string Notes { get; }
 
         public PlayerData(string id, string name, IEnumerable<string> naturalPositions,
-            int heightCm, int weightKg, PlayerAttributesData attributes)
+            int heightCm, int weightKg, PlayerAttributesData attributes, string fullName = null,
+            string birthDate = null, string preferredFoot = null, string nationalityCode = null, string notes = null, string nickname = null)
         {
             Id = id;
             Name = name;
@@ -59,6 +91,7 @@ namespace FStudio.FootballWorld.DataContracts
             HeightCm = heightCm;
             WeightKg = weightKg;
             Attributes = attributes;
+            FullName = fullName; BirthDate = birthDate; PreferredFoot = preferredFoot; NationalityCode = nationalityCode; Notes = notes; Nickname = nickname;
         }
     }
 

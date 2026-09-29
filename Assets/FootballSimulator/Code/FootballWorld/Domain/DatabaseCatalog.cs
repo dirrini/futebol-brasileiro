@@ -9,6 +9,7 @@ namespace FStudio.FootballWorld.Domain
         private readonly Dictionary<string, PlayerDefinition> playersById;
         private readonly Dictionary<string, IReadOnlyList<PlayerDefinition>> rostersByClubId;
         private readonly Dictionary<string, CompetitionEditionDefinition> editionsById;
+        private readonly Dictionary<string, StadiumDefinition> stadiumsById;
 
         public string DatabaseId { get; }
         public int DatabaseRevision { get; }
@@ -17,6 +18,9 @@ namespace FStudio.FootballWorld.Domain
         public IReadOnlyList<RosterMembership> Memberships { get; }
         public IReadOnlyList<CompetitionDefinition> Competitions { get; }
         public IReadOnlyList<CompetitionEditionDefinition> CompetitionEditions { get; }
+        public IReadOnlyList<CountryDefinition> Countries { get; }
+        public IReadOnlyList<StadiumDefinition> Stadiums { get; }
+        public DatabaseSnapshotDefinition Snapshot { get; }
 
         public DatabaseCatalog(
             string databaseId,
@@ -25,7 +29,9 @@ namespace FStudio.FootballWorld.Domain
             IEnumerable<PlayerDefinition> players,
             IEnumerable<RosterMembership> memberships,
             IEnumerable<CompetitionDefinition> competitions = null,
-            IEnumerable<CompetitionEditionDefinition> competitionEditions = null)
+            IEnumerable<CompetitionEditionDefinition> competitionEditions = null,
+            IEnumerable<CountryDefinition> countries = null, IEnumerable<StadiumDefinition> stadiums = null,
+            DatabaseSnapshotDefinition snapshot = null)
         {
             DatabaseId = DomainValidation.Id(databaseId, nameof(databaseId));
             DatabaseRevision = DomainValidation.InRange(databaseRevision, 1, int.MaxValue, nameof(databaseRevision));
@@ -143,6 +149,40 @@ namespace FStudio.FootballWorld.Domain
             }
             Competitions = competitionSnapshot.AsReadOnly();
             CompetitionEditions = editionSnapshot.AsReadOnly();
+            var countrySnapshot = new List<CountryDefinition>(countries ?? Array.Empty<CountryDefinition>());
+            var stadiumSnapshot = new List<StadiumDefinition>(stadiums ?? Array.Empty<StadiumDefinition>());
+            DomainValidation.InRange(countrySnapshot.Count, snapshot == null ? 0 : 1, 300, nameof(countries));
+            DomainValidation.InRange(stadiumSnapshot.Count, 0, 1024, nameof(stadiums));
+            var codes = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var country in countrySnapshot)
+                if (country == null || !codes.Add(country.Code)) throw new ArgumentException("Country codes must be unique and non-null.", nameof(countries));
+            stadiumsById = new Dictionary<string, StadiumDefinition>(StringComparer.Ordinal);
+            foreach (var stadium in stadiumSnapshot)
+            {
+                if (stadium == null || stadiumsById.ContainsKey(stadium.Id)) throw new ArgumentException("Stadium IDs must be unique and non-null.", nameof(stadiums));
+                if (!codes.Contains(stadium.CountryCode)) throw new ArgumentException("Stadium references an unknown country.", nameof(stadiums));
+                stadiumsById.Add(stadium.Id, stadium);
+            }
+            foreach (var club in Clubs)
+            {
+                if (snapshot != null && club.CountryCode == null) throw new ArgumentException("Observed clubs require country and city.", nameof(clubs));
+                if (club.CountryCode != null && !codes.Contains(club.CountryCode)) throw new ArgumentException("Club references an unknown country.", nameof(clubs));
+                if (club.StadiumId != null && !stadiumsById.ContainsKey(club.StadiumId)) throw new ArgumentException("Club references an unknown stadium.", nameof(clubs));
+            }
+            foreach (var player in Players)
+            {
+                if (player.NationalityCode != null && !codes.Contains(player.NationalityCode)) throw new ArgumentException("Player references an unknown country.", nameof(players));
+                if (snapshot != null && player.BirthDate.HasValue && player.BirthDate.Value.CompareTo(snapshot.Date) > 0)
+                    throw new ArgumentException("Birth date cannot be after the observation date.", nameof(players));
+            }
+            Countries = countrySnapshot.AsReadOnly(); Stadiums = stadiumSnapshot.AsReadOnly(); Snapshot = snapshot;
+        }
+
+        public StadiumDefinition GetStadium(string stadiumId)
+        {
+            DomainValidation.Id(stadiumId, nameof(stadiumId));
+            if (!stadiumsById.TryGetValue(stadiumId, out var stadium)) throw new KeyNotFoundException($"Stadium '{stadiumId}' does not exist in this catalog.");
+            return stadium;
         }
 
         public CompetitionEditionDefinition GetCompetitionEdition(string editionId)

@@ -24,6 +24,14 @@ namespace FStudio.FootballWorld.Infrastructure.GameModes
 
         public static string FormatDate(DateTime date) => date.ToString("d", Culture);
 
+        public static string CountryName(string code, string authoredName)
+        {
+            if (string.IsNullOrEmpty(code)) return Get("country.unspecified");
+            var key = "country." + code;
+            var translated = Get(key);
+            return translated == key ? authoredName : translated;
+        }
+
         public static void EnsureLoaded()
         {
             if (entries == null)

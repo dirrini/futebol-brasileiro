@@ -1,5 +1,10 @@
 {
   "Entries": [
+    { "Key": "country.label", "Portuguese": "País", "English": "Country" },
+    { "Key": "country.unspecified", "Portuguese": "Sem país informado", "English": "Country unspecified" },
+    { "Key": "country.none", "Portuguese": "Nenhum país disponível", "English": "No countries available" },
+    { "Key": "country.BR", "Portuguese": "Brasil", "English": "Brazil" },
+    { "Key": "adapter.genericClub", "Portuguese": "Escudo e uniformes genéricos, não oficiais.", "English": "Generic badge and kits, not official." },
     {
       "Key": "hub.brand",
       "Portuguese": "FUTEBOL BRASILEIRO",

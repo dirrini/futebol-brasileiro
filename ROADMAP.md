@@ -1,7 +1,10 @@
 # Entregas incrementais
 
-Revisão: 29/09/2026. O catálogo e os presets alimentam o amistoso e o campeonato
-demonstrativo. O menu oferece Quick match, Championship, Career e Options; Career
+Revisão: 29/09/2026. O catálogo v4 tem os 16 clubes do Paulistão e 363 relacionados
+nas súmulas de 10–11/01/2026, com cadastros de países e estádios principais. Ele
+alimenta o amistoso; as competições estão vazias até a implementação do regulamento
+oficial. Saves do campeonato demonstrativo conservam a própria base. O menu oferece
+Quick match, Championship, Career e Options; Career
 cria um perfil, com simulação de calendário ainda pendente. Um editor local
 intermediário está disponível em `/editor/`. As etapas podem ser revisadas com
 evidência da implementação. O editor completo e a importação de skins continuam
@@ -20,10 +23,13 @@ pendentes. Consulte
 
 A1 está concluída. A2 está implementada no recorte JSON v1 de clubes, jogadores,
 vínculos e referências visuais, extensão v2 de sete presets de aparência e v3 de
-competições/edições round-robin. Pacotes e skins ficam nas respectivas etapas
+competições/edições round-robin e v4 com referência histórica, países, estádios,
+cadastro dos clubes e biografias/apelidos. Pacotes e skins ficam nas respectivas etapas
 futuras. A3 está implementada com Domain/Application isolados,
-importador e bootstrap que carrega quatro clubes no player. A amostra atual tem
-72 jogadores, incluindo 39 do São Paulo FC; o JSON é editável por refresh no
+importador e bootstrap que carrega a base externa no player. A amostra atual tem
+16 clubes e 363 jogadores relacionados na abertura, incluindo 23 do São Paulo FC;
+não corresponde aos elencos completos. Consulte [HISTORICAL-DATA.md](HISTORICAL-DATA.md).
+O JSON é editável por refresh no
 Compose, sem recompilar. Os visuais locais do São Paulo continuam compilados.
 Nenhum resultado ou temporada foi acrescentado ao catálogo. A4 está implementada
 com LineupPlanner, bindings visuais locais e uma sessão que fixa a revisão de cada
@@ -32,6 +38,9 @@ Não criar assemblies vazias ou serviços fictícios somente para marcar uma eta
 
 O editor atual permite cadastrar/editar clubes e jogadores, transferir vínculos,
 ajustar posições, altura/peso, atributos e presets, validar, salvar e exportar JSON.
+Na v4 inclui apelido, nome completo, nascimento, pé, nacionalidade, metadados de
+clubes, países, estádios e referência histórica com fontes. Seleção de equipes
+é filtrada por país em Quick match, Championship e Career.
 O salvamento incrementa a revisão e o jogo lê a nova base após refresh. Sua prévia
 é ilustrativa e suas opções usam o personagem compilado; não incluem upload de
 imagens/modelos. Esse recorte adianta parte de D1 sem concluir o marco do editor.
@@ -120,6 +129,35 @@ O próximo recorte precisa definir vigências de vínculos, equipes e regras, re
 o conteúdo válido na data escolhida, compor calendários de várias competições e
 permitir avançar o tempo. Datas sem cobertura devem ter diagnóstico explícito.
 Não copiar elencos atuais para épocas diferentes como se fossem dados históricos.
+
+### Próximos recortes da carreira paulista
+
+1. Completar a cobertura dos elencos de janeiro além dos relacionados da estreia,
+   verificar posições e dados biográficos pendentes e criar vigências explícitas.
+   `snapshot.date` documenta a observação; não substitui esse resolvedor temporal.
+2. Implementar a edição oficial de 2026 com os 16 participantes, formato e datas
+   verificados. O motor atual aceita somente ligas round-robin. Antes de habilitar
+   a edição, adequar a persistência: o envelope com esta base completa excede o
+   limite atual de 384 KiB, mesmo após remover a formatação do JSON.
+3. Introduzir o relógio da carreira e agenda diária, com notícias de veículos
+   fictícios e resultados vinculados às partidas, sem modificar o catálogo fonte.
+4. Acrescentar finanças, propostas, treino e amistosos como estado da carreira.
+   Orçamento, reputação e patrocínio cadastrais não executam essas regras hoje.
+
+### Estádio principal e mandos temporários
+
+O cadastro guarda o estádio oficial principal (`club.stadiumId`): Allianz Parque
+para Palmeiras e Nabi Abi Chedid para Bragantino. A indisponibilidade não substitui
+esse vínculo. A etapa futura introduzirá períodos de reforma e reservas para
+eventos; estes poderão gerar receita conforme regras financeiras explícitas.
+Quando houver conflito com uma partida, a carreira exigirá escolher outro estádio
+disponível. O estádio efetivo será associado ao confronto/save, com validação dos
+conflitos de agenda, mantendo o principal no catálogo. Estádios alternativos terão
+seus próprios IDs e registros. Nenhuma dessas indisponibilidades é simulada hoje.
+
+Modelos 3D e pacotes visuais de estádios são outra entrega: o ID cadastral precisará
+ser associado a um recurso compatível, preservando dimensões lógicas do campo,
+câmeras e posições da partida. Os 16 registros atuais usam o estádio 3D genérico.
 
 ## Conclusão de cada entrega
 

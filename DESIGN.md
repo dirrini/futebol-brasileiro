@@ -22,6 +22,42 @@ components:
 
 # Futebol Brasileiro
 
+## Países na seleção de equipes
+
+Quick match conserva o controle de setas/Snap da seleção legada, com uma linha
+de país acima de cada clube e estado independente para mandante e visitante.
+As setas ficam desabilitadas quando só há uma opção. Career e Championship usam
+o TMP_Dropdown canônico do hub, com país antes do clube; Championship restringe
+ambos aos participantes da edição. Bases sem país exibem uma categoria explícita
+“Sem país informado / Country unspecified”. Layouts e textos continuam autorados
+nos prefabs MainMenuPanel e GameHub e no catálogo GameText.
+
+Clubes sem recursos próprios usam um escudo geométrico neutro e kits genéricos
+contrastantes, editáveis nos assets de Teams/Generic. Esses recursos não pretendem
+reproduzir os uniformes reais. O São Paulo preserva seus bindings existentes.
+
+## Extensão histórica do editor web — v4
+
+Os cadastros de países e estádios seguem a mesma ficha branca, lista paginada,
+barra lateral petróleo, tipografia e tokens canônicos de `database-editor/client/styles.css`.
+Não há um segundo tema para os novos recursos. Uma faixa compacta “Retrato da
+base”, com filete verde, mantém data e alcance da pesquisa visíveis entre o estado
+de salvamento e a área de trabalho. Título, data e alcance vêm do documento; não
+há texto fixo que apresente elencos parciais como completos.
+
+“Referência da base” usa uma ficha ampla, limitada a 960 px, com contexto e fontes
+em sequência. Clubes separam identificação, elenco e parâmetros de simulação;
+jogadores separam nome cadastrado, apelido e nome completo. O apelido aparece nos
+títulos/listas quando informado. Dados desconhecidos permanecem visualmente
+vazios e possuem ajuda explícita, sem sinalização de erro enquanto opcionais.
+
+Datas são texto ISO com ajuda `AAAA-MM-DD`; não há calendário que atribua o dia
+atual ao abrir o campo. Textareas crescem automaticamente. A navegação de cinco
+destinos quebra linhas em telas estreitas; não usa menus ocultos nem botões sem
+ação para campeonatos e skins futuras. O contrato de interação permanece em
+`database-editor/client/UX-CONTRACT.md`; componentes de formulário, diálogo,
+feedback e rascunho continuam únicos e compartilhados.
+
 ## Overview
 
 HUD funcional para acompanhar a partida sem desviar o olhar do jogador.

@@ -82,17 +82,18 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
 
         private static DatabaseDocument ReadDocument(JToken token, List<DatabaseImportError> errors)
         {
-            var isVersionThree = token is JObject candidate && candidate["schemaVersion"]?.Type == JTokenType.Integer &&
-                candidate["schemaVersion"].ToString(Formatting.None) == "3";
+            var declaredVersion = token is JObject candidate && candidate["schemaVersion"]?.Type == JTokenType.Integer
+                ? candidate["schemaVersion"].ToString(Formatting.None) : null;
             var rootFields = new List<string> {"schemaVersion", "databaseId", "databaseRevision",
                 "clubs", "players", "memberships", "visualProfiles"};
-            if (isVersionThree) rootFields.AddRange(new[] {"competitions", "competitionEditions"});
+            if (declaredVersion == "3" || declaredVersion == "4") rootFields.AddRange(new[] {"competitions", "competitionEditions"});
+            if (declaredVersion == "4") rootFields.AddRange(new[] {"countries", "stadiums", "snapshot"});
             var root = Object(token, "$", errors, rootFields.ToArray());
             if (root == null) return null;
             var schemaVersion = Integer(root["schemaVersion"], "$.schemaVersion", int.MinValue, int.MaxValue, errors);
             if (root["schemaVersion"] != null && root["schemaVersion"].Type == JTokenType.Integer &&
-                schemaVersion != 1 && schemaVersion != 2 && schemaVersion != 3)
-                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1, 2 and 3 are supported.");
+                schemaVersion != 1 && schemaVersion != 2 && schemaVersion != 3 && schemaVersion != 4)
+                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1, 2, 3 and 4 are supported.");
             var databaseId = Id(root["databaseId"], "$.databaseId", errors);
             var revision = Integer(root["databaseRevision"], "$.databaseRevision", 1, int.MaxValue, errors);
             var clubs = new List<ClubData>();
@@ -102,12 +103,14 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
 
             ReadItems(root["clubs"], "$.clubs", 1, errors, (item, path) =>
             {
-                var obj = Object(item, path, errors, "id", "name");
-                if (obj != null) clubs.Add(new ClubData(Id(obj["id"], path + ".id", errors), Name(obj["name"], path + ".name", errors)));
+                var club = ReadClub(item, path, schemaVersion, errors);
+                if (club != null) clubs.Add(club);
             });
             ReadItems(root["players"], "$.players", 1, errors, (item, path) =>
             {
-                var obj = Object(item, path, errors, "id", "name", "naturalPositions", "heightCm", "weightKg", "attributes");
+                var obj = ObjectWithOptionalFields(item, path, errors,
+                    new[] {"id", "name", "naturalPositions", "heightCm", "weightKg", "attributes"},
+                    schemaVersion == 4 ? new[] {"fullName", "nickname", "birthDate", "preferredFoot", "nationalityCode", "notes"} : Array.Empty<string>());
                 if (obj == null) return;
                 var id = Id(obj["id"], path + ".id", errors);
                 var name = Name(obj["name"], path + ".name", errors);
@@ -130,7 +133,10 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                         values[i] = Integer(attributes[AttributeNames[i]], path + ".attributes." + AttributeNames[i], 0, 100, errors);
                 players.Add(new PlayerData(id, name, positions, height, weight, new PlayerAttributesData(
                     values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7],
-                    values[8], values[9], values[10], values[11], values[12], values[13], values[14])));
+                    values[8], values[9], values[10], values[11], values[12], values[13], values[14]),
+                    OptionalText(obj, "fullName", path, 200, false, errors), OptionalDate(obj, "birthDate", path, errors),
+                    OptionalFoot(obj, path, errors), OptionalCode(obj, "nationalityCode", path, 2, errors),
+                    OptionalText(obj, "notes", path, 4000, true, errors), OptionalText(obj, "nickname", path, 100, false, errors)));
             });
             ReadItems(root["memberships"], "$.memberships", 0, errors, (item, path) =>
             {
@@ -163,8 +169,12 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
             });
             var competitions = new List<CompetitionData>();
             var editions = new List<CompetitionEditionData>();
-            if (schemaVersion == 3) ReadCompetitions(root, competitions, editions, errors);
-            return new DatabaseDocument(schemaVersion, databaseId, revision, clubs, players, memberships, visuals, competitions, editions);
+            if (schemaVersion >= 3) ReadCompetitions(root, competitions, editions, errors);
+            var countries = new List<CountryData>();
+            var stadiums = new List<StadiumData>();
+            var snapshot = schemaVersion == 4 ? ReadHistoricalCatalog(root, countries, stadiums, errors) : null;
+            return new DatabaseDocument(schemaVersion, databaseId, revision, clubs, players, memberships, visuals, competitions, editions,
+                countries, stadiums, snapshot);
         }
 
         private static void ValidateReferences(DatabaseDocument document, List<DatabaseImportError> errors)
@@ -193,12 +203,15 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 if (!visualPlayers.Add(item.PlayerId)) Error(errors, "duplicate_visual_profile", path, "A player can have only one visual profile.");
             }
             ValidateCompetitionReferences(document, clubs, errors);
+            if (document.SchemaVersion == 4) ValidateHistoricalReferences(document, errors);
         }
 
         private static DatabaseCatalog Map(DatabaseDocument document)
         {
             var clubs = new List<ClubDefinition>();
-            foreach (var item in document.Clubs) clubs.Add(new ClubDefinition(item.Id, item.Name));
+            foreach (var item in document.Clubs) clubs.Add(new ClubDefinition(item.Id, item.Name,
+                item.CountryCode, item.City, item.OfficialName, item.ShortName, item.StadiumId, item.Reputation,
+                item.SupporterCount, item.TransferBudget, item.MonthlyWageBudget, item.Currency, item.Sponsorship, item.Notes));
             var players = new List<PlayerDefinition>();
             foreach (var item in document.Players)
             {
@@ -208,7 +221,8 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 players.Add(new PlayerDefinition(item.Id, item.Name, positions, item.HeightCm, item.WeightKg,
                     new PlayerAttributes(a.Strength, a.Acceleration, a.TopSpeed, a.DribbleSpeed, a.Jump,
                         a.Tackling, a.BallKeeping, a.Passing, a.LongBall, a.Agility, a.Shooting,
-                        a.ShootPower, a.Positioning, a.Reaction, a.BallControl)));
+                        a.ShootPower, a.Positioning, a.Reaction, a.BallControl), item.FullName,
+                    item.BirthDate == null ? (GameDate?)null : ParseGameDate(item.BirthDate), item.PreferredFoot, item.NationalityCode, item.Notes, item.Nickname));
             }
             var memberships = new List<RosterMembership>();
             foreach (var item in document.Memberships) memberships.Add(new RosterMembership(item.ClubId, item.PlayerId));
@@ -223,7 +237,20 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 editions.Add(new CompetitionEditionDefinition(item.Id, item.CompetitionId, item.Name, item.ParticipantClubIds,
                     dates, new LeagueRules(rules.Legs, rules.WinPoints, rules.DrawPoints, rules.LossPoints)));
             }
-            return new DatabaseCatalog(document.DatabaseId, document.DatabaseRevision, clubs, players, memberships, competitions, editions);
+            var countries = new List<CountryDefinition>();
+            foreach (var item in document.Countries) countries.Add(new CountryDefinition(item.Code, item.Name));
+            var stadiums = new List<StadiumDefinition>();
+            foreach (var item in document.Stadiums) stadiums.Add(new StadiumDefinition(item.Id, item.Name, item.CountryCode, item.City, item.Capacity));
+            DatabaseSnapshotDefinition snapshot = null;
+            if (document.Snapshot != null)
+            {
+                var sources = new List<DatabaseSourceDefinition>();
+                foreach (var item in document.Snapshot.Sources) sources.Add(new DatabaseSourceDefinition(item.Id, item.Title, item.Url));
+                snapshot = new DatabaseSnapshotDefinition(ParseGameDate(document.Snapshot.Date), document.Snapshot.Label,
+                    document.Snapshot.RosterScope, document.Snapshot.Notes, sources);
+            }
+            return new DatabaseCatalog(document.DatabaseId, document.DatabaseRevision, clubs, players, memberships, competitions, editions,
+                countries, stadiums, snapshot);
         }
 
         private static JObject Object(JToken token, string path, List<DatabaseImportError> errors, params string[] fields)

@@ -55,6 +55,11 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         public event Action Changed;
         public FriendlyMatchState State { get; private set; } = FriendlyMatchState.Loading;
         public IReadOnlyList<CatalogTeamOption> Teams => adapter == null ? EmptyTeams : adapter.Teams;
+        public IReadOnlyList<CatalogCountryOption> Countries => CatalogCountryFilter.Countries(adapter?.Catalog, Teams);
+        public string SelectedHomeCountryCode { get; private set; }
+        public string SelectedAwayCountryCode { get; private set; }
+        public IReadOnlyList<CatalogTeamOption> HomeTeams => CatalogCountryFilter.Teams(Teams, SelectedHomeCountryCode);
+        public IReadOnlyList<CatalogTeamOption> AwayTeams => CatalogCountryFilter.Teams(Teams, SelectedAwayCountryCode);
         public string SelectedHomeClubId { get; private set; }
         public string SelectedAwayClubId { get; private set; }
         public CatalogMatchLease ActiveMatch { get; private set; }
@@ -102,13 +107,6 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             return null;
         }
 
-        private string RetainSelection(string previous, string other)
-        {
-            if (Find(previous) != null) return previous;
-            return Teams.FirstOrDefault(team => team.CanPlay && team.ClubId != other)?.ClubId ??
-                Teams.FirstOrDefault(team => team.ClubId != other)?.ClubId ?? Teams.FirstOrDefault()?.ClubId;
-        }
-
         private void Refresh()
         {
             // A reload must not replace objects used by the preparation screen or match.
@@ -147,8 +145,11 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                         var replacement = new CatalogMatchAdapter(catalog, source.VisualProfiles, bindings);
                         var previous = adapter;
                         adapter = replacement;
-                        SelectedHomeClubId = RetainSelection(SelectedHomeClubId, SelectedAwayClubId);
-                        SelectedAwayClubId = RetainSelection(SelectedAwayClubId, SelectedHomeClubId);
+                        var countries = Countries;
+                        SelectedHomeCountryCode = CatalogCountryFilter.RetainCountry(countries, SelectedHomeCountryCode, Teams, SelectedHomeClubId);
+                        SelectedAwayCountryCode = CatalogCountryFilter.RetainCountry(countries, SelectedAwayCountryCode, Teams, SelectedAwayClubId);
+                        SelectedHomeClubId = CatalogCountryFilter.RetainClub(HomeTeams, SelectedHomeClubId, SelectedAwayClubId);
+                        SelectedAwayClubId = CatalogCountryFilter.RetainClub(AwayTeams, SelectedAwayClubId, SelectedHomeClubId);
                         previous?.Dispose();
                         Debug.Log("[FootballWorld] Friendly selection uses database " + catalog.DatabaseId +
                             " revision " + catalog.DatabaseRevision + ": " + Teams.Count + " clubs.");
@@ -169,8 +170,27 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         public void Select(bool away, string clubId)
         {
             if (State != FriendlyMatchState.Ready || isStarting || ActiveMatch != null || Find(clubId) == null) return;
+            if (Find(clubId).CountryCode != (away ? SelectedAwayCountryCode : SelectedHomeCountryCode)) return;
             if (away) SelectedAwayClubId = clubId;
             else SelectedHomeClubId = clubId;
+            launchError = null;
+            Changed?.Invoke();
+        }
+
+        public void SelectCountry(bool away, string countryCode)
+        {
+            if (State != FriendlyMatchState.Ready || isStarting || ActiveMatch != null ||
+                !Countries.Any(country => country.Code == countryCode)) return;
+            if (away)
+            {
+                SelectedAwayCountryCode = countryCode;
+                SelectedAwayClubId = CatalogCountryFilter.RetainClub(AwayTeams, SelectedAwayClubId, SelectedHomeClubId);
+            }
+            else
+            {
+                SelectedHomeCountryCode = countryCode;
+                SelectedHomeClubId = CatalogCountryFilter.RetainClub(HomeTeams, SelectedHomeClubId, SelectedAwayClubId);
+            }
             launchError = null;
             Changed?.Invoke();
         }
