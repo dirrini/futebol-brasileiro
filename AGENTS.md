@@ -12,6 +12,8 @@
 - Keep authored database content, mutable season progress, and temporary match objects separate. Use stable IDs; never use names, array positions, Unity GUIDs, or match-local player IDs as persistent identity.
 - Keep rosters and natural player positions independent of the legacy eleven-player `TeamEntry` and match formation slots.
 - Keep the season session alive across UI unloads. Route match completion through one application operation correlated by fixture and execution IDs; duplicate completion must not award points twice.
+- Consult `README-GAME-MODES.md` for the current menu scope. Keep authored competition editions in database v3 and mutable progress in versioned saves that pin their source database; a catalog refresh must not silently migrate an existing competition.
+- Career currently creates a coach profile, start month/year and club only. Do not present its selected date as historical squad/rule resolution until temporal content and calendar simulation exist.
 - Community player skins are a required capability of the first usable external database editor, including custom model/texture import and assignment to a player. A preset-only selector does not fulfill this requirement.
 - Keep `SkinId` and immutable skin revisions separate from `PlayerId`. Resolve media and skins through visual adapters; the competition core must not load textures, prefabs, or AssetBundles.
 - Separate portable skin source packages from platform-specific prepared content. Use a versioned compatibility profile for rig, materials, kit integration, and resource budgets; retain gameplay controllers and animation-event ownership in game code.

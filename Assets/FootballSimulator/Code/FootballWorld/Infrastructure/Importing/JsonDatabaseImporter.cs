@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace FStudio.FootballWorld.Infrastructure.Importing
 {
-    public sealed class JsonDatabaseImporter
+    public sealed partial class JsonDatabaseImporter
     {
         public const int MaximumDocumentBytes = 1024 * 1024;
         public const int MaximumDepth = 32;
@@ -82,13 +82,17 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
 
         private static DatabaseDocument ReadDocument(JToken token, List<DatabaseImportError> errors)
         {
-            var root = Object(token, "$", errors, "schemaVersion", "databaseId", "databaseRevision",
-                "clubs", "players", "memberships", "visualProfiles");
+            var isVersionThree = token is JObject candidate && candidate["schemaVersion"]?.Type == JTokenType.Integer &&
+                candidate["schemaVersion"].ToString(Formatting.None) == "3";
+            var rootFields = new List<string> {"schemaVersion", "databaseId", "databaseRevision",
+                "clubs", "players", "memberships", "visualProfiles"};
+            if (isVersionThree) rootFields.AddRange(new[] {"competitions", "competitionEditions"});
+            var root = Object(token, "$", errors, rootFields.ToArray());
             if (root == null) return null;
             var schemaVersion = Integer(root["schemaVersion"], "$.schemaVersion", int.MinValue, int.MaxValue, errors);
             if (root["schemaVersion"] != null && root["schemaVersion"].Type == JTokenType.Integer &&
-                schemaVersion != 1 && schemaVersion != 2)
-                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1 and 2 are supported.");
+                schemaVersion != 1 && schemaVersion != 2 && schemaVersion != 3)
+                Error(errors, "unsupported_schema_version", "$.schemaVersion", "Only schemaVersion 1, 2 and 3 are supported.");
             var databaseId = Id(root["databaseId"], "$.databaseId", errors);
             var revision = Integer(root["databaseRevision"], "$.databaseRevision", 1, int.MaxValue, errors);
             var clubs = new List<ClubData>();
@@ -138,11 +142,11 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
             {
                 var required = new[] {"playerId", "skin"};
                 var obj = ObjectWithOptionalFields(item, path, errors, required,
-                    schemaVersion == 2 ? new[] {"appearance"} : Array.Empty<string>());
+                    schemaVersion >= 2 ? new[] {"appearance"} : Array.Empty<string>());
                 if (obj == null) return;
                 var playerId = Id(obj["playerId"], path + ".playerId", errors);
                 var skin = Object(obj["skin"], path + ".skin", errors, "skinId", "revision", "compatibilityProfile");
-                var appearance = schemaVersion == 2 && obj.Property("appearance", StringComparison.Ordinal) != null
+                var appearance = schemaVersion >= 2 && obj.Property("appearance", StringComparison.Ordinal) != null
                     ? ReadAppearance(obj["appearance"], path + ".appearance", errors)
                     : null;
                 if (skin == null) return;
@@ -157,7 +161,10 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                         "Built-in appearance requires builtin-player revision 1 with compatibilityProfile football-player-v1.");
                 visuals.Add(new VisualProfileData(playerId, skinReference, appearance));
             });
-            return new DatabaseDocument(schemaVersion, databaseId, revision, clubs, players, memberships, visuals);
+            var competitions = new List<CompetitionData>();
+            var editions = new List<CompetitionEditionData>();
+            if (schemaVersion == 3) ReadCompetitions(root, competitions, editions, errors);
+            return new DatabaseDocument(schemaVersion, databaseId, revision, clubs, players, memberships, visuals, competitions, editions);
         }
 
         private static void ValidateReferences(DatabaseDocument document, List<DatabaseImportError> errors)
@@ -185,6 +192,7 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
                 if (!players.Contains(item.PlayerId)) Error(errors, "unknown_reference", path, "Player does not exist.");
                 if (!visualPlayers.Add(item.PlayerId)) Error(errors, "duplicate_visual_profile", path, "A player can have only one visual profile.");
             }
+            ValidateCompetitionReferences(document, clubs, errors);
         }
 
         private static DatabaseCatalog Map(DatabaseDocument document)
@@ -204,7 +212,18 @@ namespace FStudio.FootballWorld.Infrastructure.Importing
             }
             var memberships = new List<RosterMembership>();
             foreach (var item in document.Memberships) memberships.Add(new RosterMembership(item.ClubId, item.PlayerId));
-            return new DatabaseCatalog(document.DatabaseId, document.DatabaseRevision, clubs, players, memberships);
+            var competitions = new List<CompetitionDefinition>();
+            foreach (var item in document.Competitions) competitions.Add(new CompetitionDefinition(item.Id, item.Name));
+            var editions = new List<CompetitionEditionDefinition>();
+            foreach (var item in document.CompetitionEditions)
+            {
+                var dates = new List<GameDate>();
+                foreach (var value in item.RoundDates) dates.Add(ParseGameDate(value));
+                var rules = item.Rules;
+                editions.Add(new CompetitionEditionDefinition(item.Id, item.CompetitionId, item.Name, item.ParticipantClubIds,
+                    dates, new LeagueRules(rules.Legs, rules.WinPoints, rules.DrawPoints, rules.LossPoints)));
+            }
+            return new DatabaseCatalog(document.DatabaseId, document.DatabaseRevision, clubs, players, memberships, competitions, editions);
         }
 
         private static JObject Object(JToken token, string path, List<DatabaseImportError> errors, params string[] fields)

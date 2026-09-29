@@ -2,6 +2,7 @@ using TMPro;
 using FStudio.UI.Events;
 using UnityEngine;
 using FStudio.UI.GamepadInput;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 
 namespace FStudio.UI {
     public class LoadingPanel : EventPanel<LoadingEvent> {
@@ -12,7 +13,7 @@ namespace FStudio.UI {
         protected override void OnDisappeared () {
             base.OnDisappeared();
 
-            SnapManager.Enable();
+            GameHubSession.Current.RestoreMenuInput();
         }
 
         protected override void OnAppearing() {

@@ -91,7 +91,9 @@ Nesse caso, mantenha os IDs existentes e incremente `databaseRevision` manualmen
 Recarregue [o jogo](http://localhost:8080): o catálogo será lido novamente.
 Não é necessário executar o script, reconstruir a imagem ou reiniciar o container
 quando a única alteração for nesse JSON compatível. A recarga reinicia o jogo;
-não atualiza uma partida em andamento nem preserva seu progresso.
+uma partida 3D interrompida perde seu progresso. O campeonato retoma o último
+resultado salvo e preserva sua revisão da base; novas partidas rápidas e novos
+campeonatos usam a revisão atual. Veja [modos de jogo](README-GAME-MODES.md).
 
 O Compose monta o diretório de autoria em `/opt/football-database`, somente para
 leitura no `soccer-web`. O serviço `database-editor` recebe o mesmo diretório em
@@ -105,7 +107,7 @@ O Nginx publica somente o JSON no endereço que o player já utiliza:
 
 Essa resposta usa `Cache-Control: no-store`, sem ETag ou respostas condicionais
 por data, para que a atualização não recupere uma revisão antiga do navegador.
-O schema publicado descreve v1 e v2; ele e os outros arquivos StreamingAssets
+O schema publicado descreve v1, v2 e v3; ele e os outros arquivos StreamingAssets
 continuam vindo do build. A pasta
 de autoria completa, incluindo arquivos `.meta`, não é exposta por essa rota.
 O JSON empacotado pelo Unity continua existindo no export, mas o servidor local
@@ -118,7 +120,7 @@ Antes de atualizar o navegador, a validação estrutural opcional em PowerShell 
 ```powershell
 Test-Json `
   -LiteralPath 'Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json' `
-  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json'
+  -SchemaFile 'Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json'
 ```
 
 O importador do jogo também valida referências, posições, IDs e limites; consulte

@@ -8,7 +8,7 @@ import { DatabaseStore } from '../server/database-store.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const legacyPath = join(root, 'Assets/FootballSimulator/Code/FootballWorld/Tests/Fixtures/legacy-four-clubs.database.json');
-export const schemas = await Promise.all([1, 2].map(async version => JSON.parse(await readFile(
+export const schemas = await Promise.all([1, 2, 3].map(async version => JSON.parse(await readFile(
   join(root, `Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v${version}.schema.json`), 'utf8'))));
 const legacy = JSON.parse(await readFile(legacyPath, 'utf8'));
 export const validate = createValidator(schemas);
@@ -16,9 +16,15 @@ export const appearance = () => ({ skinTone: 'tone-3', hairStyle: 'short', hairC
   beardStyle: 'goatee', beardColor: 'brown', bootsColor: 'cyan', sockAccessoryColor: 'white' });
 export function fixture(version = 2) {
   const document = structuredClone(legacy);
-  if (version === 2) {
-    document.schemaVersion = 2;
+  if (version >= 2) {
+    document.schemaVersion = version;
     for (const profile of document.visualProfiles) profile.appearance = appearance();
+  }
+  if (version >= 3) {
+    document.competitions = [{ id: 'competition-demo', name: 'Liga de demonstração' }];
+    document.competitionEditions = [{ id: 'edition-demo-2026', competitionId: 'competition-demo', name: 'Edição de teste 2026',
+      participantClubIds: document.clubs.map(club => club.id), roundDates: ['2026-10-03', '2026-10-10', '2026-10-17'],
+      rules: { type: 'round-robin', version: 1, legs: 1, points: { win: 3, draw: 1, loss: 0 }, tieBreakers: ['wins', 'goal-difference', 'goals-for'] } }];
   }
   return document;
 }

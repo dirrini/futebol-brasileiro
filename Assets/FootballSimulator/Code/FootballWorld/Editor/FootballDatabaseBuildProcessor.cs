@@ -29,10 +29,12 @@ namespace FStudio.FootballWorld.Editor
                     FootballDatabaseBootstrap.SourceSchemaAssetPath));
                 var schemaV2Path = Path.GetFullPath(Path.Combine(projectPath,
                     FootballDatabaseBootstrap.SourceSchemaV2AssetPath));
+                var schemaV3Path = Path.GetFullPath(Path.Combine(projectPath,
+                    FootballDatabaseBootstrap.SourceSchemaV3AssetPath));
 
-                if (!File.Exists(databasePath) || !File.Exists(schemaPath) || !File.Exists(schemaV2Path))
+                if (!File.Exists(databasePath) || !File.Exists(schemaPath) || !File.Exists(schemaV2Path) || !File.Exists(schemaV3Path))
                     throw new BuildFailedException("[FootballWorld] Database JSON or its schema is missing: " +
-                        databasePath + " / " + schemaPath + " / " + schemaV2Path);
+                        databasePath + " / " + schemaPath + " / " + schemaV2Path + " / " + schemaV3Path);
 
                 // The importer validates structure, versions, identifiers, and cross references.
                 var result = new JsonDatabaseImporter().Import(File.ReadAllText(databasePath));
@@ -41,11 +43,12 @@ namespace FStudio.FootballWorld.Editor
                         string.Join("\n", result.Errors.Select(error =>
                             error.Code + " at " + error.Path + ": " + error.Message)));
 
-                // The live database may switch between either supported version without
-                // rebuilding. Publish a self-contained schema that describes both.
+                // The live database may switch between supported versions without
+                // rebuilding. Publish a self-contained schema that describes all three.
                 var publishedSchema = CreatePublishedSchema(
                     JObject.Parse(File.ReadAllText(schemaPath)),
-                    JObject.Parse(File.ReadAllText(schemaV2Path)));
+                    JObject.Parse(File.ReadAllText(schemaV2Path)),
+                    JObject.Parse(File.ReadAllText(schemaV3Path)));
                 var generatedSchemaPath = Path.Combine(projectPath, "Library", "FootballWorld", "database.schema.json");
                 Directory.CreateDirectory(Path.GetDirectoryName(generatedSchemaPath));
                 File.WriteAllText(generatedSchemaPath, publishedSchema.ToString(), new UTF8Encoding(false));

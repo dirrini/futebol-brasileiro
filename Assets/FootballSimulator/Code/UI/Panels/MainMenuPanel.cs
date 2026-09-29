@@ -1,5 +1,6 @@
 using System;
 using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 using FStudio.UI.Events;
 using FStudio.UI.GamepadInput;
 using FStudio.UI.Utilities;
@@ -7,7 +8,7 @@ using TMPro;
 using UnityEngine;
 
 namespace FStudio.UI.Panels {
-    public class MainMenuPanel : EventPanel<MainMenuEvent> {
+    public class MainMenuPanel : EventPanel<QuickMatchEvent> {
         [SerializeField] private TeamSelectionTeam homeTeam, awayTeam;
         [SerializeField] private InteractiveUIElement playButton, retryButton;
         [SerializeField] private TextMeshProUGUI statusText;
@@ -43,7 +44,7 @@ namespace FStudio.UI.Panels {
             if (session != null) session.Changed += Refresh;
         }
 
-        protected override void OnEventCalled(MainMenuEvent eventObject) {
+        protected override void OnEventCalled(QuickMatchEvent eventObject) {
             if (eventObject == null) {
                 Disappear();
                 return;
@@ -62,7 +63,7 @@ namespace FStudio.UI.Panels {
 
             if (statusText != null) {
                 statusText.richText = false;
-                statusText.text = session != null ? session.StatusMessage : "Loading teams...";
+                statusText.text = session != null ? session.StatusMessage : GameText.Get("hub.loading");
             }
             var canPlay = session != null && session.CanPlay;
             if (playButton != null) {
@@ -83,6 +84,8 @@ namespace FStudio.UI.Panels {
 
         private void SelectHome(string clubId) => session?.Select(false, clubId);
         private void SelectAway(string clubId) => session?.Select(true, clubId);
+
+        public void BackToHome() => GameHubSession.Current.Navigate(HubPage.Home);
 
         public void Retry() {
             if (session == null || session.State != FriendlyMatchState.Failed) return;

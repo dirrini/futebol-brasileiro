@@ -5,6 +5,7 @@ using FStudio.Database;
 using FStudio.FootballWorld.Application;
 using FStudio.FootballWorld.DataContracts;
 using FStudio.FootballWorld.Domain;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 using Shared.Responses;
 using UnityEngine;
 
@@ -78,18 +79,18 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             error = null;
             if (disposed)
             {
-                error = "This team selection has been released. Reopen the club selection.";
+                error = GameText.Get("adapter.released");
                 return false;
             }
             if (string.IsNullOrEmpty(homeId) || string.IsNullOrEmpty(awayId) ||
                 !teamsById.TryGetValue(homeId, out var home) || !teamsById.TryGetValue(awayId, out var away))
             {
-                error = "Select two clubs from the loaded database.";
+                error = GameText.Get("match.selectTeams");
                 return false;
             }
             if (string.Equals(homeId, awayId, StringComparison.Ordinal))
             {
-                error = "Select different clubs for the friendly match.";
+                error = GameText.Get("match.differentClubs");
                 return false;
             }
             if (!home.CanPlay || !away.CanPlay)
@@ -133,7 +134,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             var formation = hasBinding ? binding.Formation : bindings.DefaultFormation;
             var warnings = new List<string>();
             if (!hasBinding)
-                warnings.Add("Using the declared default badge, kits and formation for this club.");
+                warnings.Add(GameText.Get("adapter.defaultClub"));
             var logo = template != null ? template.TeamLogo : null;
             var visualError = ValidateTeamVisuals(template);
             if (visualError != null) return Invalid(club, logo, visualError, warnings);
@@ -142,7 +143,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             try { legacySlots = FormationRules.GetTeamFormation(formation).Positions; }
             catch (NotImplementedException)
             {
-                return Invalid(club, logo, "The configured formation is not supported by the 3D match engine.", warnings);
+                return Invalid(club, logo, GameText.Get("adapter.formation"), warnings);
             }
             var slots = new PlayerPosition[legacySlots.Length];
             for (var i = 0; i < slots.Length; i++) slots[i] = ToCatalogPosition(legacySlots[i]);
@@ -151,8 +152,8 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             {
                 var rosterCount = Catalog.GetRoster(club.Id).Count;
                 var message = rosterCount < 11
-                    ? $"This squad has {rosterCount} players; at least 11 are required."
-                    : "This squad needs a natural goalkeeper and 10 outfield-capable players.";
+                    ? GameText.Get("adapter.shortRoster", rosterCount)
+                    : GameText.Get("adapter.goalkeeper");
                 return Invalid(club, logo, message, warnings);
             }
 
@@ -162,7 +163,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             {
                 if (profiles.TryGetValue(player.Id, out var profile) && !IsBuiltin(profile.Skin))
                     return Invalid(club, logo,
-                        $"Unsupported visual for {player.Name}. Only the built-in player appearance is available.", warnings);
+                        GameText.Get("adapter.unsupportedVisual", player.Name), warnings);
             }
 
             var selectedAppearances = new PlayerEntry[11];
@@ -179,12 +180,12 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                     usesDefaultAppearance = true;
                 }
                 if (selectedAppearances[i] == null)
-                    return Invalid(club, logo, $"The local appearance for {plan.Players[i].Name} has not been configured.", warnings);
+                    return Invalid(club, logo, GameText.Get("adapter.missingAppearance", plan.Players[i].Name), warnings);
             }
-            if (usesDefaultAppearance) warnings.Add("Using the declared default appearance for players without a local binding.");
+            if (usesDefaultAppearance) warnings.Add(GameText.Get("adapter.defaultAppearance"));
             if (plan.OutOfPositionPlayerIds.Count > 0)
             {
-                warnings.Add(plan.OutOfPositionPlayerIds.Count + " player(s) will play outside their natural positions.");
+                warnings.Add(GameText.Get("adapter.outOfPosition", plan.OutOfPositionPlayerIds.Count));
             }
 
             var team = ScriptableObject.CreateInstance<TeamEntry>();
@@ -231,9 +232,9 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         private static string ValidateTeamVisuals(TeamEntry template)
         {
             if (template == null || template.TeamLogo == null || template.TeamLogo.TeamLogoMaterial == null)
-                return "The local club badge has not been configured.";
+                return GameText.Get("adapter.missingBadge");
             if (!HasKit(template.HomeKit) || !HasKit(template.AwayKit))
-                return "The local club kits have not been fully configured.";
+                return GameText.Get("adapter.missingKits");
             return null;
         }
 

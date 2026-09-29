@@ -14,10 +14,13 @@ namespace FStudio.FootballWorld.DataContracts
         public IReadOnlyList<PlayerData> Players { get; }
         public IReadOnlyList<MembershipData> Memberships { get; }
         public IReadOnlyList<VisualProfileData> VisualProfiles { get; }
+        public IReadOnlyList<CompetitionData> Competitions { get; }
+        public IReadOnlyList<CompetitionEditionData> CompetitionEditions { get; }
 
         public DatabaseDocument(int schemaVersion, string databaseId, int databaseRevision,
             IEnumerable<ClubData> clubs, IEnumerable<PlayerData> players,
-            IEnumerable<MembershipData> memberships, IEnumerable<VisualProfileData> visualProfiles)
+            IEnumerable<MembershipData> memberships, IEnumerable<VisualProfileData> visualProfiles,
+            IEnumerable<CompetitionData> competitions = null, IEnumerable<CompetitionEditionData> competitionEditions = null)
         {
             SchemaVersion = schemaVersion;
             DatabaseId = databaseId;
@@ -26,6 +29,8 @@ namespace FStudio.FootballWorld.DataContracts
             Players = DataSnapshot.Copy(players);
             Memberships = DataSnapshot.Copy(memberships);
             VisualProfiles = DataSnapshot.Copy(visualProfiles);
+            Competitions = DataSnapshot.Copy(competitions ?? Array.Empty<CompetitionData>());
+            CompetitionEditions = DataSnapshot.Copy(competitionEditions ?? Array.Empty<CompetitionEditionData>());
         }
     }
 

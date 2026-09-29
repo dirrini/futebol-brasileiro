@@ -6,6 +6,7 @@ using FStudio.UI.GamepadInput;
 using System;
 using TMPro;
 using UnityEngine;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 
 namespace FStudio.MatchEngine.UI {
     public class MatchStatistics : EventPanel<MatchStatisticsEvent> {
@@ -138,7 +139,7 @@ namespace FStudio.MatchEngine.UI {
             EventManager.Trigger<MatchCompleteEvent>(null);
             EventManager.Trigger(new BigLoadingEvent());
 
-            EventManager.Trigger(new MainMenuEvent());
+            GameHubSession.Current.ReturnToMatchOrigin();
 
             EventManager.Trigger<BigLoadingEvent>(null);
         }

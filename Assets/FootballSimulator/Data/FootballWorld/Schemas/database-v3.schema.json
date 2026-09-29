@@ -1,0 +1,577 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:futebol-brasileiro:database:v3",
+  "title": "Futebol Brasileiro - database with dated competition editions v3",
+  "description": "Extends v2 with authored competitions and dated round-robin editions. Results, executions, fixtures and season progress are separate runtime/save data. Runtime additionally validates real dates, references, exact round count, increasing dates and win > draw >= loss.",
+  "definitions": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}(?![\\s\\S])"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "[^\\u0009-\\u000D\\u0020\\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "club": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strength",
+        "acceleration",
+        "topSpeed",
+        "dribbleSpeed",
+        "jump",
+        "tackling",
+        "ballKeeping",
+        "passing",
+        "longBall",
+        "agility",
+        "shooting",
+        "shootPower",
+        "positioning",
+        "reaction",
+        "ballControl"
+      ],
+      "properties": {
+        "strength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "acceleration": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "topSpeed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "dribbleSpeed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "jump": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "tackling": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ballKeeping": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "passing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "longBall": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "agility": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "shooting": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "shootPower": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "positioning": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "reaction": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "ballControl": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "naturalPositions",
+        "heightCm",
+        "weightKg",
+        "attributes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "naturalPositions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "GK",
+              "RB",
+              "LB",
+              "CB",
+              "DM",
+              "CM",
+              "RM",
+              "LM",
+              "AM",
+              "LW",
+              "RW",
+              "ST"
+            ]
+          },
+          "uniqueItems": true,
+          "maxItems": 12
+        },
+        "heightCm": {
+          "type": "integer",
+          "minimum": 150,
+          "maximum": 210
+        },
+        "weightKg": {
+          "type": "integer",
+          "minimum": 45,
+          "maximum": 100
+        },
+        "attributes": {
+          "$ref": "#/definitions/attributes"
+        }
+      }
+    },
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clubId",
+        "playerId"
+      ],
+      "properties": {
+        "clubId": {
+          "$ref": "#/definitions/id"
+        },
+        "playerId": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "skin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skinId",
+        "revision",
+        "compatibilityProfile"
+      ],
+      "properties": {
+        "skinId": {
+          "$ref": "#/definitions/id"
+        },
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "compatibilityProfile": {
+          "$ref": "#/definitions/id"
+        }
+      }
+    },
+    "visualProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "playerId",
+        "skin"
+      ],
+      "properties": {
+        "playerId": {
+          "$ref": "#/definitions/id"
+        },
+        "skin": {
+          "$ref": "#/definitions/skin"
+        },
+        "appearance": {
+          "$ref": "#/definitions/appearance"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "appearance"
+            ]
+          },
+          "then": {
+            "properties": {
+              "skin": {
+                "type": "object",
+                "properties": {
+                  "skinId": {
+                    "const": "builtin-player"
+                  },
+                  "revision": {
+                    "const": 1
+                  },
+                  "compatibilityProfile": {
+                    "const": "football-player-v1"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "appearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skinTone",
+        "hairStyle",
+        "hairColor",
+        "beardStyle",
+        "beardColor",
+        "bootsColor",
+        "sockAccessoryColor"
+      ],
+      "properties": {
+        "skinTone": {
+          "type": "string",
+          "enum": [
+            "tone-1",
+            "tone-2",
+            "tone-3",
+            "tone-4",
+            "tone-5",
+            "tone-6"
+          ]
+        },
+        "hairStyle": {
+          "type": "string",
+          "enum": [
+            "none",
+            "short",
+            "styled",
+            "styled-alt",
+            "mohawk",
+            "locs",
+            "short-parted"
+          ]
+        },
+        "hairColor": {
+          "type": "string",
+          "enum": [
+            "brown",
+            "dark-brown",
+            "black",
+            "light-yellow",
+            "yellow",
+            "gray",
+            "white",
+            "green",
+            "dark-green",
+            "blue",
+            "dark-blue",
+            "light-red",
+            "red",
+            "light-orange",
+            "orange"
+          ]
+        },
+        "beardStyle": {
+          "type": "string",
+          "enum": [
+            "none",
+            "mustache",
+            "goatee",
+            "full"
+          ]
+        },
+        "beardColor": {
+          "type": "string",
+          "enum": [
+            "brown",
+            "dark-brown",
+            "black",
+            "light-yellow",
+            "yellow",
+            "gray",
+            "white",
+            "green",
+            "dark-green",
+            "blue",
+            "dark-blue",
+            "light-red",
+            "red",
+            "light-orange",
+            "orange"
+          ]
+        },
+        "bootsColor": {
+          "type": "string",
+          "enum": [
+            "black",
+            "red",
+            "orange",
+            "purple",
+            "cyan",
+            "gray",
+            "white"
+          ]
+        },
+        "sockAccessoryColor": {
+          "type": "string",
+          "enum": [
+            "none",
+            "black",
+            "gray",
+            "white"
+          ]
+        }
+      }
+    },
+    "competition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        }
+      }
+    },
+    "gameDate": {
+      "type": "string",
+      "pattern": "^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(?![\\s\\S])"
+    },
+    "leagueRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "version",
+        "legs",
+        "points",
+        "tieBreakers"
+      ],
+      "properties": {
+        "type": {
+          "const": "round-robin"
+        },
+        "version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "legs": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "points": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "win",
+            "draw",
+            "loss"
+          ],
+          "properties": {
+            "win": {
+              "maximum": 100,
+              "type": "integer",
+              "minimum": 0
+            },
+            "draw": {
+              "maximum": 100,
+              "type": "integer",
+              "minimum": 0
+            },
+            "loss": {
+              "maximum": 100,
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "tieBreakers": {
+          "const": [
+            "wins",
+            "goal-difference",
+            "goals-for"
+          ],
+          "type": "array"
+        }
+      }
+    },
+    "competitionEdition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "competitionId",
+        "name",
+        "participantClubIds",
+        "roundDates",
+        "rules"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "competitionId": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "participantClubIds": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "minItems": 2,
+          "items": {
+            "$ref": "#/definitions/id"
+          }
+        },
+        "roundDates": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/gameDate"
+          }
+        },
+        "rules": {
+          "$ref": "#/definitions/leagueRules"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "databaseId",
+    "databaseRevision",
+    "clubs",
+    "players",
+    "memberships",
+    "visualProfiles",
+    "competitions",
+    "competitionEditions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 3
+    },
+    "databaseId": {
+      "$ref": "#/definitions/id"
+    },
+    "databaseRevision": {
+      "$ref": "#/definitions/revision"
+    },
+    "clubs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/club"
+      }
+    },
+    "players": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/player"
+      }
+    },
+    "memberships": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/membership"
+      }
+    },
+    "visualProfiles": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/visualProfile"
+      }
+    },
+    "competitions": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/definitions/competition"
+      }
+    },
+    "competitionEditions": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/definitions/competitionEdition"
+      }
+    }
+  }
+}

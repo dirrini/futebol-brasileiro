@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5320980794f40f8a948cddeffbd79fc, type: 3}
+  m_Name: GameHubTheme
+  m_EditorClassIdentifier: 
+  Font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  RoundedPanel: {fileID: 21300000, guid: 779de4a1f4afde9469d9503d04936c5c, type: 3}
+  Circle: {fileID: 21300000, guid: cd2c8d6072518d1499e6d10adafaab7a, type: 3}
+  Background: {r: 0.09411765, g: 0.23921569, b: 0.2784314, a: 1}
+  Surface: {r: 0.92941177, g: 0.9490196, b: 0.94509804, a: 1}
+  White: {r: 1, g: 1, b: 1, a: 1}
+  Ink: {r: 0.09019608, g: 0.23137255, b: 0.27450982, a: 1}
+  Muted: {r: 0.35686275, g: 0.4627451, b: 0.48235294, a: 1}
+  Primary: {r: 0.13725491, g: 0.4509804, b: 0.3529412, a: 1}
+  Accent: {r: 0.7490196, g: 0.8784314, b: 0.7882353, a: 1}
+  Line: {r: 0.7607843, g: 0.8392157, b: 0.8156863, a: 1}
+  Danger: {r: 0.6666667, g: 0.2, b: 0.25490198, a: 1}
+  Hover: {r: 0.8509804, g: 0.9490196, b: 0.8901961, a: 1}
+  Selected: {r: 0.73333335, g: 0.8627451, b: 0.79607844, a: 1}
+  Pressed: {r: 0.62352943, g: 0.7921569, b: 0.7058824, a: 1}
+  Disabled: {r: 0.65, g: 0.65, b: 0.65, a: 0.6}
+  Portraits:
+  - Id: coach-1
+    LabelKey: career.avatar1
+    Skin: {r: 0.8509804, g: 0.6509804, b: 0.47843137, a: 1}
+    Hair: {r: 0.20392157, g: 0.16078432, b: 0.13333334, a: 1}
+    Shirt: {r: 0.21176471, g: 0.3647059, b: 0.4, a: 1}
+    HasHair: 1
+  - Id: coach-2
+    LabelKey: career.avatar2
+    Skin: {r: 0.64705884, g: 0.45490196, b: 0.33333334, a: 1}
+    Hair: {r: 0.12941177, g: 0.10980392, b: 0.09411765, a: 1}
+    Shirt: {r: 0.13725491, g: 0.4509804, b: 0.3529412, a: 1}
+    HasHair: 0
+  - Id: coach-3
+    LabelKey: career.avatar3
+    Skin: {r: 0.3764706, g: 0.25882354, b: 0.19215687, a: 1}
+    Hair: {r: 0.13333334, g: 0.13725491, b: 0.14901961, a: 1}
+    Shirt: {r: 0.14901961, g: 0.21568628, b: 0.27450982, a: 1}
+    HasHair: 1

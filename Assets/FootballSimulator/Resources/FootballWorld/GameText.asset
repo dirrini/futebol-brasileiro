@@ -1,0 +1,394 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b714043536824104913212cfc4b22df0, type: 3}
+  m_Name: GameText
+  m_EditorClassIdentifier: 
+  Entries:
+  - Key: hub.brand
+    Portuguese: FUTEBOL BRASILEIRO
+    English: FUTEBOL BRASILEIRO
+  - Key: hub.tagline
+    Portuguese: "O jogo come\xE7a com voc\xEA."
+    English: The game starts with you.
+  - Key: hub.home
+    Portuguese: "In\xEDcio"
+    English: Home
+  - Key: hub.back
+    Portuguese: Voltar
+    English: Back
+  - Key: hub.quickMatch
+    Portuguese: Amistoso
+    English: Quick match
+  - Key: hub.quickMatchHint
+    Portuguese: Escolha dois clubes e entre em campo.
+    English: Choose two clubs and take the pitch.
+  - Key: hub.championships
+    Portuguese: Campeonatos
+    English: Championship
+  - Key: hub.championshipsHint
+    Portuguese: "Dispute uma edi\xE7\xE3o e acompanhe a classifica\xE7\xE3o."
+    English: Play an edition and follow the standings.
+  - Key: hub.career
+    Portuguese: Carreira
+    English: Career
+  - Key: hub.careerHint
+    Portuguese: "Crie seu treinador e escolha onde come\xE7ar."
+    English: Create your coach and choose where to begin.
+  - Key: hub.options
+    Portuguese: "Op\xE7\xF5es"
+    English: Options
+  - Key: hub.optionsHint
+    Portuguese: "Idioma, c\xE2mera e dificuldade."
+    English: Language, camera and difficulty.
+  - Key: hub.play
+    Portuguese: "Jogar pr\xF3xima partida"
+    English: Play next match
+  - Key: hub.continue
+    Portuguese: Continuar campeonato
+    English: Continue championship
+  - Key: hub.newChampionship
+    Portuguese: Iniciar campeonato
+    English: Start championship
+  - Key: hub.edition
+    Portuguese: "Edi\xE7\xE3o"
+    English: Edition
+  - Key: hub.club
+    Portuguese: Seu clube
+    English: Your club
+  - Key: hub.noEditions
+    Portuguese: "Nenhuma edi\xE7\xE3o dispon\xEDvel."
+    English: No editions available.
+  - Key: hub.noClubs
+    Portuguese: "Nenhum clube dispon\xEDvel."
+    English: No clubs available.
+  - Key: hub.standings
+    Portuguese: "Classifica\xE7\xE3o"
+    English: Standings
+  - Key: hub.fixtures
+    Portuguese: Confrontos
+    English: Fixtures
+  - Key: hub.nextFixture
+    Portuguese: "Pr\xF3ximo jogo"
+    English: Next match
+  - Key: hub.complete
+    Portuguese: "Campeonato conclu\xEDdo"
+    English: Championship complete
+  - Key: hub.retry
+    Portuguese: Tentar novamente
+    English: Retry
+  - Key: hub.busy
+    Portuguese: "Preparando a partida\u2026"
+    English: "Preparing the match\u2026"
+  - Key: hub.loading
+    Portuguese: "Carregando a base\u2026"
+    English: "Loading database\u2026"
+  - Key: hub.revision
+    Portuguese: "Base \xB7 revis\xE3o {0}"
+    English: "Database \xB7 revision {0}"
+  - Key: hub.completed
+    Portuguese: "Conclu\xEDdo"
+    English: Completed
+  - Key: hub.round
+    Portuguese: Rodada {0}
+    English: Round {0}
+  - Key: hub.tableClub
+    Portuguese: Clube
+    English: Club
+  - Key: hub.tablePts
+    Portuguese: PTS
+    English: PTS
+  - Key: hub.tableP
+    Portuguese: J
+    English: P
+  - Key: hub.tableW
+    Portuguese: V
+    English: W
+  - Key: hub.tableD
+    Portuguese: E
+    English: D
+  - Key: hub.tableL
+    Portuguese: D
+    English: L
+  - Key: hub.tableGD
+    Portuguese: SG
+    English: GD
+  - Key: hub.dates
+    Portuguese: '{0} a {1}'
+    English: '{0} to {1}'
+  - Key: hub.pending
+    Portuguese: Pendente
+    English: Pending
+  - Key: hub.dismiss
+    Portuguese: Fechar aviso
+    English: Dismiss notice
+  - Key: career.title
+    Portuguese: Seu treinador
+    English: Your coach
+  - Key: career.name
+    Portuguese: Nome do treinador
+    English: Coach name
+  - Key: career.namePlaceholder
+    Portuguese: "Como voc\xEA se chama?"
+    English: What is your name?
+  - Key: career.avatar
+    Portuguese: "Apar\xEAncia"
+    English: Appearance
+  - Key: career.start
+    Portuguese: "In\xEDcio da carreira"
+    English: Career start
+  - Key: career.month
+    Portuguese: "M\xEAs"
+    English: Month
+  - Key: career.year
+    Portuguese: Ano
+    English: Year
+  - Key: career.yearHint
+    Portuguese: De 1 a 9999
+    English: From 1 to 9999
+  - Key: career.save
+    Portuguese: Criar perfil
+    English: Create profile
+  - Key: career.update
+    Portuguese: Salvar perfil
+    English: Save profile
+  - Key: career.created
+    Portuguese: Perfil criado
+    English: Profile created
+  - Key: career.limit
+    Portuguese: "Perfil inicial, sem simula\xE7\xE3o de calend\xE1rio. A data n\xE3o
+      transforma o elenco da base em hist\xF3rico."
+    English: Starting profile; no calendar simulation. The date does not turn this
+      database roster into a historical one.
+  - Key: career.avatar1
+    Portuguese: "Cl\xE1ssico"
+    English: Classic
+  - Key: career.avatar2
+    Portuguese: Esportivo
+    English: Sporty
+  - Key: career.avatar3
+    Portuguese: Formal
+    English: Formal
+  - Key: options.title
+    Portuguese: "Prefer\xEAncias"
+    English: Preferences
+  - Key: options.language
+    Portuguese: Idioma
+    English: Language
+  - Key: options.camera
+    Portuguese: "C\xE2mera"
+    English: Camera
+  - Key: options.difficulty
+    Portuguese: Dificuldade
+    English: Difficulty
+  - Key: options.saved
+    Portuguese: "Prefer\xEAncias salvas automaticamente neste navegador."
+    English: Preferences are saved automatically in this browser.
+  - Key: camera.Stadium
+    Portuguese: "Est\xE1dio"
+    English: Stadium
+  - Key: camera.Tele
+    Portuguese: "Televis\xE3o"
+    English: Tele
+  - Key: camera.Broadcast
+    Portuguese: "Transmiss\xE3o"
+    English: Broadcast
+  - Key: camera.StadiumHigh
+    Portuguese: "Est\xE1dio alto"
+    English: High stadium
+  - Key: difficulty.Amateur
+    Portuguese: Amador
+    English: Amateur
+  - Key: difficulty.SemiPro
+    Portuguese: Semiprofissional
+    English: Semi-pro
+  - Key: difficulty.Professional
+    Portuguese: Profissional
+    English: Professional
+  - Key: difficulty.WorldClass
+    Portuguese: Classe mundial
+    English: World class
+  - Key: difficulty.Legendary
+    Portuguese: "Lend\xE1rio"
+    English: Legendary
+  - Key: dialog.replaceChampionshipTitle
+    Portuguese: Iniciar outro campeonato?
+    English: Start another championship?
+  - Key: dialog.replaceChampionshipBody
+    Portuguese: "O campeonato salvo ser\xE1 substitu\xEDdo. Os resultados atuais
+      ser\xE3o removidos."
+    English: The saved championship will be replaced. Current results will be removed.
+  - Key: dialog.replaceCareerTitle
+    Portuguese: Substituir o perfil do treinador?
+    English: Replace the coach profile?
+  - Key: dialog.replaceCareerBody
+    Portuguese: "O perfil salvo ser\xE1 atualizado com os dados desta ficha."
+    English: The saved profile will be updated with the details in this form.
+  - Key: dialog.confirm
+    Portuguese: Substituir
+    English: Replace
+  - Key: dialog.cancel
+    Portuguese: Cancelar
+    English: Cancel
+  - Key: match.play
+    Portuguese: "Ir para o vesti\xE1rio"
+    English: Go to dressing room
+  - Key: match.start
+    Portuguese: Iniciar partida
+    English: Start match
+  - Key: match.backTeams
+    Portuguese: Voltar aos times
+    English: Back to teams
+  - Key: match.daytime
+    Portuguese: "Hor\xE1rio"
+    English: Time of day
+  - Key: match.side
+    Portuguese: Lado controlado
+    English: Controlled side
+  - Key: match.home
+    Portuguese: Mandante
+    English: Home
+  - Key: match.away
+    Portuguese: Visitante
+    English: Away
+  - Key: match.leave
+    Portuguese: Sair da partida
+    English: Leave match
+  - Key: match.resume
+    Portuguese: Continuar
+    English: Resume
+  - Key: match.inProgress
+    Portuguese: "Uma partida j\xE1 est\xE1 em andamento."
+    English: A match is already in progress.
+  - Key: match.needsTwoClubs
+    Portuguese: A base precisa de pelo menos dois clubes.
+    English: The database needs at least two clubs.
+  - Key: match.selectTeams
+    Portuguese: Selecione dois clubes da base carregada.
+    English: Select two clubs from the loaded database.
+  - Key: match.differentClubs
+    Portuguese: Selecione clubes diferentes para o amistoso.
+    English: Select different clubs for the friendly match.
+  - Key: session.databaseFailed
+    Portuguese: "N\xE3o foi poss\xEDvel carregar a base. Tente novamente."
+    English: Could not load the database. Please retry.
+  - Key: session.visualsFailed
+    Portuguese: "N\xE3o foi poss\xEDvel preparar os visuais dos clubes."
+    English: Could not prepare the club visuals.
+  - Key: session.matchFailed
+    Portuguese: "N\xE3o foi poss\xEDvel preparar a partida. Tente novamente."
+    English: Could not prepare the match. Please retry.
+  - Key: session.recoveryFailed
+    Portuguese: "N\xE3o foi poss\xEDvel retornar ao menu. Atualize a p\xE1gina para
+      tentar novamente."
+    English: Could not return to the menu. Refresh the page to retry.
+  - Key: session.cannotStartChampionship
+    Portuguese: "N\xE3o foi poss\xEDvel iniciar este campeonato."
+    English: Could not start this championship.
+  - Key: career.invalid
+    Portuguese: "Preencha um nome, avatar, m\xEAs, ano de 1 a 9999 e clube v\xE1lidos."
+    English: Enter a valid name, avatar, month, year from 1 to 9999 and club.
+  - Key: save.save_too_large
+    Portuguese: "A base \xE9 grande demais para salvar este campeonato no navegador.
+      O save anterior foi preservado."
+    English: This database is too large to save this championship in the browser.
+      The previous save was preserved.
+  - Key: save.save_failed
+    Portuguese: "N\xE3o foi poss\xEDvel salvar o progresso. O save anterior foi preservado;
+      mantenha esta p\xE1gina aberta para continuar a sess\xE3o atual."
+    English: Could not save progress. The previous save was preserved; keep this
+      page open to continue the current session.
+  - Key: save.preferences_failed
+    Portuguese: "N\xE3o foi poss\xEDvel salvar as prefer\xEAncias. Elas continuam
+      v\xE1lidas nesta sess\xE3o."
+    English: Could not save preferences. They still apply in this session.
+  - Key: save.championship_restore_failed
+    Portuguese: "O campeonato salvo n\xE3o p\xF4de ser carregado. Ele foi preservado;
+      iniciar outro campeonato o substituir\xE1."
+    English: The saved championship could not be loaded. It was preserved; starting
+      another championship will replace it.
+  - Key: save.career_restore_failed
+    Portuguese: "O perfil salvo n\xE3o p\xF4de ser carregado. Ele foi preservado;
+      criar outro perfil o substituir\xE1."
+    English: The saved profile could not be loaded. It was preserved; creating another
+      profile will replace it.
+  - Key: daytime.Morning
+    Portuguese: "Manh\xE3"
+    English: Morning
+  - Key: daytime.Afternoon
+    Portuguese: Tarde
+    English: Afternoon
+  - Key: daytime.Night
+    Portuguese: Noite
+    English: Night
+  - Key: side.None
+    Portuguese: Nenhum (assistir)
+    English: None (watch)
+  - Key: side.Home
+    Portuguese: Mandante
+    English: Home
+  - Key: side.Away
+    Portuguese: Visitante
+    English: Away
+  - Key: adapter.released
+    Portuguese: "Esta sele\xE7\xE3o foi liberada. Abra novamente a sele\xE7\xE3o
+      de clubes."
+    English: This team selection has been released. Reopen the club selection.
+  - Key: adapter.defaultClub
+    Portuguese: "Usando o escudo, uniformes e forma\xE7\xE3o padr\xE3o declarados
+      para este clube."
+    English: Using the declared default badge, kits and formation for this club.
+  - Key: adapter.formation
+    Portuguese: "A forma\xE7\xE3o configurada n\xE3o \xE9 suportada pela partida
+      3D."
+    English: The configured formation is not supported by the 3D match engine.
+  - Key: adapter.shortRoster
+    Portuguese: "Este elenco tem {0} jogadores; s\xE3o necess\xE1rios pelo menos
+      11."
+    English: This squad has {0} players; at least 11 are required.
+  - Key: adapter.goalkeeper
+    Portuguese: Este elenco precisa de um goleiro de origem e 10 jogadores de linha.
+    English: This squad needs a natural goalkeeper and 10 outfield-capable players.
+  - Key: adapter.unsupportedVisual
+    Portuguese: "Visual n\xE3o suportado para {0}. Apenas a apar\xEAncia integrada
+      est\xE1 dispon\xEDvel."
+    English: Unsupported visual for {0}. Only the built-in player appearance is available.
+  - Key: adapter.missingAppearance
+    Portuguese: "A apar\xEAncia local de {0} n\xE3o foi configurada."
+    English: The local appearance for {0} has not been configured.
+  - Key: adapter.defaultAppearance
+    Portuguese: "Usando a apar\xEAncia padr\xE3o declarada para jogadores sem v\xEDnculo
+      local."
+    English: Using the declared default appearance for players without a local binding.
+  - Key: adapter.outOfPosition
+    Portuguese: "{0} jogador(es) atuar\xE3o fora de suas posi\xE7\xF5es de origem."
+    English: '{0} player(s) will play outside their natural positions.'
+  - Key: adapter.missingBadge
+    Portuguese: "O escudo local do clube n\xE3o foi configurado."
+    English: The local club badge has not been configured.
+  - Key: adapter.missingKits
+    Portuguese: "Os uniformes locais do clube n\xE3o foram totalmente configurados."
+    English: The local club kits have not been fully configured.
+  - Key: match.backChampionship
+    Portuguese: Voltar ao campeonato
+    English: Back to championship
+  - Key: hub.simulated
+    Portuguese: Simulado
+    English: Simulated
+  - Key: match.quality
+    Portuguese: "Qualidade gr\xE1fica"
+    English: Graphics quality
+  - Key: match.lineup
+    Portuguese: "Escala\xE7\xE3o"
+    English: Line up
+  - Key: hub.played
+    Portuguese: Jogado
+    English: Played

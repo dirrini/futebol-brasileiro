@@ -81,6 +81,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             var previousCatalog = bootstrap.Session.ActiveCatalog;
             var previousProfiles = bootstrap.VisualProfiles;
             var previousActiveSource = bootstrap.ActiveSourceUri;
+            var previousSourceJson = bootstrap.ActiveSourceJson;
             var invalidPath = CreateTemporaryDatabase("{");
             var invalidUri = new Uri(invalidPath).AbsoluteUri;
 
@@ -93,6 +94,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             Assert.That(bootstrap.Session.ActiveCatalog, Is.SameAs(previousCatalog));
             Assert.That(bootstrap.VisualProfiles, Is.SameAs(previousProfiles));
             Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(previousActiveSource));
+            Assert.That(bootstrap.ActiveSourceJson, Is.EqualTo(previousSourceJson));
             Assert.That(bootstrap.Errors, Has.Count.EqualTo(1));
             Assert.That(bootstrap.Errors[0].Code, Is.EqualTo("invalid_json"));
             Assert.That(bootstrap.SourceUri, Is.EqualTo(invalidUri));
@@ -105,6 +107,7 @@ namespace FStudio.FootballWorld.Tests.PlayMode
             Assert.That(bootstrap.Session.ActiveCatalog, Is.Not.SameAs(previousCatalog));
             Assert.That(bootstrap.VisualProfiles, Is.Not.SameAs(previousProfiles));
             Assert.That(bootstrap.ActiveSourceUri, Is.EqualTo(invalidUri));
+            Assert.That(bootstrap.ActiveSourceJson, Is.EqualTo(validJson));
             Assert.That(bootstrap.Errors, Is.Empty);
         }
 

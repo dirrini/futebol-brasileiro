@@ -152,3 +152,52 @@ edita apenas o acessório disponível no motor. A cor do meião pertence ao kit.
 Prévia 3D real e upload de modelos são etapas futuras, sem controles simulados.
 Verificar criação/edição/remoção, validação, conflito, descarte, teclado, largura
 reduzida e aplicação dos dados no jogo; auditoria estática não substitui esse teste.
+
+## Hub inicial e modos de jogo
+
+O novo hub usa a identidade Futebol Brasileiro, com quatro destinos reais:
+Quick match, Championship, Career e Options. O idioma inicial é inglês; a opção
+Português traduz o hub e os controles afetados da partida. A seleção antiga de
+times permanece como subtela de amistoso. A referência visual é a ficha de clube
+com um quadro tático discreto, evitando efeitos de estádio pesados para um menu.
+
+Career recebe o cartão maior, com retrato 2D autorado e chamada para criar o
+treinador. Os outros três destinos compartilham cartões compactos, título,
+descrição e seta. Nenhum cartão apresenta um fluxo futuro como se estivesse pronto.
+O perfil informa que ainda não há simulação de calendário; sua data não muda a
+época do elenco carregado.
+
+Paleta inicial: petróleo `#183D47` no fundo, papel frio `#EDF2F1` nos painéis,
+texto `#173B46`, secundário `#5B767B`, ação verde `#23735A`, destaque `#BFE0C9`,
+linha `#C2D6D0`, branco e perigo `#AA3341`. O fundo traz linhas suaves de campo
+autoradas em Images/RectTransforms. O destaque é a composição dos cartões e do
+retrato; o restante mantém contraste, hierarquia e espaço para leitura.
+
+Fontes reutilizam LiberationSans SDF existente: bold em títulos e ações, regular
+nas descrições e dados. A referência é Canvas de 1600 × 900, títulos 46–56 unidades,
+ações 26–34, corpo 24–28 e texto auxiliar 19–22. Auto-size tem limite inferior
+explícito e reticências para nomes extensos. Status ocupa uma faixa reservada no
+rodapé; erro ou carregamento não desloca os controles de iniciar/salvar.
+
+`Resources/FootballWorld/GameHub.prefab` é a fonte da composição final. O Inspector
+permite ajustar cada cor, posição, dimensão, texto e transição. O tema
+`GameHubTheme.asset` guarda defaults de autoria e paletas dos três retratos, além
+de fonte e sprites reutilizáveis; os componentes de retrato e linhas consultam esse
+recurso. `GameText.asset` centraliza chaves e textos PT/EN. O builder Editor cria a
+primeira versão a partir desses recursos, preserva autoria existente nas chamadas
+normais e só refaz o layout mediante ação explícita de reconstrução.
+
+O mapeamento do tema é explícito: `GameHubTheme.asset` → papéis em
+`GameHubThemeBinding` → cor/fonte dos componentes autorados. Alterar diretamente
+um Image/TMP no prefab afeta seu visual salvo. Após alterar o tema, usar
+**Tools → Futebol Brasileiro → Apply game hub theme** para reaplicar os papéis
+sem modificar geometria, conteúdo de texto ou eventos. Esse comando substitui
+cores/fontes dos componentes vinculados; remover um vínculo permite uma exceção
+visual deliberada. Paletas de retratos e realce das linhas são lidos do tema pelos
+respectivos componentes. A estrutura da tela nunca é refeita automaticamente.
+
+As subtelas compartilham cabeçalho, retorno, campos e botões. Classificação e
+confrontos têm suas próprias barras de rolagem; nomes de clube permanecem texto
+simples. O clube controlado é marcado por fundo e peso de fonte. Confirmações de
+substituição usam o mesmo painel, com Cancelar como foco inicial e botão de perigo.
+O contrato de comportamento do jogo está em `UX-CONTRACT.md`.

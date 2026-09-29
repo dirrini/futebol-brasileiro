@@ -1,4 +1,4 @@
-# Base externa e amistoso
+# Base externa e modos de jogo
 
 O jogo carrega um catálogo de clubes/jogadores independente do motor Unity.
 A base de exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores e
@@ -8,6 +8,8 @@ A seleção e o amistoso usam esse catálogo para os dados esportivos e os prese
 de aparência. O [editor local](http://localhost:8080/editor/) permite editar a base
 no navegador. Escudos, uniformes, formações, modelos e as próprias paletas/meshes
 dos presets continuam sendo recursos Unity compilados.
+O JSON v3 também inclui uma liga demonstrativa. Consulte
+[os modos de jogo](README-GAME-MODES.md) para calendário, progresso salvo e carreira.
 
 ## Editar no navegador
 
@@ -16,6 +18,8 @@ Escolha um jogador e use as abas **Ficha**, **Atributos** e **Aparência**. É p
 criar, editar e excluir clubes/jogadores, transferir o vínculo do jogador ou deixá-lo
 sem clube, selecionar posições naturais e editar altura, peso e quinze atributos.
 Um clube com jogadores precisa ter esses vínculos removidos antes da exclusão.
+Clubes participantes de uma edição também precisam ser removidos dessa edição
+no JSON antes da exclusão; o editor preserva e valida esse vínculo.
 
 As alterações formam um rascunho único nesta aba; não há salvamento automático.
 **Salvar alterações** valida e publica a base inteira, incrementando a revisão
@@ -34,7 +38,7 @@ Esse backup local é substituído a cada gravação e não entra no Git; não é
 histórico de revisões nem um save de temporada.
 
 Esta é uma ferramenta intermediária de cadastro e presets. A prévia é ilustrativa,
-não o personagem 3D real. Ainda não há cadastro de campeonatos/regras, upload de
+não o personagem 3D real. Ainda não há formulários de campeonatos/regras, upload de
 imagens, importação de modelos ou processamento de skins da comunidade.
 
 ## Arquivos de autoria
@@ -42,6 +46,7 @@ imagens, importação de modelos ou processamento de skins da comunidade.
 - [Base de exemplo](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 - [JSON Schema v1](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
 - [JSON Schema v2](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json), com aparência portátil.
+- [JSON Schema v3](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json), com competições e edições.
 - [Bindings visuais](Assets/FootballSimulator/Resources/FootballWorld/LegacyMatchBindings.asset).
 - [Contrato e limites](DATA-FORMAT.md).
 - [Arquitetura](ARCHITECTURE.md) e [próximas entregas](ROADMAP.md).
@@ -59,14 +64,14 @@ largura e profundidade. Esses valores também participam do dimensionamento do
 collider legado. Salvar uma revisão compatível e atualizar o navegador aplica
 os valores na próxima partida, sem recompilar no fluxo local descrito abaixo.
 
-No JSON v2, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
+No JSON v2/v3, `visualProfiles[].appearance` contém sete escolhas: tom de pele,
 estilo e cor do cabelo, estilo e cor da barba, cor das chuteiras e cor da faixa da
 meia. A meia principal continua no uniforme do clube. Esses campos usam IDs de
 presets compilados; não são cores RGB livres ou modelos novos. Veja as opções
 completas em [DATA-FORMAT.md](DATA-FORMAT.md).
 
 A aparência completa no JSON tem prioridade sobre os bindings e dispensa um
-`PlayerEntry` de referência. Quando omitida, v1/v2 preservam a aparência associada
+`PlayerEntry` de referência. Quando omitida, v1/v2/v3 preservam a aparência associada
 por `PlayerId` em `LegacyMatchBindings`, ou seu default declarado. O editor oferece
 **Definir aparência na base** nesses casos; uma skin externa vinculada não é
 sobrescrita por presets. A revisão 3 da amostra usa v2 e copia para o JSON exatamente
@@ -105,8 +110,8 @@ O JSON e seu schema podem ser inspecionados no servidor local:
 - [database.schema.json](http://localhost:8080/StreamingAssets/FootballWorld/database.schema.json)
 - [Schema do editor](http://localhost:8080/editor/api/schema)
 
-Os endpoints de schema descrevem as duas versões suportadas. Os schemas de
-autoria v1/v2 continuam separados nos arquivos indicados acima.
+Os endpoints de schema descrevem as três versões suportadas. Os schemas de
+autoria v1/v2/v3 continuam separados nos arquivos indicados acima.
 
 O Compose monta o diretório de autoria somente para leitura no `soccer-web`, e o Nginx entrega
 o JSON original nesse endereço com `Cache-Control: no-store`. Para testar nomes,
@@ -122,6 +127,9 @@ partida que já está em andamento. Refresh encerra essa partida. JSON inválido
 mostra o diagnóstico de importação; corrija a fonte e use Retry ou atualize.
 O diretório é montado para suportar editores que salvam substituindo o arquivo.
 Não editar a cópia em Builds/UnityWebGLProject; ela é gerada pelo script.
+O campeonato salvo retoma a revisão com que foi criado. Mudanças na base são
+usadas em novos campeonatos e amistosos; atualizar a página não migra uma
+competição em andamento. Uma partida interrompida volta a ficar pendente.
 
 Essa atualização direta é o fluxo local do Compose. A exportação ainda inclui
 uma cópia validada para outros servidores; nesses destinos, publique o JSON

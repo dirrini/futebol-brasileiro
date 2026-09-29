@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using FStudio.Events;
 using FStudio.FootballWorld.Bootstrap;
 using FStudio.FootballWorld.Domain;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 using FStudio.MatchEngine;
 using FStudio.UI.Events;
 using UnityEngine;
+using Shared.Responses;
 
 namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
 {
@@ -28,6 +30,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         private bool isStarting;
         private string sourceError;
         private string launchError;
+        private string observedLanguage;
 
         public static FriendlyMatchSession Current
         {
@@ -55,6 +58,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         public string SelectedHomeClubId { get; private set; }
         public string SelectedAwayClubId { get; private set; }
         public CatalogMatchLease ActiveMatch { get; private set; }
+        public MatchCreateRequest.UserTeam? LockedUserSide { get; private set; }
         public bool CanPlay => State == FriendlyMatchState.Ready && !isStarting &&
             ActiveMatch == null && SelectionError() == null;
 
@@ -62,9 +66,9 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         {
             get
             {
-                if (isStarting) return "Preparing match...";
-                if (ActiveMatch != null) return "Match in progress.";
-                if (State == FriendlyMatchState.Loading) return "Loading database...";
+                if (isStarting) return GameText.Get("hub.busy");
+                if (ActiveMatch != null) return GameText.Get("match.inProgress");
+                if (State == FriendlyMatchState.Loading) return GameText.Get("hub.loading");
                 if (State == FriendlyMatchState.Failed) return sourceError;
                 var error = SelectionError();
                 if (error != null) return error;
@@ -88,11 +92,11 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
 
         private string SelectionError()
         {
-            if (Teams.Count < 2) return "The database needs at least two clubs to play a friendly match.";
+            if (Teams.Count < 2) return GameText.Get("match.needsTwoClubs");
             var home = Find(SelectedHomeClubId);
             var away = Find(SelectedAwayClubId);
-            if (home == null || away == null) return "Select both teams.";
-            if (home.ClubId == away.ClubId) return "Choose two different clubs.";
+            if (home == null || away == null) return GameText.Get("match.selectTeams");
+            if (home.ClubId == away.ClubId) return GameText.Get("match.differentClubs");
             if (!home.CanPlay) return home.Name + ": " + home.Error;
             if (!away.CanPlay) return away.Name + ": " + away.Error;
             return null;
@@ -113,17 +117,20 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             var catalog = source == null ? null : source.Session.ActiveCatalog;
             var state = source == null ? (FootballDatabaseLoadState?)null : source.State;
             var errors = source == null ? null : source.Errors;
+            var language = GameUserSettings.Current.Language;
+            var languageChanged = observedLanguage != language;
             if (!refreshRequested && ReferenceEquals(observedCatalog, catalog) &&
-                observedState == state && ReferenceEquals(observedErrors, errors)) return;
+                observedState == state && ReferenceEquals(observedErrors, errors) && !languageChanged) return;
             refreshRequested = false;
             observedCatalog = catalog;
             observedState = state;
             observedErrors = errors;
+            observedLanguage = language;
 
             if (source == null || state == FootballDatabaseLoadState.Failed)
             {
                 State = FriendlyMatchState.Failed;
-                sourceError = "Could not load the database. Check the database file and try again.";
+                sourceError = GameText.Get("session.databaseFailed");
             }
             else if (state == FootballDatabaseLoadState.Loading)
             {
@@ -133,7 +140,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             {
                 try
                 {
-                    if (adapter == null || !ReferenceEquals(adapter.Catalog, catalog))
+                    if (adapter == null || !ReferenceEquals(adapter.Catalog, catalog) || languageChanged)
                     {
                         var bindings = Resources.Load<LegacyMatchBindings>("FootballWorld/LegacyMatchBindings");
                         if (bindings == null) throw new InvalidOperationException("LegacyMatchBindings resource is missing.");
@@ -153,7 +160,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                 {
                     Debug.LogException(exception);
                     State = FriendlyMatchState.Failed;
-                    sourceError = "Could not prepare the teams. Check the visual configuration and try again.";
+                    sourceError = GameText.Get("session.visualsFailed");
                 }
             }
             Changed?.Invoke();
@@ -187,7 +194,21 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
                 Changed?.Invoke();
                 return;
             }
+            GameHubSession.Current.NotifyQuickMatchStarting();
+            await StartLease(lease, null);
+        }
+
+        public Task StartPreparedMatch(CatalogMatchLease lease, MatchCreateRequest.UserTeam side)
+        {
+            if (lease == null) throw new ArgumentNullException(nameof(lease));
+            if (isStarting || ActiveMatch != null) throw new InvalidOperationException("A match is already active.");
+            return StartLease(lease, side);
+        }
+
+        private async Task StartLease(CatalogMatchLease lease, MatchCreateRequest.UserTeam? side)
+        {
             ActiveMatch = lease;
+            LockedUserSide = side;
             isStarting = true;
             launchError = null;
             Changed?.Invoke();
@@ -212,19 +233,19 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
         public async Task ReportMatchFailure(Exception exception)
         {
             Debug.LogException(exception);
-            launchError = "Could not open the match. Please try again.";
+            launchError = GameText.Get("session.matchFailed");
             try
             {
                 if (MatchEngineLoader.Current != null) await MatchEngineLoader.Current.UnloadMatch();
-                else ReleaseActiveMatch();
+                else { GameHubSession.Current.NotifyMatchUnloaded(); ReleaseActiveMatch(); }
                 EventManager.Trigger(new CloseAllPanelsEvent());
-                EventManager.Trigger(new MainMenuEvent());
+                GameHubSession.Current.ReturnToMatchOrigin();
             }
             catch (Exception recoveryError)
             {
                 Debug.LogException(recoveryError);
                 State = FriendlyMatchState.Failed;
-                sourceError = "Could not return to team selection. Reload the game to recover.";
+                sourceError = GameText.Get("session.recoveryFailed");
             }
             Changed?.Invoke();
         }
@@ -235,6 +256,7 @@ namespace FStudio.FootballWorld.Infrastructure.LegacyMatch
             if (current == null) return;
             var lease = current.ActiveMatch;
             current.ActiveMatch = null;
+            current.LockedUserSide = null;
             lease?.Dispose();
             current.isStarting = false;
             current.refreshRequested = true;

@@ -16,6 +16,7 @@ using FStudio.Graphics.Cameras;
 using FStudio.UI.MatchThemes.MatchEvents;
 using FStudio.MatchEngine.Enums;
 using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 using System;
 
 namespace FStudio.MatchEngine {
@@ -176,6 +177,7 @@ namespace FStudio.MatchEngine {
 
                 // This also handles cancelling the preparation screen, before a
                 // MatchManager exists. Release consumers before their database lease.
+                GameHubSession.Current.NotifyMatchUnloaded();
                 if (MatchManager.Current != null) MatchManager.Current.ClearMatch();
                 UILoader.Current.MatchUILoader.Unload();
                 loader.Unload();
@@ -191,6 +193,7 @@ namespace FStudio.MatchEngine {
                 if (UILoader.Current.GeneralUILoader.CurrentInstantiated == null)
                     await UILoader.Current.GeneralUILoader.Load();
                 GameInput.SwitchToUI();
+                MatchPause.Resume();
             } finally {
                 engineLoadTask = null;
                 isLoaded = false;

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "databaseId": "db-2bc0ad3f537e4fadbd99aa1addb41feb",
-  "databaseRevision": 5,
+  "databaseRevision": 6,
   "clubs": [
     {
       "id": "club-8515fca92adc4d77a428fb272bb7d160",
@@ -3425,6 +3425,45 @@
         "beardColor": "brown",
         "bootsColor": "black",
         "sockAccessoryColor": "none"
+      }
+    }
+  ],
+  "competitions": [
+    {
+      "id": "competition-4df5b2e16c124a0ea112420d497e19a1",
+      "name": "Liga de demonstração"
+    }
+  ],
+  "competitionEditions": [
+    {
+      "id": "edition-2044bdb6bf76409f9cc1e2d15a42e937",
+      "competitionId": "competition-4df5b2e16c124a0ea112420d497e19a1",
+      "name": "Outubro 2026",
+      "participantClubIds": [
+        "club-8515fca92adc4d77a428fb272bb7d160",
+        "club-693114dde0d84c34ba6c73647f0b91ba",
+        "club-8143073533e7441db9b47a06e6e1503e",
+        "club-560982a07573454c9cc5ee551216e265"
+      ],
+      "roundDates": [
+        "2026-10-03",
+        "2026-10-10",
+        "2026-10-17"
+      ],
+      "rules": {
+        "type": "round-robin",
+        "version": 1,
+        "legs": 1,
+        "points": {
+          "win": 3,
+          "draw": 1,
+          "loss": 0
+        },
+        "tieBreakers": [
+          "wins",
+          "goal-difference",
+          "goals-for"
+        ]
       }
     }
   ]

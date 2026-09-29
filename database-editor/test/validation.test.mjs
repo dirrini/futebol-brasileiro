@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { appearance, fixture, isError, schemas, validate } from './helpers.mjs';
 
-test('validator accepts v1 and v2, including v2 profiles with omitted appearance', () => {
-  for (const version of [1, 2]) {
+test('validator accepts v1, v2 and v3, including v2 profiles with omitted appearance', () => {
+  for (const version of [1, 2, 3]) {
     const document = fixture(version);
     assert.equal(validate(document), document);
   }
@@ -23,7 +23,7 @@ test('validator does not coerce, insert defaults, remove fields or mutate its in
 });
 
 test('validator rejects unsupported versions and unknown root properties', () => {
-  for (const value of [null, [], {}, { schemaVersion: 3 }, { schemaVersion: '2' }])
+  for (const value of [null, [], {}, { schemaVersion: 4 }, { schemaVersion: '2' }])
     assert.throws(() => validate(value), isError(422, 'unsupported_schema_version'));
   const document = fixture();
   document.competitions = [];

@@ -7,6 +7,7 @@ using FStudio.MatchEngine.Enums;
 using TMPro;
 using FStudio.UI.Panels;
 using FStudio.FootballWorld.Infrastructure.LegacyMatch;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 using System;
 
 namespace FStudio.UI.MatchThemes {
@@ -36,7 +37,7 @@ namespace FStudio.UI.MatchThemes {
 
             Debug.Log("Upcoming match");
 
-            EventManager.Trigger(new LoadingEvent("PREPARING_MATCH"));
+            EventManager.Trigger(new LoadingEvent(GameText.Get("hub.busy")));
 
             await teams [0].SetTeam(
                 eventObject.details.homeTeam,
@@ -54,6 +55,11 @@ namespace FStudio.UI.MatchThemes {
             kits[1] = true; // set away teams kit to side kit.
 
             UpdateKits();
+
+            if (difficultyText != null) difficultyText.text = GameText.Get("difficulty." + GameUserSettings.Current.Difficulty);
+            foreach (var label in GetComponentsInChildren<LocalizedText>(true))
+                if (label.Key == "match.backTeams" || label.Key == "match.backChampionship")
+                    label.Key = FriendlyMatchSession.Current.LockedUserSide.HasValue ? "match.backChampionship" : "match.backTeams";
 
             Appear();
 
@@ -96,9 +102,9 @@ namespace FStudio.UI.MatchThemes {
             try {
             // update the details.
             var details = matchEvent.details;
-            details.aiLevel = MatchSettingsPanel.AILEVEL;
+            details.aiLevel = GameUserSettings.Current.Difficulty;
             details.dayTime = MatchSettingsPanel.DAYTIMES;
-            details.userTeam = MatchSettingsPanel.SIDE;
+            details.userTeam = session.LockedUserSide ?? MatchSettingsPanel.SIDE;
             matchEvent.details = details;
             //
 
@@ -126,7 +132,7 @@ namespace FStudio.UI.MatchThemes {
                 await MatchEngineLoader.Current.UnloadMatch();
                 if (session != null && session.ActiveMatch == null) {
                     EventManager.Trigger(new CloseAllPanelsEvent());
-                    EventManager.Trigger(new MainMenuEvent());
+                    GameHubSession.Current.ReturnToMatchOrigin();
                 }
             } catch (Exception exception) {
                 if (session != null && (session.ActiveMatch == null || ReferenceEquals(session.ActiveMatch, lease)))

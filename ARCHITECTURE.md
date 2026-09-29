@@ -1,9 +1,10 @@
 # Arquitetura do Futebol Brasileiro
 
-Estado: catálogo e presets integrados ao amistoso, 28/09/2026. Domain, Application,
-DTOs v1/v2, importador JSON, bootstrap e ponte com a partida 3D estão implementados.
-Há um editor local intermediário de clubes/jogadores e aparência padrão.
-Campeonato, editor completo e processamento de skins continuam planejados
+Estado: menu e campeonato demonstrativo, 29/09/2026. Domain, Application,
+DTOs v1/v2/v3, importador JSON, bootstrap e ponte com a partida 3D estão implementados.
+Há um editor local intermediário de clubes/jogadores e aparência padrão, uma liga
+com progresso local e a criação de perfil de carreira. Simulação do calendário da
+carreira, editor completo e processamento de skins continuam planejados
 conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão em
 [DATA-FORMAT.md](DATA-FORMAT.md); uso e testes em [README-DATABASE.md](README-DATABASE.md).
 
@@ -12,7 +13,8 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 - `Domain`: ClubDefinition, PlayerDefinition, PlayerAttributes, PlayerPosition,
   RosterMembership e DatabaseCatalog imutáveis, com invariantes próprias.
 - `Application`: CatalogSession ativa um catálogo completo; LineupPlanner escolhe
-  onze jogadores para uma formação. Não representa uma temporada em andamento.
+  onze jogadores para uma formação. CompetitionSession coordena confrontos,
+  tentativas, resultados, classificação e snapshots, sem Unity ou armazenamento.
 - `DataContracts`: DTOs de intercâmbio, incluindo referências visuais separadas e
   os sete IDs de preset em BuiltinAppearanceData, sem enums do motor Unity.
 - `Infrastructure/Importing`: JsonDatabaseImporter valida JSON e suas referências,
@@ -20,7 +22,7 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
 - `Bootstrap`: FootballDatabaseBootstrap lê a base externa com UnityWebRequest e
   só ativa resultados válidos. A sessão sobrevive às trocas de cena/UI.
 - `Editor`: FootballDatabaseBuildProcessor valida a base e a registra com um schema
-  que aceita v1/v2 como StreamingAssets adicionais, sem criar fontes fora de
+  que aceita v1/v2/v3 como StreamingAssets adicionais, sem criar fontes fora de
   FootballSimulator.
 - `Infrastructure/LegacyMatch`: CatalogMatchAdapter converte os onze escalados em
   objetos temporários do motor. FriendlyMatchSession conecta catálogo, seleção,
@@ -30,6 +32,11 @@ conforme [ROADMAP.md](ROADMAP.md). Contrato atual e extensões propostas estão 
   edição, formulários, prévia ilustrativa e publicação explícita da base.
 - `database-editor/server`: Node 22 com rotas HTTP, validação Ajv 8 dos schemas,
   verificação semântica e gravação do arquivo separadas em módulos.
+- `Infrastructure/GameModes`: GameHubSession conecta navegação, campeonato,
+  perfil de carreira, preferências, localização e armazenamento local. Os codecs
+  convertem snapshots para saves versionados, fora do domínio.
+- `Presentation`: GameHubView e componentes UGUI/TMP exibem consultas da fachada;
+  prefab, tema e avatares são recursos editáveis no Unity.
 
 O exemplo contém São Paulo FC, Milano, London e Catalagna, com 72 jogadores. A seleção
 aguarda o catálogo e apresenta seus clubes; o amistoso recebe nomes, medidas e
@@ -93,10 +100,10 @@ uma assembly criada por `.asmdef` não pode depender de classes em
 necessidade. [Referência Unity](https://docs.unity3d.com/2022.3/Documentation/Manual/ScriptCompilationAssemblyDefinitionFiles.html).
 
 Nesta integração incremental, MainMenuPanel/TeamSelectionTeam dependem da fachada
-Unity FriendlyMatchSession. Ela é uma fronteira de composição concreta, fora de
-Domain/Application. O restante da UI e do motor legado não foi repartido em novas
-assemblies. Os contratos de competição abaixo serão extraídos quando tiverem
-consumidores reais; não são APIs já implementadas pelo amistoso.
+Unity FriendlyMatchSession; GameHubView depende de GameHubSession. São fronteiras
+de composição concretas, fora de Domain/Application. As fachadas, Presentation e
+adaptadores legados permanecem em Assembly-CSharp; o restante da UI e do motor
+legado não foi repartido em novas assemblies.
 
 Não introduzir um servidor para coordenar a competição local, repositórios
 genéricos, um barramento global novo ou um framework de injeção apenas para
@@ -108,7 +115,7 @@ existentes ficam encapsulados pela ponte com o motor.
 | Informação | Proprietário | Tempo de vida |
 | --- | --- | --- |
 | Clubes, jogadores, vínculos iniciais, competições e regras | Base externa versionada | Revisão imutável importada |
-| Confrontos, resultados, mudanças de elenco e progresso | Sessão da temporada | Durante a sessão; save próprio em etapa futura |
+| Confrontos, resultados e progresso | Sessão da competição | Snapshot versionado salvo localmente; mudanças de elenco ainda futuras |
 | Escalação e IDs locais de jogadores na partida | Adaptador e motor de partida | Uma execução de confronto |
 | Retratos, escudos e skins | Catálogo visual e carregador de mídia | Recursos versionados, carregados conforme uso |
 
@@ -120,9 +127,12 @@ pertence à escalação.
 
 Uma temporada fixa a revisão da base e suas regras ao nascer. Atualizar o catálogo
 oferece conteúdo para novas temporadas. Aplicar alterações a uma temporada
-existente exigirá migração explícita. O futuro save guarda sua própria versão e
-um snapshot dos dados necessários à retomada, incluindo referências exatas dos
-recursos visuais; não depende de um catálogo remoto que pode mudar.
+existente exigirá migração explícita. O save local guarda sua própria versão,
+snapshot dos confrontos/resultados e o JSON da base ativada, incluindo os presets
+e referências de skins declarados nesse JSON. Escudos, uniformes, formação e
+aparências de fallback continuam vindo dos `LegacyMatchBindings` do build em uso;
+o save atual não fixa revisões desses assets compilados nem empacota meshes ou
+texturas. Alterá-los em outro build pode mudar a apresentação de um save antigo.
 
 ScriptableObjects continuam adequados à autoria de materiais, catálogos de
 recursos Unity, prefabs e parâmetros de apresentação. Não são o armazenamento
@@ -154,19 +164,20 @@ autoritativo do cadastro externo nem do progresso da temporada.
   perfil football-player-v1 é suportada. Outra skin em um titular bloqueia o
   clube com diagnóstico; reservas são verificadas quando escaladas.
 
-### Contratos da competição futura
+### Competição implementada
 
-Contratos iniciais, ainda a implementar:
-
-- `MatchRequest`: SeasonId, FixtureId, ExecutionId, clubes e escalações necessárias
-  à execução, representados por dados independentes do motor.
-- `MatchOptions`: lado controlado, dificuldade e opções de apresentação.
-- `IMatchRunner`: inicia uma execução e devolve `Completed(result)`, `Abandoned`
-  ou `Failed`. Unity3DMatchRunner implementa a execução atual; simulação rápida
-  será outra implementação posteriormente.
-- `MatchResult`: FixtureId, ExecutionId, IDs dos participantes e placar final,
-  copiados antes de descarregar o motor. Não contém GameObjects ou TeamEntry.
-- `CompleteFixture`: única operação de aplicação que aceita e registra resultado.
+- `CompetitionDefinition` e `CompetitionEditionDefinition` pertencem ao catálogo:
+  participantes, datas por rodada e `LeagueRules` versionadas vêm do JSON v3.
+- `RoundRobinScheduler` gera turno único ou ida/volta; clubes ímpares recebem folgas.
+- `CompetitionSession` mantém SeasonId, FixtureId e ExecutionId independentes do
+  motor. `BeginFixture`, `AbortFixture` e `CompleteFixture` coordenam a tentativa.
+- `FixtureResult` copia o placar e as identidades antes do descarregamento;
+  `StandingsCalculator` deriva a classificação. Empate esportivo completo mantém
+  a mesma posição, sem escolher campeão pelo identificador.
+- `DeterministicMatchSimulator` resolve os outros jogos da rodada. O clube
+  controlado joga no motor 3D; jogos simulados são identificados na interface.
+- `CompetitionSnapshot` guarda somente dados de progresso. O adaptador de save
+  combina esse snapshot com o JSON da revisão fixada e valida ambos ao restaurar.
 
 Só uma execução fica ativa por sessão. O confronto passa de pendente para em
 execução e concluído. Abandono ou falha de carregamento devolve-o a pendente sem
@@ -184,8 +195,8 @@ Limitações observadas do legado que orientam a implementação:
   temporária dos onze escalados, preservando o elenco completo no domínio.
 - `MatchCreateRequest` atribui IDs locais 0 a 21. Manter um mapeamento para
   PlayerId; não exportar esses índices como identidade permanente.
-- `FinalWhistleEvent` não contém placar, e o relógio é zerado antes do evento.
-  Capturar um resultado definitivo na origem, antes da limpeza.
+- O placar definitivo é capturado na origem do apito final, antes da limpeza.
+  Fechar estatísticas ou abandonar a partida não equivale a concluir um confronto.
 - `GoalCelebrationScene` atualiza o placar. Preservar esse comportamento durante
   a primeira integração; qualquer separação posterior exige testes de gols.
 
@@ -235,8 +246,9 @@ regras suportados. O domínio mantém suas próprias invariantes. Um pacote inv�
 não substitui a base ativa. Não executar scripts ou nomes de tipos recebidos em
 JSON. Regulamentos parametrizam comportamentos implementados no jogo.
 
-O editor atual oferece criar, editar, validar e exportar clubes/jogadores. A rota
-local ainda não importa pacotes gráficos, competições ou regulamentos. Hospedagem
+O editor atual oferece criar, editar, validar e exportar clubes/jogadores. Preserva
+e valida as competições/regulamentos v3, editáveis no JSON; seus formulários ainda
+não existem. A rota local ainda não importa pacotes gráficos. Hospedagem
 de catálogos públicos pode ser acrescentada como outra origem de conteúdo; a
 aplicação local não define autenticação ou publicação pública de uma galeria.
 

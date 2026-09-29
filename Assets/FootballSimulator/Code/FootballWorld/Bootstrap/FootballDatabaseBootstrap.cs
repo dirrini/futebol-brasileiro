@@ -30,6 +30,8 @@ namespace FStudio.FootballWorld.Bootstrap
             "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json";
         public const string SourceSchemaV2AssetPath =
             "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json";
+        public const string SourceSchemaV3AssetPath =
+            "Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json";
         public const string StreamingDatabasePath = "FootballWorld/database.json";
         public const string StreamingSchemaPath = "FootballWorld/database.schema.json";
 
@@ -49,6 +51,9 @@ namespace FStudio.FootballWorld.Bootstrap
         public IReadOnlyList<VisualProfileData> VisualProfiles { get; private set; } = NoVisualProfiles;
         public string SourceUri { get; private set; }
         public string ActiveSourceUri { get; private set; }
+        // Exact validated authored content, pinned by a local season save.
+        // Failed reloads preserve this snapshot along with the active catalog.
+        public string ActiveSourceJson { get; private set; }
 
         public static string DefaultSourceUri
         {
@@ -207,6 +212,7 @@ namespace FStudio.FootballWorld.Bootstrap
                 Session.Activate(result.Catalog);
                 VisualProfiles = result.VisualProfiles;
                 ActiveSourceUri = sourceUri;
+                ActiveSourceJson = json;
                 Errors = NoErrors;
                 State = FootballDatabaseLoadState.Ready;
 

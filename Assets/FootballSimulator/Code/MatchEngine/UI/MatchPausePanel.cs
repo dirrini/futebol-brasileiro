@@ -5,11 +5,11 @@ using FStudio.UI;
 using FStudio.UI.Events;
 using TMPro;
 using UnityEngine;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 
 namespace FStudio.MatchEngine.UI {
     internal class MatchPausePanel : EventPanel<MatchPauseEvent> {
         private const string SETTING_QUALITY = "SETTING_QUALITY";
-        private const string SETTING_CAMERA = "SETTING_CAMERA";
 
         private const int DEFAULT_QUALIY =
 #if UNITY_STANDALONE
@@ -19,7 +19,6 @@ namespace FStudio.MatchEngine.UI {
 #endif
 ;
 
-        private const int DEFAULT_CAMERA = 1;
 
 
         [SerializeField] private Selector qualitySelector;
@@ -41,11 +40,11 @@ namespace FStudio.MatchEngine.UI {
 
             matchCameraSelector.OnSelectionUpdate += async (val) => {
                 var cam = cameraTypes[val];
-                await CameraSystem.Current.SwitchCamera(cam);
+                GameUserSettings.Current.SetCamera(cam);
+                if (CameraSystem.Current != null) await CameraSystem.Current.SwitchCamera(cam);
 
-                cameraText.text = cam;
+                if (this != null) cameraText.text = GameText.Get("camera." + cam);
 
-                PlayerPrefs.SetInt(SETTING_CAMERA, val);
             };
 
             qualitySelector.OnSelectionUpdate += (val) => {
@@ -58,8 +57,8 @@ namespace FStudio.MatchEngine.UI {
                 Shader.SetGlobalFloat("_SHADER_LAYER_COUNT", 2 + val * 3 + val);
             };
 
-            var qSetting = PlayerPrefs.GetInt(SETTING_QUALITY, DEFAULT_QUALIY);
-            var cSetting = PlayerPrefs.GetInt(SETTING_CAMERA, DEFAULT_CAMERA);
+            var qSetting = Mathf.Clamp(PlayerPrefs.GetInt(SETTING_QUALITY, DEFAULT_QUALIY), 0, qNames.Length - 1);
+            var cSetting = System.Array.IndexOf(cameraTypes, GameUserSettings.Current.CameraId);
 
             qualitySelector.SetSelected(qSetting);
             matchCameraSelector.SetSelected(cSetting);
@@ -68,7 +67,7 @@ namespace FStudio.MatchEngine.UI {
         protected override void OnDisappearing() {
             base.OnDisappearing();
             GameInput.SwitchToMatchEngine();
-            MatchPause.Pause();
+            MatchPause.Resume();
         }
 
         protected override void OnEventCalled(MatchPauseEvent eventObject) {
@@ -90,7 +89,7 @@ namespace FStudio.MatchEngine.UI {
             }
 
             EventManager.Trigger(new CloseAllPanelsEvent());
-            EventManager.Trigger(new MainMenuEvent());
+            GameHubSession.Current.ReturnToMatchOrigin();
         }
     }
 }

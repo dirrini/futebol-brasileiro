@@ -1,9 +1,11 @@
 # Entregas incrementais
 
-Revisão: 28/09/2026. O catálogo de clubes/jogadores e os presets de aparência já
-alimentam o amistoso 3D. Um editor local intermediário está disponível em `/editor/`.
-As etapas podem ser revisadas com evidência da implementação. O campeonato,
-o editor completo e a importação de skins ainda não estão implementados. Consulte
+Revisão: 29/09/2026. O catálogo e os presets alimentam o amistoso e o campeonato
+demonstrativo. O menu oferece Quick match, Championship, Career e Options; Career
+cria um perfil, com simulação de calendário ainda pendente. Um editor local
+intermediário está disponível em `/editor/`. As etapas podem ser revisadas com
+evidência da implementação. O editor completo e a importação de skins continuam
+pendentes. Consulte
 [ARCHITECTURE.md](ARCHITECTURE.md), [DATA-FORMAT.md](DATA-FORMAT.md) e
 [README-DATABASE.md](README-DATABASE.md).
 
@@ -17,15 +19,15 @@ o editor completo e a importação de skins ainda não estão implementados. Con
 | A4 | Catálogo na seleção e no amistoso | Seleção por ClubId; escalação de onze sem truncar elenco; dados importados na partida; cancelamento e retorno com liberação dos clones |
 
 A1 está concluída. A2 está implementada no recorte JSON v1 de clubes, jogadores,
-vínculos e referências visuais, com extensão v2 de sete presets de aparência;
-schemas de competições, pacotes e skins ficam nas
-respectivas etapas futuras. A3 está implementada com Domain/Application isolados,
+vínculos e referências visuais, extensão v2 de sete presets de aparência e v3 de
+competições/edições round-robin. Pacotes e skins ficam nas respectivas etapas
+futuras. A3 está implementada com Domain/Application isolados,
 importador e bootstrap que carrega quatro clubes no player. A amostra atual tem
 72 jogadores, incluindo 39 do São Paulo FC; o JSON é editável por refresh no
 Compose, sem recompilar. Os visuais locais do São Paulo continuam compilados.
 Nenhum resultado ou temporada foi acrescentado ao catálogo. A4 está implementada
 com LineupPlanner, bindings visuais locais e uma sessão que fixa a revisão de cada
-amistoso. Não inclui captura de resultados ou FixtureId/ExecutionId de B4.
+amistoso. A integração de resultados identificados pertence a B4.
 Não criar assemblies vazias ou serviços fictícios somente para marcar uma etapa.
 
 O editor atual permite cadastrar/editar clubes e jogadores, transferir vínculos,
@@ -45,15 +47,17 @@ imagens/modelos. Esse recorte adianta parte de D1 sem concluir o marco do editor
 | B5 | Interface editável no Unity | Calendário -> partida -> retorno à classificação atualizada; sessão sobrevive à troca de telas |
 | B6 | Campeonato completo no navegador | Seis jogos concluídos; encerramento correto; verificados repetição, abandono e retorno |
 
-Para o protótipo, propor vitória/empate/derrota com 3/1/0 pontos e ordenar por
+O exemplo usa vitória/empate/derrota com 3/1/0 pontos e ordena por
 pontos, vitórias, saldo e gols marcados. Empate completo permanece empate
 esportivo; ClubId pode estabilizar a apresentação, sem inventar um campeão único.
-Registrar esses parâmetros na base de exemplo. Regulamentos oficiais são conteúdo
+Esses parâmetros estão na base de exemplo. Regulamentos oficiais são conteúdo
 posterior, com regras verificadas para a edição correspondente.
 
-Os seis jogos deste marco usam o motor 3D, controlando um lado ou assistindo à IA.
-Ao recarregar o navegador, o protótipo perde a temporada; a interface deve informar
-isso até a entrega de persistência. Simulação rápida pertence ao marco seguinte.
+O escopo escolhido para o menu antecipa C1–C3: o usuário assume um dos quatro
+clubes, joga seus três confrontos no motor 3D e os demais jogos são simulados.
+O progresso é salvo no navegador, incluindo a revisão da base. Há seis resultados
+ao concluir a liga. A implementação de B1–B5 e C1–C3 deve ser validada em conjunto;
+testes de regras não substituem o aceite B6 de um campeonato completo no player.
 
 ## C. Segundo marco: temporada persistente
 
@@ -86,8 +90,8 @@ Próximo passo recomendado nessa frente: adicionar uma prévia 3D real ao fluxo 
 edição e executar D2 com uma única skin de referência compatível. Isso deve
 confirmar rig, materiais, troca de uniforme e animações antes de construir o
 processamento e a interface de upload. Não substituir D2 por mais opções de
-presets. Em paralelo, B1 pode iniciar a temporada em memória, sem acoplar o core
-ao editor ou às imagens. D1 continua parcial até o cadastro das competições e
+presets. A competição permanece separada do editor e das imagens. D1 continua
+parcial até os formulários de cadastro das competições e
 regras suportadas.
 
 **O primeiro editor utilizável precisa concluir D1 a D6.** Um seletor de presets,
@@ -104,6 +108,18 @@ não prometer converter automaticamente qualquer personagem ou criar um modelo
 
 Uma galeria pública com contas e worker hospedado é uma etapa posterior. A rota
 local deve permitir importar, preparar e compartilhar pacotes como arquivos.
+
+## E. Carreira e conteúdo temporal
+
+O primeiro recorte cria e salva nome/avatar do treinador, clube e mês/ano inicial.
+Os avatares são retratos gráficos locais, sem criação de personagem 3D. A data é
+registrada como intenção de início; ainda não altera os elencos nem escolhe uma
+revisão histórica automaticamente.
+
+O próximo recorte precisa definir vigências de vínculos, equipes e regras, resolver
+o conteúdo válido na data escolhida, compor calendários de várias competições e
+permitir avançar o tempo. Datas sem cobertura devem ter diagnóstico explícito.
+Não copiar elencos atuais para épocas diferentes como se fossem dados históricos.
 
 ## Conclusão de cada entrega
 

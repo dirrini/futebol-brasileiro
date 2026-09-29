@@ -1,32 +1,35 @@
 # Contratos de base e mídia
 
-Estado: contratos JSON v1 e v2 de clubes/jogadores implementados em 28/09/2026.
-V2 acrescenta presets de aparência; o editor local cria e salva esse conteúdo.
-Pacotes ZIP, campeonatos, mídia carregável e skins completas nas seções seguintes
+Estado: contratos JSON v1, v2 e v3 em 29/09/2026. V2 acrescenta presets de
+aparência; v3 acrescenta campeonatos e edições com regulamento e datas de rodadas.
+Pacotes ZIP, mídia carregável e skins completas nas seções seguintes
 continuam sendo extensões planejadas. Consulte [README-DATABASE.md](README-DATABASE.md),
 [ROADMAP.md](ROADMAP.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Contratos executáveis atuais: JSON v1 e v2
+## Contratos executáveis atuais: JSON v1, v2 e v3
 
 Schema: [database-v1.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v1.schema.json).
 Extensão de aparência: [database-v2.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v2.schema.json).
+Extensão de competições: [database-v3.schema.json](Assets/FootballSimulator/Data/FootballWorld/Schemas/database-v3.schema.json).
 Exemplo: [four-clubs.database.json](Assets/FootballSimulator/Data/FootballWorld/Examples/four-clubs.database.json).
 
 O arquivo é JSON UTF-8 simples, não ZIP. Seu objeto raiz contém exatamente:
 
 | Campo obrigatório | Conteúdo |
 | --- | --- |
-| schemaVersion | Inteiro 1 ou 2 |
+| schemaVersion | Inteiro 1, 2 ou 3 |
 | databaseId | ID permanente da base |
 | databaseRevision | Inteiro de 1 a 2147483647 |
 | clubs | Um ou mais objetos com id e name |
 | players | Um ou mais jogadores com id, name, naturalPositions, heightCm, weightKg e attributes |
 | memberships | Zero ou mais vínculos clubId/playerId; um clube inicial por jogador |
-| visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional apenas em v2; no máximo um por jogador |
+| visualProfiles | Zero ou mais perfis com playerId e skin; appearance opcional em v2/v3; no máximo um por jogador |
+| competitions (apenas v3) | Até 128 campeonatos com id e name |
+| competitionEditions (apenas v3) | Até 128 edições com participantes, datas e regras suportadas |
 
 `skin` contém `skinId`, `revision` inteira positiva e `compatibilityProfile`.
 O importador valida a forma da referência e a existência de PlayerId. A ponte do
-amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`. Em v2,
+amistoso aceita `builtin-player`, revisão 1, perfil `football-player-v1`. Em v2/v3,
 uma `appearance` completa define os sete presets; se omitida, usa a aparência
 local associada ao PlayerId ou o default declarado com diagnóstico. Perfil
 ausente também mantém o comportamento legado. V1 continua válido e rejeita o
@@ -93,8 +96,8 @@ elencos vazios ou maiores que onze são válidos no catálogo. LineupPlanner ver
 se o clube pode fornecer um goleiro natural e dez jogadores de linha ao amistoso.
 
 Objetos não aceitam propriedades desconhecidas. Null, campos obrigatórios ausentes e conversões
-implícitas de strings para números são rejeitados. Regras, competições, caminhos
-de arquivo e recursos binários não podem ser acrescentados aos contratos atuais sem uma evolução
+implícitas de strings para números são rejeitados. Competições e regras exigem v3.
+Novos tipos de regra, caminhos de arquivo e recursos binários exigem outra evolução
 explícita de versão e importador; não são campos silenciosamente ignorados.
 
 O runtime impõe até 1 MiB UTF-8 e profundidade 32. JSON deve usar aspas duplas,
@@ -123,14 +126,54 @@ no Compose; novos recursos compilados ainda requerem build.
 O editor local salva JSON validado com controle de concorrência por ETag/If-Match,
 incremento de `databaseRevision` no servidor e substituição atômica do arquivo.
 Exportar um rascunho não muda a revisão publicada. A aplicação pode ler v1 e
-promove o rascunho para v2 ao definir uma aparência. Os schemas de autoria são
+promove v1 para v2 ao definir uma aparência; uma base v3 permanece v3 e conserva
+suas competições. Os schemas de autoria são
 separados; `StreamingAssets/FootballWorld/database.schema.json` e
-`/editor/api/schema` publicam as duas versões suportadas.
+`/editor/api/schema` publicam as três versões suportadas.
+
+### Campeonatos e edições v3
+
+O campeonato tem identidade própria (`id`, `name`); cada edição declara `id`,
+`competitionId`, `name`, `participantClubIds`, `roundDates` e `rules`.
+Os participantes são 2 a 64 ClubIds distintos e existentes. As datas são civis,
+sem fuso horário, no formato exato `AAAA-MM-DD`, com anos 0001 a 9999 e dias reais.
+Devem ser estritamente crescentes; início e fim são derivados da primeira e da
+última rodada. V1/v2 continuam aceitos, com listas de competições vazias.
+
+O regulamento implementado é:
+
+```json
+{
+  "type": "round-robin",
+  "version": 1,
+  "legs": 1,
+  "points": { "win": 3, "draw": 1, "loss": 0 },
+  "tieBreakers": ["wins", "goal-difference", "goals-for"]
+}
+```
+
+`legs` aceita 1 ou 2. Pontos são inteiros entre 0 e 100, com vitória maior que
+empate e empate maior ou igual à derrota. A ordem de desempate acima é fixa
+nesta versão; um empate esportivo completo conserva posição compartilhada.
+Para N participantes, são necessárias `(N par ? N−1 : N) × legs` datas. Clubes
+ímpares têm folgas. IDs de confrontos são gerados uma vez ao criar a sessão;
+confrontos, resultados e classificação pertencem ao progresso, não ao JSON autoral.
+
+A revisão 6 da amostra adiciona a Liga de demonstração, em 3, 10 e 17 de outubro
+de 2026: quatro clubes, três rodadas e seis jogos, turno único, 3/1/0 pontos.
+Esse calendário é demonstrativo e não representa um campeonato oficial.
+O editor web conserva e valida estes dados ao editar jogadores/clubes; a autoria
+de competições ainda é feita no JSON. Excluir um clube participante é bloqueado
+até remover sua participação explicitamente.
+
+O mês/ano da carreira é estado da carreira, separado das datas da base. Escolher
+outro período não fabrica elencos históricos: uma futura base desse período
+deverá fornecer os clubes, jogadores, regras e edições correspondentes.
 
 ## Extensões planejadas
 
 As seções abaixo orientam as próximas versões. Elas não descrevem campos extras
-aceitos pelos importadores v1/v2 nem funcionalidades já disponíveis.
+aceitos pelos importadores atuais nem funcionalidades já disponíveis.
 
 ## Versões e identidades
 
@@ -167,7 +210,8 @@ base.futdb
 `database.json` conterá coleções de clubes, jogadores, vínculos iniciais de elenco,
 competições, edições/participantes e regulamentos. Aparência e associação de mídia
 ficam em perfis visuais associados aos IDs, separados dos atributos esportivos.
-Listas de resultados e progresso pertencem ao futuro formato de save.
+Listas de resultados e progresso pertencem ao save versionado separado da base;
+veja [README-GAME-MODES.md](README-GAME-MODES.md).
 
 Regulamentos declaram um tipo suportado e seus parâmetros. O primeiro tipo é liga
 de turno único. JSON não contém código, expressões executáveis nem nomes de
@@ -264,7 +308,7 @@ Exemplo parcial de associação em um perfil visual:
 ```
 
 Os valores e campos desse exemplo são ilustrativos da extensão futura; não formam
-um objeto válido dos contratos v1/v2 atuais. O perfil visual não altera velocidade,
+um objeto válido dos contratos v1/v2/v3 atuais. O perfil visual não altera velocidade,
 força, IA, colisão ou regras.
 Referências abreviadas como `portraitAssetId` e `fallbackSkinId` são resolvidas
 pelo manifesto imutável da base para revisões e digests exatos. Isso também vale

@@ -8,19 +8,24 @@ namespace FStudio.FootballWorld.Domain
         private readonly Dictionary<string, ClubDefinition> clubsById;
         private readonly Dictionary<string, PlayerDefinition> playersById;
         private readonly Dictionary<string, IReadOnlyList<PlayerDefinition>> rostersByClubId;
+        private readonly Dictionary<string, CompetitionEditionDefinition> editionsById;
 
         public string DatabaseId { get; }
         public int DatabaseRevision { get; }
         public IReadOnlyList<ClubDefinition> Clubs { get; }
         public IReadOnlyList<PlayerDefinition> Players { get; }
         public IReadOnlyList<RosterMembership> Memberships { get; }
+        public IReadOnlyList<CompetitionDefinition> Competitions { get; }
+        public IReadOnlyList<CompetitionEditionDefinition> CompetitionEditions { get; }
 
         public DatabaseCatalog(
             string databaseId,
             int databaseRevision,
             IEnumerable<ClubDefinition> clubs,
             IEnumerable<PlayerDefinition> players,
-            IEnumerable<RosterMembership> memberships)
+            IEnumerable<RosterMembership> memberships,
+            IEnumerable<CompetitionDefinition> competitions = null,
+            IEnumerable<CompetitionEditionDefinition> competitionEditions = null)
         {
             DatabaseId = DomainValidation.Id(databaseId, nameof(databaseId));
             DatabaseRevision = DomainValidation.InRange(databaseRevision, 1, int.MaxValue, nameof(databaseRevision));
@@ -116,6 +121,36 @@ namespace FStudio.FootballWorld.Domain
             Clubs = clubSnapshot.AsReadOnly();
             Players = playerSnapshot.AsReadOnly();
             Memberships = membershipSnapshot.AsReadOnly();
+            var competitionSnapshot = new List<CompetitionDefinition>(competitions ?? Array.Empty<CompetitionDefinition>());
+            var editionSnapshot = new List<CompetitionEditionDefinition>(competitionEditions ?? Array.Empty<CompetitionEditionDefinition>());
+            DomainValidation.InRange(competitionSnapshot.Count, 0, 128, nameof(competitions));
+            DomainValidation.InRange(editionSnapshot.Count, 0, 128, nameof(competitionEditions));
+            var competitionIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var competition in competitionSnapshot)
+                if (competition == null || !competitionIds.Add(competition.Id))
+                    throw new ArgumentException("Competitions must be non-null with unique IDs.", nameof(competitions));
+            editionsById = new Dictionary<string, CompetitionEditionDefinition>(StringComparer.Ordinal);
+            foreach (var edition in editionSnapshot)
+            {
+                if (edition == null || editionsById.ContainsKey(edition.Id))
+                    throw new ArgumentException("Editions must be non-null with unique IDs.", nameof(competitionEditions));
+                if (!competitionIds.Contains(edition.CompetitionId))
+                    throw new ArgumentException("Edition references an unknown competition.", nameof(competitionEditions));
+                foreach (var clubId in edition.ParticipantClubIds)
+                    if (!clubsById.ContainsKey(clubId))
+                        throw new ArgumentException("Edition references an unknown club.", nameof(competitionEditions));
+                editionsById.Add(edition.Id, edition);
+            }
+            Competitions = competitionSnapshot.AsReadOnly();
+            CompetitionEditions = editionSnapshot.AsReadOnly();
+        }
+
+        public CompetitionEditionDefinition GetCompetitionEdition(string editionId)
+        {
+            DomainValidation.Id(editionId, nameof(editionId));
+            if (!editionsById.TryGetValue(editionId, out var edition))
+                throw new KeyNotFoundException($"Edition '{editionId}' does not exist in this catalog.");
+            return edition;
         }
 
         public ClubDefinition GetClub(string clubId)

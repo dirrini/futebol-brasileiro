@@ -646,7 +646,8 @@ namespace FStudio.MatchEngine {
 
                         EventManager.Trigger(new RefereeLastWhistleEvent());
 
-                        EventManager.Trigger(new FinalWhistleEvent(GameTeam1.Team.Team, GameTeam2.Team.Team));
+                        EventManager.Trigger(new FinalWhistleEvent(GameTeam1.Team.Team, GameTeam2.Team.Team,
+                            homeTeamScore, awayTeamScore));
 
                         // game over.
                         MatchFlags = MatchStatus.Special;

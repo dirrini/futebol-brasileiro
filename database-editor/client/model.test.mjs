@@ -100,3 +100,16 @@ test('source snapshot remains unchanged while draft edits and deletes', () => {
   assert.equal(original.memberships.length, 1);
   assert.equal(original.visualProfiles.length, 1);
 });
+
+test('adding appearance or a player to v3 preserves the schema and competition data', () => {
+  const document = empty();
+  document.schemaVersion = 3;
+  document.competitions = [{ id: 'competition-one', name: 'Liga' }];
+  document.competitionEditions = [{ id: 'edition-one', participantClubIds: ['club-one', 'club-two'] }];
+  const before = clone(document.competitionEditions);
+  const player = addPlayer(document, 'Novo atleta', 'club-one', options);
+  enableAppearance(document, player.id, options.defaultAppearance);
+  assert.equal(document.schemaVersion, 3);
+  assert.deepEqual(document.competitionEditions, before);
+  assert.equal(document.competitions[0].id, 'competition-one');
+});

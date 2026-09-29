@@ -8,6 +8,7 @@ using FStudio.Database;
 using FStudio.FootballWorld.DataContracts;
 using FStudio.FootballWorld.Domain;
 using FStudio.FootballWorld.Infrastructure.Importing;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 using FStudio.FootballWorld.Infrastructure.LegacyMatch;
 using NUnit.Framework;
 using UnityEditor;
@@ -190,7 +191,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             Assert.IsTrue(matchPlayers.All(player => player != null));
             Assert.AreEqual(22, lease.Players.Count);
             Assert.IsFalse(adapter.TryCreateMatch(lease.HomeClubId, lease.AwayClubId, out _, out var error));
-            StringAssert.Contains("released", error);
+            Assert.AreEqual(GameText.Get("adapter.released"), error);
             lease.Dispose();
             lease.Dispose();
             Assert.IsTrue(lease.IsDisposed);
@@ -207,7 +208,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             var clubId = adapter.Teams[0].ClubId;
             Assert.IsFalse(adapter.TryCreateMatch(clubId, clubId, out var lease, out var error));
             Assert.IsNull(lease);
-            StringAssert.Contains("different clubs", error);
+            Assert.AreEqual(GameText.Get("match.differentClubs"), error);
             Assert.IsFalse(adapter.TryCreateMatch(clubId, "missing-club", out lease, out error));
             Assert.IsNull(lease);
             Assert.IsNotEmpty(error);
@@ -225,7 +226,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             var invalid = adapter.Teams[0];
             Assert.IsFalse(invalid.CanPlay);
             Assert.IsTrue(invalid.Preview == null);
-            StringAssert.Contains("Unsupported visual", invalid.Error);
+            Assert.AreEqual(GameText.Get("adapter.unsupportedVisual", imported.Catalog.GetPlayer(playerId).Name), invalid.Error);
             StringAssert.Contains(imported.Catalog.GetPlayer(playerId).Name, invalid.Error);
             StringAssert.DoesNotContain(playerId, invalid.Error);
             Assert.IsTrue(adapter.Teams[1].CanPlay);
@@ -349,7 +350,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             var adapter = CreateAdapter(incomplete);
             Assert.IsFalse(adapter.Teams[0].CanPlay);
             Assert.IsTrue(adapter.Teams[0].Preview == null);
-            StringAssert.Contains("at least 11", adapter.Teams[0].Error);
+            Assert.AreEqual(GameText.Get("adapter.shortRoster", 10), adapter.Teams[0].Error);
             StringAssert.DoesNotContain(catalog.Clubs[0].Id, adapter.Teams[0].Error);
             Assert.IsTrue(adapter.Teams[1].CanPlay);
             Assert.AreEqual(10, incomplete.GetRoster(catalog.Clubs[0].Id).Count);
@@ -363,7 +364,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             var catalog = ReplacePlayers(imported.Catalog.Players.Select(player => player.Id == keeper.Id ? converted : player));
             var adapter = CreateAdapter(catalog);
             Assert.IsFalse(adapter.Teams[0].CanPlay);
-            StringAssert.Contains("goalkeeper", adapter.Teams[0].Error);
+            Assert.AreEqual(GameText.Get("adapter.goalkeeper"), adapter.Teams[0].Error);
         }
 
         [Test]
@@ -379,9 +380,9 @@ namespace FStudio.FootballWorld.Editor.Tests
             var adapter = CreateAdapter(expanded);
             var option = adapter.Teams.Single(item => item.ClubId == club.Id);
             Assert.IsTrue(option.CanPlay, option.Error);
-            StringAssert.Contains("default badge, kits and formation", option.Warning);
-            StringAssert.Contains("default appearance", option.Warning);
-            StringAssert.Contains("outside their natural positions", option.Warning);
+            StringAssert.Contains(GameText.Get("adapter.defaultClub"), option.Warning);
+            StringAssert.Contains(GameText.Get("adapter.defaultAppearance"), option.Warning);
+            StringAssert.Contains(GameText.Get("adapter.outOfPosition", string.Empty).TrimStart(), option.Warning);
             Assert.AreEqual(Formations._4_4_2, option.Preview.Formation);
             Assert.AreSame(bindings.DefaultVisualTemplate.HomeKit, option.Preview.HomeKit);
             Assert.AreEqual(club.Name, option.Preview.TeamName);
@@ -425,7 +426,7 @@ namespace FStudio.FootballWorld.Editor.Tests
             localBindings.DefaultPlayerAppearance = bindings.DefaultPlayerAppearance;
             var adapter = CreateAdapter(localBindings: localBindings);
             Assert.IsTrue(adapter.Teams.All(option => !option.CanPlay && option.Preview == null));
-            StringAssert.Contains("badge", adapter.Teams[0].Error);
+            Assert.AreEqual(GameText.Get("adapter.missingBadge"), adapter.Teams[0].Error);
         }
 
         private CatalogMatchAdapter CreateAdapter(DatabaseCatalog catalog = null,

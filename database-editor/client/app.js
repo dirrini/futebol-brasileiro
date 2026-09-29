@@ -196,6 +196,7 @@ function removeRecord() {
   const players = state.view === 'players';
   const members = !players && state.document.memberships.filter(member => member.clubId === record.id);
   if (members?.length) { state.feedback = { tone: 'warning', title: 'Este clube ainda tem jogadores', message: 'Transfira os jogadores para outro clube ou deixe-os sem clube antes de excluir o cadastro.' }; renderFeedback(); return; }
+  if (!players && state.document.competitionEditions?.some(edition => edition.participantClubIds.includes(record.id))) { state.feedback = { tone: 'warning', title: 'Este clube participa de um campeonato', message: 'Remova a participação na edição do campeonato antes de excluir o clube. Por enquanto, os campeonatos são editados no JSON da base.' }; renderFeedback(); return; }
   if (state.document[state.view].length === 1) { state.feedback = { tone: 'warning', title: 'Mantenha ao menos um cadastro', message: `A base precisa de pelo menos um ${players ? 'jogador' : 'clube'}.` }; renderFeedback(); return; }
   showDialog({ title: `Excluir ${record.name}?`, description: players ? 'O jogador, seu vínculo com o clube e sua aparência serão removidos do rascunho. A exclusão só será publicada ao salvar as alterações.' : 'O clube será removido do rascunho. A exclusão só será publicada ao salvar as alterações.', action: players ? 'Excluir jogador' : 'Excluir clube', danger: true, onAccept: () => {
     if (players) deletePlayer(state.document, record.id); else state.document.clubs = state.document.clubs.filter(club => club.id !== record.id);

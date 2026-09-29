@@ -29,7 +29,7 @@ export function enableAppearance(document, playerId, defaults) {
     document.visualProfiles.push(profile);
   }
   if (!profile.appearance) profile.appearance = clone(defaults);
-  document.schemaVersion = 2;
+  document.schemaVersion = Math.max(document.schemaVersion, 2);
   return profile.appearance;
 }
 

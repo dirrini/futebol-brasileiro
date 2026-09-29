@@ -5,6 +5,7 @@ using FStudio.Events;
 using FStudio.UI.Events;
 using FStudio.MatchEngine.Events;
 using System.Threading.Tasks;
+using FStudio.FootballWorld.Infrastructure.GameModes;
 
 namespace FStudio.MatchEngine.Cameras {
     [RequireComponent (typeof (Camera))]
@@ -39,6 +40,7 @@ namespace FStudio.MatchEngine.Cameras {
         public string CurrentCameraType { get; private set; }
 
         public Vector3? TargetPosition;
+        private int cameraGeneration;
 
         private void ActiveCameraChanged () {
             if (target == null) {
@@ -55,8 +57,11 @@ namespace FStudio.MatchEngine.Cameras {
         }
 
         public async Task SwitchCamera(string cameraType) {
+            var generation = ++cameraGeneration;
             Debug.Log($"[CameraSystem] Switch Camera: {cameraType}");
-            CurrentCamera = await matchCameras.FindAsync(cameraType);
+            var resolved = await matchCameras.FindAsync(cameraType);
+            if (this == null || generation != cameraGeneration) return;
+            CurrentCamera = resolved;
             CurrentCameraType = cameraType;
             isInTransition = false;
             instantTransitionInNextFrame = true; 
@@ -65,7 +70,7 @@ namespace FStudio.MatchEngine.Cameras {
         }
 
         private async void Start() {
-            await SwitchCamera("Stadium"); // default camera.
+            await SwitchCamera(GameUserSettings.Current.CameraId);
         }
 
         /// <summary>
